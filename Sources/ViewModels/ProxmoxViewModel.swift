@@ -8,6 +8,7 @@ class ProxmoxViewModel: ObservableObject {
     @Published var appState: ProxmoxServiceStatus = .stopped
     @Published var errorMessage: String?
     @Published var searchText: String = ""
+    @Published var isRefreshing: Bool = false
     
     enum ResourceFilter: String, CaseIterable {
         case all = "All"

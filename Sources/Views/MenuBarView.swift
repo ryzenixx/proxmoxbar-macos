@@ -5,16 +5,17 @@ struct MenuBarView: View {
     @ObservedObject var settings: SettingsService
     @ObservedObject var launchService: LaunchAtLoginService
     @ObservedObject var updaterController: UpdaterController
-    
+
     @Environment(\.colorScheme) var colorScheme
-    
+
     enum Screen {
         case dashboard
         case settings
     }
-    
+
     @State private var currentScreen: Screen = .dashboard
-    
+    @State private var isRefreshing: Bool = false
+
     private var statusColor: Color {
         switch viewModel.appState {
         case .running: return .green
@@ -23,7 +24,7 @@ struct MenuBarView: View {
         case .error: return .red
         }
     }
-    
+
     private var statusText: String {
         switch viewModel.appState {
         case .running: return "CONNECTED"
@@ -32,11 +33,11 @@ struct MenuBarView: View {
         case .error: return "ERROR"
         }
     }
-    
+
     private var headerIcon: NSImage {
         return NSImage(systemSymbolName: "server.rack", accessibilityDescription: nil) ?? NSImage()
     }
-    
+
     var body: some View {
         ZStack {
             if currentScreen == .dashboard {
@@ -70,10 +71,10 @@ struct MenuBarView: View {
             }
         }
     }
-    
+
     var dashboardContent: some View {
         VStack(spacing: 0) {
-            
+
             VStack(spacing: 12) {
                 HStack {
                     Image(nsImage: headerIcon)
@@ -82,7 +83,7 @@ struct MenuBarView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 22, height: 22)
                     .foregroundColor(.primary)
-                    
+
                     VStack(alignment: .leading, spacing: 2) {
                         Menu {
                             ForEach(settings.servers) { server in
@@ -107,7 +108,7 @@ struct MenuBarView: View {
                         }
                         .menuStyle(.borderlessButton)
                         .fixedSize()
-                        
+
                         HStack(spacing: 4) {
                             Circle()
                                 .fill(statusColor)
@@ -117,9 +118,30 @@ struct MenuBarView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
-                    
+
                     Spacer()
                     
+                    Button {
+                        isRefreshing = true
+                        Task {
+                            await viewModel.loadData()
+                            try? await Task.sleep(nanoseconds: 500_000_000)
+                            isRefreshing = false
+                        }
+                    } label: {
+                        if #available(macOS 15.0, *) {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.system(size: 14))
+                                .foregroundColor(.secondary)
+                                .symbolEffect(.rotate, options: .speed(10.0) ,isActive: isRefreshing)
+                        } else {
+                            Image(systemName: "arrow.clockwise")
+                                .font(.system(size: 14))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .buttonStyle(.borderless)
+
                     Menu {
                         Button {
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -128,9 +150,9 @@ struct MenuBarView: View {
                         } label: {
                             Label("Settings", systemImage: "gear")
                         }
-                        
+
                         Divider()
-                        
+
                         Button {
                             NSApplication.shared.terminate(nil)
                         } label: {
@@ -148,39 +170,21 @@ struct MenuBarView: View {
                 }
                 .padding(.horizontal)
                 .padding(.top, 16)
-                
-                if case .loading(let text) = viewModel.appState {
-                     HStack(spacing: 8) {
-                        ProgressView()
-                            .controlSize(.small)
-                        Text(text.capitalized)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(height: 30)
-                } else {
-                    HStack(spacing: 10) {
-                        ActionStatusButton(icon: "arrow.triangle.2.circlepath", label: "Refresh") {
-                            Task.detached { await viewModel.loadData() }
-                        }
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom, 12)
-                }
+                .padding(.bottom, 16)
             }
             .background(.thinMaterial)
-            
+
             Divider()
-            
+
             HStack(spacing: 8) {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.secondary)
-                    
+
                     TextField("Search resources...", text: $viewModel.searchText)
                         .textFieldStyle(.plain)
                         .font(.system(size: 13))
-                    
+
                     Menu {
                         ForEach(ProxmoxViewModel.ResourceFilter.allCases, id: \.self) { filter in
                             Button {
@@ -212,14 +216,14 @@ struct MenuBarView: View {
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
-            
+
             if viewModel.filteredVMs.isEmpty {
                 VStack {
                     if settings.servers.isEmpty {
                         Text("No server found")
                             .foregroundColor(.secondary)
                             .padding(.top, 40)
-                        
+
                         Button("Add a Server") {
                             withAnimation { currentScreen = .settings }
                         }
@@ -234,18 +238,18 @@ struct MenuBarView: View {
                                 return ("Error", fullError)
                             }
                         }()
-                        
+
                         VStack(spacing: 4) {
                             Image(systemName: "exclamationmark.triangle")
                                 .font(.system(size: 22))
                                 .foregroundColor(.red)
                                 .padding(.bottom, 4)
-                            
+
                             Text(title)
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(.secondary)
                                 .multilineTextAlignment(.center)
-                            
+
                             Text(description)
                                 .font(.system(size: 11))
                                 .foregroundColor(.secondary)
@@ -259,13 +263,13 @@ struct MenuBarView: View {
                         Text("No VMs found")
                             .foregroundColor(.secondary)
                         Spacer()
-                        
+
                         if viewModel.searchText.isEmpty {
                             HStack(alignment: .top, spacing: 10) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .foregroundColor(.orange)
                                     .font(.system(size: 14))
-                                
+
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("Missing Resources?")
                                         .font(.system(size: 12, weight: .bold))
@@ -302,7 +306,7 @@ struct MenuBarView: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 8)
                         .padding(.bottom, 4)
-                        
+
                         ForEach(viewModel.filteredVMs) { vm in
                             VMRow(vm: vm, viewModel: viewModel)
                             Divider()
@@ -319,9 +323,9 @@ struct ActionStatusButton: View {
     let icon: String
     let label: String
     let action: () -> Void
-    
+
     @State private var isHovered = false
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 6) {
@@ -348,20 +352,20 @@ struct VMRow: View {
     let vm: ProxmoxVM
     @ObservedObject var viewModel: ProxmoxViewModel
     @State private var isHovered = false
-    
+
     var body: some View {
         HStack(spacing: 12) {
             ZStack {
                 Circle()
                     .fill(vm.isRunning ? Color.green.opacity(0.1) : Color.gray.opacity(0.1))
                     .frame(width: 28, height: 28)
-                
+
                 Image(systemName: vm.type == "lxc" ? "cube.box" : "display")
                     .font(.system(size: 12))
                     .foregroundColor(vm.isRunning ? .green : .gray)
                     .frame(width: 14)
             }
-            
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(vm.name)
                     .font(.system(size: 13, weight: .medium))
@@ -373,7 +377,7 @@ struct VMRow: View {
                         .padding(.vertical, 1)
                         .background(Color.primary.opacity(0.05))
                         .cornerRadius(4)
-                    
+
                     Text(vm.status.uppercased())
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(vm.isRunning ? .green : .secondary)
@@ -381,18 +385,18 @@ struct VMRow: View {
                     if vm.isRunning {
                         let cpuVal = vm.cpu ?? 0
                         let memVal = (vm.maxmem ?? 0) > 0 ? Double(vm.mem ?? 0) / Double(vm.maxmem!) : 0
-                        
+
                         Text("•")
                             .font(.system(size: 10))
                             .foregroundColor(.secondary.opacity(0.5))
-                        
+
                         Image(systemName: "cpu")
                             .font(.system(size: 10))
                             .foregroundColor(getUsageColor(cpuVal))
                         Text(vm.cpuUsage)
                             .font(.system(size: 11, weight: .medium, design: .monospaced))
                             .foregroundColor(getUsageColor(cpuVal))
-                        
+
                         Image(systemName: "memorychip")
                             .font(.system(size: 10))
                             .foregroundColor(getUsageColor(memVal))
@@ -400,10 +404,10 @@ struct VMRow: View {
                         Text(vm.memUsage)
                             .font(.system(size: 11, weight: .medium, design: .monospaced))
                             .foregroundColor(getUsageColor(memVal))
-                        
+
                         if vm.type != "qemu", let maxdisk = vm.maxdisk, maxdisk > 0 {
                             let diskVal = Double(vm.disk ?? 0) / Double(maxdisk)
-                            
+
                             Image(systemName: "internaldrive")
                                 .font(.system(size: 10))
                                 .foregroundColor(getUsageColor(diskVal))
@@ -415,9 +419,9 @@ struct VMRow: View {
                     }
                 }
             }
-            
+
             Spacer()
-            
+
             Button {
                 Task {
                     await viewModel.toggleVMState(vm)
@@ -439,7 +443,7 @@ struct VMRow: View {
         .contentShape(Rectangle())
         .onHover { isHovered = $0 }
     }
-    
+
     private func getUsageColor(_ value: Double) -> Color {
         if value >= 0.95 {
             return .red
