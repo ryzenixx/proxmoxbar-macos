@@ -2,6 +2,5 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>ProxmoxBar</title>
-        <!-- Items will be automatically added here by the generate_appcast.sh script -->
     </channel>
 </rss>
