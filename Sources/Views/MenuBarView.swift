@@ -387,9 +387,15 @@ struct VMRow: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(vm.name)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.primary)
+                HStack(spacing: 4) {
+                    Text(vm.name)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(.primary)
+                    
+                    Text("(\(vm.node))")
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                }
                 HStack(spacing: 4) {
                     Text("\(vm.vmid)")
                         .font(.system(size: 10, design: .monospaced))
