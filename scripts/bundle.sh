@@ -34,6 +34,12 @@ else
     echo "⚠️  Warning: AppIcon.icns not found in Sources/Assets/"
 fi
 
+if [ -f "Sources/Assets/MenuBarIcon.png" ]; then
+    cp "Sources/Assets/MenuBarIcon.png" "$RESOURCES_PATH/"
+else
+    echo "⚠️  Warning: MenuBarIcon.png not found in Sources/Assets/"
+fi
+
 # Install Sparkle Framework
 find .build -name "Sparkle.framework" -exec cp -R {} "$FRAMEWORKS_PATH/" \;
 if [ ! -d "$FRAMEWORKS_PATH/Sparkle.framework" ]; then
