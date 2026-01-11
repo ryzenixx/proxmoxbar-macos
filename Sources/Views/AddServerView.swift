@@ -50,6 +50,30 @@ struct AddServerView: View {
             
             Divider()
             
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(.orange)
+                    .font(.system(size: 14))
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Important Configuration")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(.primary)
+                    Text("Uncheck 'Privilege Separation' when generating the API Token, otherwise connection will fail.")
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer()
+            }
+            .padding(10)
+            .background(Color.orange.opacity(0.1))
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+            )
+            
             VStack(alignment: .leading, spacing: 4) {
                 Text("Token ID")
                     .font(.caption)
