@@ -324,10 +324,12 @@ struct MenuBarView: View {
                         .padding(.top, 8)
                         .padding(.bottom, 4)
 
-                        ForEach(viewModel.filteredVMs) { vm in
+                        ForEach(Array(viewModel.filteredVMs.enumerated()), id: \.element.id) { index, vm in
                             VMRow(vm: vm, viewModel: viewModel)
-                            Divider()
-                                .padding(.leading, 40)
+                            if index < viewModel.filteredVMs.count - 1 {
+                                Divider()
+                                    .padding(.leading, 40)
+                            }
                         }
                     }
                 }
