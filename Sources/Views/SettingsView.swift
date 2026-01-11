@@ -37,34 +37,6 @@ struct SettingsView: View {
                 VStack(spacing: 20) {
                     
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("GENERAL")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.secondary)
-                            .padding(.horizontal, 4)
-                        
-                        VStack(spacing: 0) {
-                            HStack {
-                                Image(systemName: "arrow.up.circle")
-                                    .foregroundColor(.blue)
-                                    .font(.system(size: 16))
-                                Text("Launch at Login")
-                                    .font(.system(size: 13))
-                                Spacer()
-                                Toggle("", isOn: Binding(
-                                    get: { launchService.isEnabled },
-                                    set: { _ in launchService.toggle() }
-                                ))
-                                .labelsHidden()
-                                .toggleStyle(.switch)
-                            }
-                            .padding(12)
-                            .background(Color.primary.opacity(0.03))
-                            .cornerRadius(8)
-                        }
-                    }
-
-                    VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Text("SERVERS")
                                 .font(.caption)
@@ -112,6 +84,34 @@ struct SettingsView: View {
                                     .cornerRadius(8)
                                 }
                             }
+                        }
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("GENERAL")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.secondary)
+                            .padding(.horizontal, 4)
+                        
+                        VStack(spacing: 0) {
+                            HStack {
+                                Image(systemName: "arrow.up.circle")
+                                    .foregroundColor(.blue)
+                                    .font(.system(size: 16))
+                                Text("Launch at Login")
+                                    .font(.system(size: 13))
+                                Spacer()
+                                Toggle("", isOn: Binding(
+                                    get: { launchService.isEnabled },
+                                    set: { _ in launchService.toggle() }
+                                ))
+                                .labelsHidden()
+                                .toggleStyle(.switch)
+                            }
+                            .padding(12)
+                            .background(Color.primary.opacity(0.03))
+                            .cornerRadius(8)
                         }
                     }
                     
