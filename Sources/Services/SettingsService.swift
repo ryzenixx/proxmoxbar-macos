@@ -21,7 +21,6 @@ class SettingsService: ObservableObject {
     init() {
         self.servers = []
         loadServers()
-        migrateLegacySettings()
     }
     
     private func loadServers() {
@@ -34,28 +33,6 @@ class SettingsService: ObservableObject {
     private func saveServers() {
         if let encoded = try? JSONEncoder().encode(servers) {
             UserDefaults.standard.set(encoded, forKey: "proxmox_servers")
-        }
-    }
-    
-    private func migrateLegacySettings() {
-        if servers.isEmpty {
-            let legacyUrl = UserDefaults.standard.string(forKey: "proxmox_url")
-            let legacyToken = UserDefaults.standard.string(forKey: "proxmox_token_id")
-            let legacySecret = UserDefaults.standard.string(forKey: "proxmox_secret")
-            
-            if let url = legacyUrl, !url.isEmpty,
-               let token = legacyToken, !token.isEmpty,
-               let secret = legacySecret, !secret.isEmpty {
-                
-                let legacyServer = ProxmoxServerConfig(
-                    name: "Default Server",
-                    url: url,
-                    tokenId: token,
-                    secret: secret
-                )
-                
-                self.servers.append(legacyServer)
-            }
         }
     }
     
