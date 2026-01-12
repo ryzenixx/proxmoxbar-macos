@@ -3,14 +3,30 @@
     <channel>
         <title>ProxmoxBar</title>
         <item>
-            <title>1.0.7</title>
-            <pubDate>Mon, 12 Jan 2026 19:22:15 +0000</pubDate>
-            <sparkle:version>1.0.7</sparkle:version>
-            <sparkle:shortVersionString>1.0.7</sparkle:shortVersionString>
+            <title>1.0.8</title>
+            <pubDate>Mon, 12 Jan 2026 22:29:43 +0000</pubDate>
+            <sparkle:version>1.0.8</sparkle:version>
+            <sparkle:shortVersionString>1.0.8</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.7/ProxmoxBar.dmg" length="1305068" type="application/octet-stream" sparkle:edSignature="Kb21ULHuxp7D72NE6mElt7QGYakKvsQrrHreB4s/Xg0NPAhgLhnLUTwMko//os+mUYR5S7lFItITRq8ZVlgfBg=="/>
-        <description><![CDATA[<h1 id="release-1.0.7">Release 1.0.7</h1>
+            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.8/ProxmoxBar.dmg" length="1320169" type="application/octet-stream" sparkle:edSignature="uBNhd4GzPOF3c62Bm1zU3+k0ochtfBs5g9ZW/onw4wx6uGfPA/u3rbNF0e2BXH4dsr0XFEcRAjRjmKcdY3a4DQ=="/>
+        <description><![CDATA[<h1 id="release-1.0.8">Release 1.0.8</h1>
 <h3 id="features">Features</h3>
+<ul>
+<li><strong>Notifications (Beta)</strong>: Stay informed about your
+resources with native macOS notifications.
+<ul>
+<li><strong>State Monitoring</strong>: Get alerted immediately when a VM
+or LXC container starts or stops.</li>
+<li><strong>Safety First</strong>: This feature is currently in Beta and
+disabled by default. It includes a dedicated warning when enabling to
+ensure you are aware of the background monitoring involved.</li>
+<li><strong>Visual Feedback</strong>: A new settings toggle with a clear
+Beta badge helps distinguish this experimental feature.</li>
+</ul></li>
+</ul>
+<hr />
+<h1 id="release-1.0.7">Release 1.0.7</h1>
+<h3 id="features-1">Features</h3>
 <ul>
 <li><strong>Resource Sorting</strong>: Added a new sort menu to organize
 your VMs and LXCs.
@@ -26,7 +42,7 @@ automatically.</li>
 </ul>
 <hr />
 <h1 id="release-1.0.6">Release 1.0.6</h1>
-<h3 id="features-1">Features</h3>
+<h3 id="features-2">Features</h3>
 <ul>
 <li><strong>Server Management</strong>:
 <ul>
