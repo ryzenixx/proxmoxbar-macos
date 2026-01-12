@@ -1,3 +1,12 @@
+# Release 1.0.5
+
+### Fixed
+- **Dark Mode Detection**: Improved logic to robustly detect Dark Mode on all system configurations.
+  - Previously, the app could incorrectly fallback to "Light Mode" colors (darker/forest tones) even when Dark Mode was active.
+  - Now uses `NSAppearance.bestMatch` for 100% reliable detection, restoring the vibrant "neon" colors for Dark Mode users.
+
+---
+
 # Release 1.0.4
 
 ### Fixed
