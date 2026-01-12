@@ -145,6 +145,11 @@ class ProxmoxViewModel: ObservableObject {
             await MainActor.run {
                 self.appState = .error(error.localizedDescription)
                 self.errorMessage = error.localizedDescription
+                
+                // Clear data to prevent displaying stale information from previous server
+                self.vms = []
+                self.nodes = []
+                self.storages = []
             }
         }
     }
