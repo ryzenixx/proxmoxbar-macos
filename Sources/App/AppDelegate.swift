@@ -7,6 +7,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var appState: ProxmoxAppState!
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Initialize NotificationManager to ensure delegate is set
+        #if !DEBUG
+        _ = NotificationManager.shared
+        #endif
+        
         appState = ProxmoxAppState()
         
         popover = NSPopover()
