@@ -26,8 +26,13 @@ class SettingsService: ObservableObject {
         didSet { saveServers() }
     }
     
+    @Published var enableNotifications: Bool {
+        didSet { UserDefaults.standard.set(enableNotifications, forKey: "enableNotifications") }
+    }
+    
     init() {
         self.servers = []
+        self.enableNotifications = UserDefaults.standard.bool(forKey: "enableNotifications")
         loadServers()
     }
     

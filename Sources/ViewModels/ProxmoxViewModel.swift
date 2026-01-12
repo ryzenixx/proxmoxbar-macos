@@ -176,6 +176,12 @@ class ProxmoxViewModel: ObservableObject {
             
             await MainActor.run {
                 self.appState = status
+                
+                // Check for notifications
+                if self.settings.enableNotifications {
+                    self.checkForStateChanges(old: self.vms, new: taggedVMs)
+                }
+                
                 self.vms = taggedVMs
                 self.nodes = nodes
                 self.storages = storages
@@ -254,6 +260,22 @@ class ProxmoxViewModel: ObservableObject {
         
         if let url = components?.url {
             NSWorkspace.shared.open(url)
+        }
+    }
+    
+    private func checkForStateChanges(old: [ProxmoxVM], new: [ProxmoxVM]) {
+        for vm in new {
+            guard let oldVM = old.first(where: { $0.id == vm.id }) else { continue }
+            
+            if oldVM.status != vm.status {
+                let action = vm.isRunning ? "started" : "stopped"
+                let icon = vm.isRunning ? "🟢" : "🔴"
+                
+                NotificationManager.shared.sendNotification(
+                    title: "Resource Update",
+                    body: "\(icon) \(vm.name) has \(action)."
+                )
+            }
         }
     }
 }

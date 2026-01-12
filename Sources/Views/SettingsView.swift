@@ -8,6 +8,7 @@ struct SettingsView: View {
     
     @State private var activeSheet: SettingsSheet?
     @State private var serverToDelete: ProxmoxServerConfig?
+    @State private var showBetaAlert = false
     
     // For Drag and Drop
     @State private var draggedItem: ProxmoxServerConfig?
@@ -112,7 +113,7 @@ struct SettingsView: View {
                             .foregroundColor(.secondary)
                             .padding(.horizontal, 4)
                         
-                        VStack(spacing: 0) {
+                        VStack(spacing: 12) {
                             HStack {
                                 Image(systemName: "arrow.up.circle")
                                     .foregroundColor(.blue)
@@ -126,6 +127,66 @@ struct SettingsView: View {
                                 ))
                                 .labelsHidden()
                                 .toggleStyle(.switch)
+                            }
+                            .padding(12)
+                            .background(Color.primary.opacity(0.03))
+                            .cornerRadius(8)
+                            
+                            HStack {
+                                Image(systemName: "bell.badge")
+                                    .foregroundColor(.orange)
+                                    .font(.system(size: 16))
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    HStack(spacing: 6) {
+                                        Text("Enable Notifications")
+                                            .font(.system(size: 13))
+                                        
+                                        HStack(spacing: 2) {
+                                            Image(systemName: "exclamationmark.triangle.fill")
+                                                .font(.system(size: 8))
+                                            Text("BETA")
+                                                .font(.system(size: 8, weight: .bold))
+                                        }
+                                        .foregroundColor(.orange)
+                                        .padding(.horizontal, 4)
+                                        .padding(.vertical, 2)
+                                        .background(Color.orange.opacity(0.1))
+                                        .cornerRadius(4)
+                                    }
+                                    
+                                    #if DEBUG
+                                    Text("Notifications disabled in development build")
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.secondary)
+                                    #endif
+                                }
+                                
+                                Spacer()
+                                
+                                Toggle("", isOn: Binding(
+                                    get: {
+                                        #if DEBUG
+                                        return false
+                                        #else
+                                        return settings.enableNotifications
+                                        #endif
+                                    },
+                                    set: { newValue in
+                                        #if !DEBUG
+                                        if newValue {
+                                            showBetaAlert = true
+                                        } else {
+                                            settings.enableNotifications = false
+                                        }
+                                        #endif
+                                    }
+                                ))
+                                .labelsHidden()
+                                .toggleStyle(.switch)
+                                #if DEBUG
+                                .disabled(true)
+                                #endif
                             }
                             .padding(12)
                             .background(Color.primary.opacity(0.03))
@@ -237,6 +298,19 @@ struct SettingsView: View {
                 message: Text("Are you sure you want to remove '\(server.name)'?"),
                 primaryButton: .destructive(Text("Delete")) {
                     settings.removeServer(id: server.id)
+                },
+                secondaryButton: .cancel()
+            )
+        }
+        .alert(isPresented: $showBetaAlert) {
+            Alert(
+                title: Text("Enable Beta Notifications?"),
+                message: Text("This feature is currently in BETA. Enabling notifications involves background monitoring which may be unstable or inaccurate.\n\nUse at your own risk."),
+                primaryButton: .destructive(Text("Enable")) {
+                    settings.enableNotifications = true
+                    Task {
+                        _ = await NotificationManager.shared.requestPermission()
+                    }
                 },
                 secondaryButton: .cancel()
             )
