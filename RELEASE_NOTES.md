@@ -1,3 +1,20 @@
+# Release 1.0.6
+
+### Features
+- **Server Management**:
+  - **Edit Servers**: Added ability to edit existing server configurations (Host, Token, Secret) without deleting/recreating them.
+  - **Reordering**: Implemented Drag & Drop to reorder your list of servers.
+  - **Refined UI**: Preserved the custom "Card" design while adding native management features.
+
+### Improvements
+- **Settings UI**: Polished the Settings view by hiding scroll indicators and optimizing layout.
+- **Form Behavior**: Fixed a flickering issue when opening the server editor; the form now loads instantly.
+
+### Fixed
+- **Stale Data**: Fixed a bug where data from the previous server would remain visible if the connection to the new server failed. The list is now properly cleared on error.
+
+---
+
 # Release 1.0.5
 
 ### Fixed
