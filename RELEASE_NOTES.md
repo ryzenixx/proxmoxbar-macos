@@ -1,3 +1,13 @@
+# Release 1.0.8
+
+### Features
+- **Notifications (Beta)**: Stay informed about your resources with native macOS notifications.
+  - **State Monitoring**: Get alerted immediately when a VM or LXC container starts or stops.
+  - **Safety First**: This feature is currently in Beta and disabled by default. It includes a dedicated warning when enabling to ensure you are aware of the background monitoring involved.
+  - **Visual Feedback**: A new settings toggle with a clear Beta badge helps distinguish this experimental feature.
+
+---
+
 # Release 1.0.7
 
 ### Features
