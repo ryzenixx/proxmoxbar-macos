@@ -6,10 +6,10 @@ struct SettingsView: View {
     @ObservedObject var updaterController: UpdaterController
     var onBack: () -> Void
     
-    @State private var showServerForm = false
-    @State private var editingServer: ProxmoxServerConfig? = nil
+    @State private var activeSheet: SettingsSheet?
     @State private var serverToDelete: ProxmoxServerConfig?
     
+    // For Drag and Drop
     @State private var draggedItem: ProxmoxServerConfig?
     
     var body: some View {
@@ -37,7 +37,7 @@ struct SettingsView: View {
             
             Divider()
             
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
                     
                     VStack(alignment: .leading, spacing: 12) {
@@ -48,8 +48,7 @@ struct SettingsView: View {
                                 .foregroundColor(.secondary)
                             Spacer()
                             Button {
-                                editingServer = nil
-                                showServerForm = true
+                                activeSheet = .add
                             } label: {
                                 Image(systemName: "plus")
                                     .font(.system(size: 12, weight: .bold))
@@ -77,8 +76,7 @@ struct SettingsView: View {
                                         Spacer()
                                         
                                         Button {
-                                            editingServer = server
-                                            showServerForm = true
+                                            activeSheet = .edit(server)
                                         } label: {
                                             Image(systemName: "pencil")
                                                 .foregroundColor(.secondary)
@@ -225,8 +223,13 @@ struct SettingsView: View {
             .padding(.bottom, 16)
         }
         .background(CursorFixView())
-        .sheet(isPresented: $showServerForm) {
-            ServerFormView(settings: settings, existingServer: editingServer)
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .add:
+                ServerFormView(settings: settings, existingServer: nil)
+            case .edit(let server):
+                ServerFormView(settings: settings, existingServer: server)
+            }
         }
         .alert(item: $serverToDelete) { server in
             Alert(
@@ -265,6 +268,18 @@ struct DropViewDelegate: DropDelegate {
             withAnimation {
                 servers.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
             }
+        }
+    }
+}
+
+enum SettingsSheet: Identifiable {
+    case add
+    case edit(ProxmoxServerConfig)
+    
+    var id: String {
+        switch self {
+        case .add: return "add"
+        case .edit(let server): return server.id.uuidString
         }
     }
 }
