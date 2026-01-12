@@ -524,19 +524,19 @@ struct VMRow: View {
 extension Color {
     static var adaptiveGreen: Color {
         Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
-            appearance.name == .darkAqua ? NSColor.green : NSColor(displayP3Red: 0, green: 0.6, blue: 0, alpha: 1)
+            return appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? NSColor.green : NSColor(displayP3Red: 0, green: 0.6, blue: 0, alpha: 1)
         }))
     }
     
     static var adaptiveRed: Color {
         Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
-            appearance.name == .darkAqua ? NSColor.red : NSColor(displayP3Red: 0.8, green: 0, blue: 0, alpha: 1)
+            return appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? NSColor.red : NSColor(displayP3Red: 0.8, green: 0, blue: 0, alpha: 1)
         }))
     }
     
     static var adaptiveOrange: Color {
         Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
-            appearance.name == .darkAqua ? NSColor.orange : NSColor(displayP3Red: 0.8, green: 0.4, blue: 0, alpha: 1)
+            return appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? NSColor.orange : NSColor(displayP3Red: 0.8, green: 0.4, blue: 0, alpha: 1)
         }))
     }
 }
