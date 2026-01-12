@@ -1,4 +1,3 @@
-
 <div align="center">
 
   <img src=".github/assets/proxmoxbar.png" alt="ProxmoxBar" width="300">
