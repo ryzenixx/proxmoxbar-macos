@@ -11,6 +11,14 @@ struct ProxmoxServerConfig: Identifiable, Codable, Hashable {
     var authHeader: String {
         return "PVEAPIToken=\(tokenId)=\(secret)"
     }
+    
+    var baseWebURL: URL? {
+        guard let url = URL(string: self.url) else { return nil }
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        components?.path = ""
+        components?.query = nil
+        return components?.url
+    }
 }
 
 class SettingsService: ObservableObject {

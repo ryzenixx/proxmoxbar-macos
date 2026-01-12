@@ -198,4 +198,18 @@ class ProxmoxViewModel: ObservableObject {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
         }
     }
+    
+    func openVMInBrowser(_ vm: ProxmoxVM) {
+        guard let serverId = vm.serverId,
+              let server = settings.servers.first(where: { $0.id == serverId }),
+              let baseURL = server.baseWebURL else { return }
+        
+        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
+        let type = vm.type // "qemu" or "lxc"
+        components?.percentEncodedFragment = "v1:0:=\(type)%2F\(vm.vmid)"
+        
+        if let url = components?.url {
+            NSWorkspace.shared.open(url)
+        }
+    }
 }

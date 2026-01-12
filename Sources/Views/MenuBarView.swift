@@ -508,6 +508,10 @@ struct VMRow: View {
         .background(isHovered ? Color.primary.opacity(0.05) : Color.clear)
         .contentShape(Rectangle())
         .onHover { isHovered = $0 }
+        .onTapGesture {
+            viewModel.openVMInBrowser(vm)
+        }
+        .help("Open in Web Browser")
     }
 
     private func getUsageColor(_ value: Double) -> Color {
