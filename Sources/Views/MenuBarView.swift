@@ -70,6 +70,7 @@ struct MenuBarView: View {
             }
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.8), value: currentScreen)
+        .background(Color(nsColor: .windowBackgroundColor).opacity(0.4))
         .background(WindowAccessor { window in
             guard let window = window else { return }
             if window.styleMask.contains(.resizable) {
@@ -293,7 +294,7 @@ struct MenuBarView: View {
                         if viewModel.searchText.isEmpty {
                             HStack(alignment: .top, spacing: 10) {
                                 Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundColor(.orange)
+                                    .foregroundColor(.adaptiveOrange)
                                     .font(.system(size: 14))
 
                                 VStack(alignment: .leading, spacing: 2) {
@@ -308,11 +309,11 @@ struct MenuBarView: View {
                                 Spacer()
                             }
                             .padding(10)
-                            .background(Color.orange.opacity(0.1))
+                            .background(Color.adaptiveOrange.opacity(0.1))
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+                                    .stroke(Color.adaptiveOrange.opacity(0.3), lineWidth: 1)
                             )
                             .padding(.horizontal)
                             .padding(.bottom, 20)
@@ -385,12 +386,12 @@ struct VMRow: View {
         HStack(spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(vm.isRunning ? Color.green.opacity(0.1) : Color.gray.opacity(0.1))
+                    .fill(vm.isRunning ? Color.adaptiveGreen.opacity(0.1) : Color.gray.opacity(0.1))
                     .frame(width: 28, height: 28)
 
                 Image(systemName: vm.type == "lxc" ? "cube.box" : "display")
                     .font(.system(size: 12))
-                    .foregroundColor(vm.isRunning ? .green : .gray)
+                    .foregroundColor(vm.isRunning ? .adaptiveGreen : .gray)
                     .frame(width: 14)
             }
 
@@ -414,7 +415,7 @@ struct VMRow: View {
 
                     Text(vm.status.uppercased())
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(vm.isRunning ? .green : .secondary)
+                        .foregroundColor(vm.isRunning ? .adaptiveGreen : .secondary)
 
                     if vm.isRunning {
                         let cpuVal = vm.cpu ?? 0
@@ -477,7 +478,7 @@ struct VMRow: View {
                     } label: {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 10))
-                            .foregroundColor(.orange)
+                            .foregroundColor(.adaptiveOrange)
                             .frame(width: 20, height: 20)
                             .background(Color.primary.opacity(0.1))
                             .clipShape(Circle())
@@ -493,7 +494,7 @@ struct VMRow: View {
                 } label: {
                     Image(systemName: vm.isRunning ? "stop.fill" : "play.fill")
                         .font(.system(size: 10))
-                        .foregroundColor(vm.isRunning ? .red : .green)
+                        .foregroundColor(vm.isRunning ? .adaptiveRed : .adaptiveGreen)
                         .frame(width: 20, height: 20)
                         .background(Color.primary.opacity(0.1))
                         .clipShape(Circle())
@@ -511,11 +512,31 @@ struct VMRow: View {
 
     private func getUsageColor(_ value: Double) -> Color {
         if value >= 0.95 {
-            return .red
+            return .adaptiveRed
         } else if value >= 0.8 {
-            return .orange
+            return .adaptiveOrange
         } else {
-            return .white.opacity(0.7)
+            return .primary
         }
+    }
+}
+
+extension Color {
+    static var adaptiveGreen: Color {
+        Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
+            appearance.name == .darkAqua ? NSColor.green : NSColor(displayP3Red: 0, green: 0.6, blue: 0, alpha: 1)
+        }))
+    }
+    
+    static var adaptiveRed: Color {
+        Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
+            appearance.name == .darkAqua ? NSColor.red : NSColor(displayP3Red: 0.8, green: 0, blue: 0, alpha: 1)
+        }))
+    }
+    
+    static var adaptiveOrange: Color {
+        Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
+            appearance.name == .darkAqua ? NSColor.orange : NSColor(displayP3Red: 0.8, green: 0.4, blue: 0, alpha: 1)
+        }))
     }
 }

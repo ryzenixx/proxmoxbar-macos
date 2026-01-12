@@ -1,10 +1,6 @@
-# Release 1.0.3 🚀
+# Release 1.0.4
 
-### Added
-- **Restart Action**: Added a dedicated "Restart" button for running VMs.
-- **Action Feedback**: Visual loading state (spinner) on buttons while an action (Start/Stop/Restart) is processing.
-- **Stability**: Implemented "Smart Polling" using Proxmox UPID. The UI now waits for the server to confirm the task is fully completed before unlocking, preventing "flickering" states.
-
-### Changed
-- **UI**: Increased main window width (380px -> 420px) to comfortably fit new action buttons.
-- **Performance**: Optimized status verification loop to handle server latency gracefully.
+### Fixed
+- **UI Contrast**: Fixed readability issue in Light Mode where usage statistics (CPU/RAM/Disk) appeared as white text on a light background. Changed to adaptive system colors for perfect contrast in both Light and Dark modes.
+- **Light Mode Colors**: Adjusted Green/Red/Orange status colors to be less "neon" and more legible when using Light Mode, while retaining the vibrant look in Dark Mode.
+- **Transparency**: Added a subtle background tint to improve legibility on colorful wallpapers while maintaining the frosted glass effect.
