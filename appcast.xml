@@ -3,14 +3,42 @@
     <channel>
         <title>ProxmoxBar</title>
         <item>
-            <title>1.0.5</title>
-            <pubDate>Mon, 12 Jan 2026 14:13:25 +0000</pubDate>
-            <sparkle:version>1.0.5</sparkle:version>
-            <sparkle:shortVersionString>1.0.5</sparkle:shortVersionString>
+            <title>1.0.6</title>
+            <pubDate>Mon, 12 Jan 2026 15:28:35 +0000</pubDate>
+            <sparkle:version>1.0.6</sparkle:version>
+            <sparkle:shortVersionString>1.0.6</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.5/ProxmoxBar.dmg" length="1272999" type="application/octet-stream" sparkle:edSignature="uYBCWVw8xmOIls76t7MwWpsQABhYdl16ra36ELSy7lh53BMOl42vo7XpqOZy1h/AEd7ReCCoJVlWUWuAqNrlCw=="/>
-        <description><![CDATA[<h1 id="release-1.0.5">Release 1.0.5</h1>
+            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.6/ProxmoxBar.dmg" length="1296354" type="application/octet-stream" sparkle:edSignature="x5K3X7y4mdIbFsvW7DB4PJx9qHk2KCAsGjfVrY3PI7txf2VZ21llLy2LP9Qb33ojQR4AUDYay2rwmmoV23mGCA=="/>
+        <description><![CDATA[<h1 id="release-1.0.6">Release 1.0.6</h1>
+<h3 id="features">Features</h3>
+<ul>
+<li><strong>Server Management</strong>:
+<ul>
+<li><strong>Edit Servers</strong>: Added ability to edit existing server
+configurations (Host, Token, Secret) without deleting/recreating
+them.</li>
+<li><strong>Reordering</strong>: Implemented Drag &amp; Drop to reorder
+your list of servers.</li>
+<li><strong>Refined UI</strong>: Preserved the custom “Card” design
+while adding native management features.</li>
+</ul></li>
+</ul>
+<h3 id="improvements">Improvements</h3>
+<ul>
+<li><strong>Settings UI</strong>: Polished the Settings view by hiding
+scroll indicators and optimizing layout.</li>
+<li><strong>Form Behavior</strong>: Fixed a flickering issue when
+opening the server editor; the form now loads instantly.</li>
+</ul>
 <h3 id="fixed">Fixed</h3>
+<ul>
+<li><strong>Stale Data</strong>: Fixed a bug where data from the
+previous server would remain visible if the connection to the new server
+failed. The list is now properly cleared on error.</li>
+</ul>
+<hr />
+<h1 id="release-1.0.5">Release 1.0.5</h1>
+<h3 id="fixed-1">Fixed</h3>
 <ul>
 <li><strong>Dark Mode Detection</strong>: Improved logic to robustly
 detect Dark Mode on all system configurations.
@@ -23,7 +51,7 @@ detection, restoring the vibrant “neon” colors for Dark Mode users.</li>
 </ul>
 <hr />
 <h1 id="release-1.0.4">Release 1.0.4</h1>
-<h3 id="fixed-1">Fixed</h3>
+<h3 id="fixed-2">Fixed</h3>
 <ul>
 <li><strong>UI Contrast</strong>: Fixed readability issue in Light Mode
 where usage statistics (CPU/RAM/Disk) appeared as white text on a light
