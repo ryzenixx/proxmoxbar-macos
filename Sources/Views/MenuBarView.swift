@@ -456,37 +456,51 @@ struct VMRow: View {
 
             Spacer()
 
-            if vm.isRunning {
+            if viewModel.processingVMIDs.contains(vm.vmid) {
+                if #available(macOS 15.0, *) {
+                    Image(systemName: "arrow.triangle.2.circlepath")
+                        .font(.system(size: 10))
+                        .foregroundColor(.secondary)
+                        .symbolEffect(.rotate, options: .repeating)
+                        .frame(width: 20, height: 20)
+                } else {
+                    ProgressView()
+                        .scaleEffect(0.5)
+                        .frame(width: 20, height: 20)
+                }
+            } else {
+                if vm.isRunning {
+                     Button {
+                        Task {
+                            await viewModel.restartVM(vm)
+                        }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 10))
+                            .foregroundColor(.orange)
+                            .frame(width: 20, height: 20)
+                            .background(Color.primary.opacity(0.1))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .help("Restart")
+                }
+
                 Button {
                     Task {
-                        await viewModel.restartVM(vm)
+                        await viewModel.toggleVMState(vm)
                     }
                 } label: {
-                    Image(systemName: "arrow.clockwise")
+                    Image(systemName: vm.isRunning ? "stop.fill" : "play.fill")
                         .font(.system(size: 10))
-                        .foregroundColor(.orange)
+                        .foregroundColor(vm.isRunning ? .red : .green)
                         .frame(width: 20, height: 20)
                         .background(Color.primary.opacity(0.1))
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .help("Restart")
+                .help(vm.isRunning ? "Stop (Shutdown)" : "Start")
             }
-
-            Button {
-                Task {
-                    await viewModel.toggleVMState(vm)
-                }
-            } label: {
-                Image(systemName: vm.isRunning ? "stop.fill" : "play.fill")
-                    .font(.system(size: 10))
-                    .foregroundColor(vm.isRunning ? .red : .green)
-                    .frame(width: 20, height: 20)
-                    .background(Color.primary.opacity(0.1))
-                    .clipShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .help(vm.isRunning ? "Stop (Shutdown)" : "Start")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
