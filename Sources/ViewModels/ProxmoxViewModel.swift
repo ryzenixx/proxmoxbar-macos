@@ -268,12 +268,11 @@ class ProxmoxViewModel: ObservableObject {
             guard let oldVM = old.first(where: { $0.id == vm.id }) else { continue }
             
             if oldVM.status != vm.status {
-                let action = vm.isRunning ? "started" : "stopped"
-                let icon = vm.isRunning ? "🟢" : "🔴"
+                let status = vm.isRunning ? "Running" : "Stopped"
                 
                 NotificationManager.shared.sendNotification(
-                    title: "Resource Update",
-                    body: "\(icon) \(vm.name) has \(action)."
+                    title: "\(vm.name) (\(vm.vmid))",
+                    body: "is now \(status)."
                 )
             }
         }
