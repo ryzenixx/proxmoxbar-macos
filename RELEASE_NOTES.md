@@ -1,3 +1,12 @@
+# Release 1.0.10
+
+### Features
+- **Intel Mac Support**: ProxmoxBar is now a **Universal Binary**!
+  - It runs natively on both **Apple Silicon** and **Intel** based Macs.
+  - The same application file works for everyone, no separate downloads needed.
+
+---
+
 # Release 1.0.8
 
 ### Features
