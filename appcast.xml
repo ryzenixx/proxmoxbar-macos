@@ -3,14 +3,27 @@
     <channel>
         <title>ProxmoxBar</title>
         <item>
-            <title>1.0.9</title>
-            <pubDate>Mon, 12 Jan 2026 22:47:47 +0000</pubDate>
-            <sparkle:version>1.0.9</sparkle:version>
-            <sparkle:shortVersionString>1.0.9</sparkle:shortVersionString>
+            <title>1.0.10</title>
+            <pubDate>Tue, 13 Jan 2026 17:52:49 +0000</pubDate>
+            <sparkle:version>1.0.10</sparkle:version>
+            <sparkle:shortVersionString>1.0.10</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.9/ProxmoxBar.dmg" length="1320337" type="application/octet-stream" sparkle:edSignature="Owlb1BZVb4InKjLKl3YKQtnI+CxLSuSMHpdJ11WggLzZoqH7VqiTtUYEWKZorstO4isZF0bJ4W+5B/BMoDrfAg=="/>
-        <description><![CDATA[<h1 id="release-1.0.8">Release 1.0.8</h1>
+            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.10/ProxmoxBar.dmg" length="1683665" type="application/octet-stream" sparkle:edSignature="hDD/uffxHPBf8+0bf3xt1wet7XPMtwIuguYIcECp2PBbR7mU7PadW/oyNQYH1vG8E40yIYCJN650DtBhJDkGDw=="/>
+        <description><![CDATA[<h1 id="release-1.0.10">Release 1.0.10</h1>
 <h3 id="features">Features</h3>
+<ul>
+<li><strong>Intel Mac Support</strong>: ProxmoxBar is now a
+<strong>Universal Binary</strong>!
+<ul>
+<li>It runs natively on both <strong>Apple Silicon</strong> and
+<strong>Intel</strong> based Macs.</li>
+<li>The same application file works for everyone, no separate downloads
+needed.</li>
+</ul></li>
+</ul>
+<hr />
+<h1 id="release-1.0.8">Release 1.0.8</h1>
+<h3 id="features-1">Features</h3>
 <ul>
 <li><strong>Notifications (Beta)</strong>: Stay informed about your
 resources with native macOS notifications.
@@ -26,7 +39,7 @@ Beta badge helps distinguish this experimental feature.</li>
 </ul>
 <hr />
 <h1 id="release-1.0.7">Release 1.0.7</h1>
-<h3 id="features-1">Features</h3>
+<h3 id="features-2">Features</h3>
 <ul>
 <li><strong>Resource Sorting</strong>: Added a new sort menu to organize
 your VMs and LXCs.
@@ -42,7 +55,7 @@ automatically.</li>
 </ul>
 <hr />
 <h1 id="release-1.0.6">Release 1.0.6</h1>
-<h3 id="features-2">Features</h3>
+<h3 id="features-3">Features</h3>
 <ul>
 <li><strong>Server Management</strong>:
 <ul>
