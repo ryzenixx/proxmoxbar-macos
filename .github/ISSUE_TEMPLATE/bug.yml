@@ -1,12 +1,12 @@
-name: 👀 Report a bug
-description: Reporting bugs helps improve the app!
+name: 👀 Bug report
+description: Create a report to help us improve
 title: "[Bug]: "
 
 body:
   - type: textarea
     attributes:
       label: Bug description
-      description: The more details we have, the faster we can find the bug!
+      description: A clear and concise description of what the bug is.
       placeholder: My Proxmox connection isn't working; I get an infinite loading screen when I try to connect.
     validations:
       required: true
@@ -14,18 +14,18 @@ body:
   - type: textarea
     attributes:
       label: Steps to reproduce
-      description: How can we reproduce the bug?
+      description: Steps to reproduce the behavior.
       placeholder: |
         1. Open the app
         2. Add a server
-        3. Seeing the connection error even though everything is fine
+        3. See error...
     validations:
       required: true
 
   - type: textarea
     attributes:
       label: Expected behavior
-      description: What should ProxmoxBar do?
+      description: A clear and concise description of what you expected to happen.
       placeholder: The connection to my Proxmox server should work and there should be no infinite loading.
     validations:
       required: true
@@ -42,22 +42,22 @@ body:
     attributes:
       label: macOS Version
       description: On which macOS version did you encounter this bug?
-      placeholder: macOS 15
+      placeholder: macOS 15.0
     validations:
       required: true
 
   - type: input
     attributes:
       label: ProxmoxBar Version
-      description: ProxmoxBar -> Settings -> Version displayed at the bottom of the page
+      description: Which version are you using? (displayed in Settings)
       placeholder: "1.0.7"
     validations:
       required: true
 
   - type: textarea
     attributes:
-      label: Screenshots / Video
-      description: This will help us resolve the bug faster
+      label: Screenshots / Link to video
+      description: If applicable, add screenshots or a link to a video to help explain your problem.
       placeholder: Click on the 📎 icon to import a photo/video
     validations:
       required: false
