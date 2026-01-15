@@ -1,3 +1,12 @@
+# Release 1.0.12
+
+### Fixed
+- **Settings Alerts**: Resolved an issue where the "Delete Server" confirmation and other alerts were not appearing correctly.
+- **Popover Behavior**: Fixed the menu bar window not closing when clicking outside the application.
+- **Documentation**: Clarified security model in README (Hardened Runtime support).
+
+---
+
 # Release 1.0.10
 
 ### Features
