@@ -7,11 +7,22 @@ struct SettingsView: View {
     var onBack: () -> Void
     
     @State private var activeSheet: SettingsSheet?
-    @State private var serverToDelete: ProxmoxServerConfig?
-    @State private var showBetaAlert = false
+    @State private var activeAlert: ActiveAlert?
     
     // For Drag and Drop
     @State private var draggedItem: ProxmoxServerConfig?
+    
+    enum ActiveAlert: Identifiable {
+        case delete(ProxmoxServerConfig)
+        case beta
+        
+        var id: String {
+            switch self {
+            case .delete(let server): return "delete-\(server.id)"
+            case .beta: return "beta"
+            }
+        }
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -86,7 +97,7 @@ struct SettingsView: View {
                                         .padding(.trailing, 4)
                                         
                                         Button {
-                                            serverToDelete = server
+                                            activeAlert = .delete(server)
                                         } label: {
                                             Image(systemName: "trash")
                                                 .foregroundColor(.red.opacity(0.7))
@@ -175,7 +186,7 @@ struct SettingsView: View {
                                     set: { newValue in
                                         #if !DEBUG
                                         if newValue {
-                                            showBetaAlert = true
+                                            activeAlert = .beta
                                         } else {
                                             settings.enableNotifications = false
                                         }
@@ -326,28 +337,30 @@ struct SettingsView: View {
                 ServerFormView(settings: settings, existingServer: server)
             }
         }
-        .alert(item: $serverToDelete) { server in
-            Alert(
-                title: Text("Delete Server"),
-                message: Text("Are you sure you want to remove '\(server.name)'?"),
-                primaryButton: .destructive(Text("Delete")) {
-                    settings.removeServer(id: server.id)
-                },
-                secondaryButton: .cancel()
-            )
-        }
-        .alert(isPresented: $showBetaAlert) {
-            Alert(
-                title: Text("Enable Beta Notifications?"),
-                message: Text("This feature is currently in BETA. Enabling notifications involves background monitoring which may be unstable or inaccurate.\n\nUse at your own risk."),
-                primaryButton: .destructive(Text("Enable")) {
-                    settings.enableNotifications = true
-                    Task {
-                        _ = await NotificationManager.shared.requestPermission()
-                    }
-                },
-                secondaryButton: .cancel()
-            )
+        .alert(item: $activeAlert) { alert in
+            switch alert {
+            case .delete(let server):
+                return Alert(
+                    title: Text("Delete Server"),
+                    message: Text("Are you sure you want to remove '\(server.name)'?"),
+                    primaryButton: .destructive(Text("Delete")) {
+                        settings.removeServer(id: server.id)
+                    },
+                    secondaryButton: .cancel()
+                )
+            case .beta:
+                return Alert(
+                    title: Text("Enable Beta Notifications?"),
+                    message: Text("This feature is currently in BETA. Enabling notifications involves background monitoring which may be unstable or inaccurate.\n\nUse at your own risk."),
+                    primaryButton: .destructive(Text("Enable")) {
+                        settings.enableNotifications = true
+                        Task {
+                            _ = await NotificationManager.shared.requestPermission()
+                        }
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
         }
     }
 }
