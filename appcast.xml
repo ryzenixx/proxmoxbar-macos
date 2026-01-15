@@ -3,13 +3,25 @@
     <channel>
         <title>ProxmoxBar</title>
         <item>
-            <title>1.0.11</title>
-            <pubDate>Tue, 13 Jan 2026 19:35:19 +0000</pubDate>
-            <sparkle:version>1.0.11</sparkle:version>
-            <sparkle:shortVersionString>1.0.11</sparkle:shortVersionString>
+            <title>1.0.12</title>
+            <pubDate>Thu, 15 Jan 2026 20:09:02 +0000</pubDate>
+            <sparkle:version>1.0.12</sparkle:version>
+            <sparkle:shortVersionString>1.0.12</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.11/ProxmoxBar.dmg" length="1688688" type="application/octet-stream" sparkle:edSignature="ODB18fQ+g1f3ym4jaaFyBiQzQ4omLmFwFHzTvAX30T5fOVuCa7R8gTImaTk6Q+T0GF8faEUgcOt4EiygrvBZAg=="/>
-        <description><![CDATA[<h1 id="release-1.0.10">Release 1.0.10</h1>
+            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.12/ProxmoxBar.dmg" length="1710532" type="application/octet-stream" sparkle:edSignature="GVCggRYr+OHoXk7qoOFV16vVqkcxJV6AZzRZd+Y9EFZ/6oFSlk5t7fpNhPZaYTL5fxniG8bVZopkgfK/POLODg=="/>
+        <description><![CDATA[<h1 id="release-1.0.12">Release 1.0.12</h1>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li><strong>Settings Alerts</strong>: Resolved an issue where the
+“Delete Server” confirmation and other alerts were not appearing
+correctly.</li>
+<li><strong>Popover Behavior</strong>: Fixed the menu bar window not
+closing when clicking outside the application.</li>
+<li><strong>Documentation</strong>: Clarified security model in README
+(Hardened Runtime support).</li>
+</ul>
+<hr />
+<h1 id="release-1.0.10">Release 1.0.10</h1>
 <h3 id="features">Features</h3>
 <ul>
 <li><strong>Intel Mac Support</strong>: ProxmoxBar is now a
@@ -75,7 +87,7 @@ scroll indicators and optimizing layout.</li>
 <li><strong>Form Behavior</strong>: Fixed a flickering issue when
 opening the server editor; the form now loads instantly.</li>
 </ul>
-<h3 id="fixed">Fixed</h3>
+<h3 id="fixed-1">Fixed</h3>
 <ul>
 <li><strong>Stale Data</strong>: Fixed a bug where data from the
 previous server would remain visible if the connection to the new server
@@ -83,7 +95,7 @@ failed. The list is now properly cleared on error.</li>
 </ul>
 <hr />
 <h1 id="release-1.0.5">Release 1.0.5</h1>
-<h3 id="fixed-1">Fixed</h3>
+<h3 id="fixed-2">Fixed</h3>
 <ul>
 <li><strong>Dark Mode Detection</strong>: Improved logic to robustly
 detect Dark Mode on all system configurations.
@@ -96,7 +108,7 @@ detection, restoring the vibrant “neon” colors for Dark Mode users.</li>
 </ul>
 <hr />
 <h1 id="release-1.0.4">Release 1.0.4</h1>
-<h3 id="fixed-2">Fixed</h3>
+<h3 id="fixed-3">Fixed</h3>
 <ul>
 <li><strong>UI Contrast</strong>: Fixed readability issue in Light Mode
 where usage statistics (CPU/RAM/Disk) appeared as white text on a light
