@@ -3,13 +3,22 @@
     <channel>
         <title>ProxmoxBar</title>
         <item>
-            <title>1.0.12</title>
-            <pubDate>Thu, 15 Jan 2026 20:09:02 +0000</pubDate>
-            <sparkle:version>1.0.12</sparkle:version>
-            <sparkle:shortVersionString>1.0.12</sparkle:shortVersionString>
+            <title>1.0.13</title>
+            <pubDate>Mon, 26 Jan 2026 22:15:27 +0000</pubDate>
+            <sparkle:version>1.0.13</sparkle:version>
+            <sparkle:shortVersionString>1.0.13</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.12/ProxmoxBar.dmg" length="1710532" type="application/octet-stream" sparkle:edSignature="GVCggRYr+OHoXk7qoOFV16vVqkcxJV6AZzRZd+Y9EFZ/6oFSlk5t7fpNhPZaYTL5fxniG8bVZopkgfK/POLODg=="/>
-        <description><![CDATA[<h1 id="release-1.0.12">Release 1.0.12</h1>
+            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.13/ProxmoxBar.dmg" length="1710874" type="application/octet-stream" sparkle:edSignature="3KqBFQP2t9ZiQimKA3bbEEpePcR/9XkvfSPykOHa9wf/jwgwTu0Lsm9ukL6ycOTsqFfUYBp4YiWia9gdu3IwAA=="/>
+        <description><![CDATA[<h1 id="release-1.0.13">Release 1.0.13</h1>
+<h3 id="improvements">Improvements</h3>
+<ul>
+<li><strong>UI</strong>: Added a link to the README in the “Missing
+Resources” and “Configuration” alerts.</li>
+<li><strong>Documentation</strong>: Updated the README to clarify the
+usage of non-root users and permissions.</li>
+</ul>
+<hr />
+<h1 id="release-1.0.12">Release 1.0.12</h1>
 <h3 id="fixed">Fixed</h3>
 <ul>
 <li><strong>Settings Alerts</strong>: Resolved an issue where the
@@ -80,7 +89,7 @@ your list of servers.</li>
 while adding native management features.</li>
 </ul></li>
 </ul>
-<h3 id="improvements">Improvements</h3>
+<h3 id="improvements-1">Improvements</h3>
 <ul>
 <li><strong>Settings UI</strong>: Polished the Settings view by hiding
 scroll indicators and optimizing layout.</li>
