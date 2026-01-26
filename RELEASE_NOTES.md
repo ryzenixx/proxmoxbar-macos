@@ -1,3 +1,11 @@
+# Release 1.0.13
+
+### Improvements
+- **UI**: Added a link to the README in the "Missing Resources" and "Configuration" alerts.
+- **Documentation**: Updated the README to clarify the usage of non-root users and permissions.
+
+---
+
 # Release 1.0.12
 
 ### Fixed
