@@ -41,6 +41,42 @@
 It features secure auto-updates and follows modern macOS security standards.
 Requires **macOS 14 (Sonoma)** or later.
 
+## 🔐 Permissions & Security
+
+To enhance security, it is highly recommended to follow the **Principle of Least Privilege**.
+Follow these steps to create a restricted API Token for ProxmoxBar:
+
+### 1. Create a Custom Role
+Go to **Datacenter** → **Permissions** → **Roles** and click **Create**.
+- **Name**: `ProxmoxBar`
+- **Privileges**: Check **only** the following:
+  - [x] `Datastore.Audit` (View Storage)
+  - [x] `Pool.Audit` (View Pools & Members)
+  - [x] `SDN.Audit` (View Network)
+  - [x] `Sys.Audit` (View Node Stats)
+  - [x] `VM.Audit` (View VMs)
+  - [x] `VM.PowerMgmt` (Start/Stop/Reboot)
+
+### 2. Create a User
+Go to **Datacenter** → **Permissions** → **Users** → **Add**.
+- **User name**: `proxmoxbar`
+- **Realm**: `Proxmox VE authentication server`
+- **Password**: (Set a strong password, won't be used by the app)
+
+### 3. Create an API Token
+Go to **Datacenter** → **Permissions** → **API Tokens** → **Add**.
+- **User**: `proxmoxbar@pve`
+- **Token ID**: `monitor` (or anything you like)
+- **Privilege Separation**: ❌ **Uncheck**
+> ⚠️ Copy the **Secret** now, it won't be shown again!
+
+### 4. Assign Permissions
+Go to **Datacenter** → **Permissions** → **Add** → **User Permission**.
+- **Path**: `/`
+- **User**: `proxmoxbar`
+- **Role**: `ProxmoxBar`
+- **Propagate**: ✅ **Checked** (To apply to all VMs/Nodes)
+
 ## 🚀 Installation
 
 ### Recommended
