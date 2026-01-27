@@ -1,5 +1,18 @@
 import Foundation
 import Combine
+import SwiftUI
+
+enum SettingsSheet: Identifiable {
+    case add
+    case edit(ProxmoxServerConfig)
+    
+    var id: String {
+        switch self {
+        case .add: return "add"
+        case .edit(let server): return server.id.uuidString
+        }
+    }
+}
 
 struct ProxmoxServerConfig: Identifiable, Codable, Hashable {
     var id: UUID = UUID()
@@ -25,6 +38,8 @@ class SettingsService: ObservableObject {
     @Published var servers: [ProxmoxServerConfig] {
         didSet { saveServers() }
     }
+    
+    @Published var activeSheet: SettingsSheet?
     
     @Published var enableNotifications: Bool {
         didSet { UserDefaults.standard.set(enableNotifications, forKey: "enableNotifications") }

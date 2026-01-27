@@ -6,7 +6,6 @@ struct SettingsView: View {
     @ObservedObject var updaterController: UpdaterController
     var onBack: () -> Void
     
-    @State private var activeSheet: SettingsSheet?
     @State private var activeAlert: ActiveAlert?
     
     // For Drag and Drop
@@ -60,7 +59,7 @@ struct SettingsView: View {
                                 .foregroundColor(.secondary)
                             Spacer()
                             Button {
-                                activeSheet = .add
+                                settings.activeSheet = .add
                             } label: {
                                 Image(systemName: "plus")
                                     .font(.system(size: 12, weight: .bold))
@@ -88,7 +87,7 @@ struct SettingsView: View {
                                         Spacer()
                                         
                                         Button {
-                                            activeSheet = .edit(server)
+                                            settings.activeSheet = .edit(server)
                                         } label: {
                                             Image(systemName: "pencil")
                                                 .foregroundColor(.secondary)
@@ -329,7 +328,7 @@ struct SettingsView: View {
             .padding(.bottom, 16)
         }
         .background(CursorFixView())
-        .sheet(item: $activeSheet) { sheet in
+        .sheet(item: $settings.activeSheet) { sheet in
             switch sheet {
             case .add:
                 ServerFormView(settings: settings, existingServer: nil)
@@ -389,18 +388,6 @@ struct DropViewDelegate: DropDelegate {
             withAnimation {
                 servers.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
             }
-        }
-    }
-}
-
-enum SettingsSheet: Identifiable {
-    case add
-    case edit(ProxmoxServerConfig)
-    
-    var id: String {
-        switch self {
-        case .add: return "add"
-        case .edit(let server): return server.id.uuidString
         }
     }
 }

@@ -1,3 +1,11 @@
+# Release 1.0.14
+
+### Fixed
+- **UI Freeze**: Resolved a critical issue where the application would freeze when clicking outside the "Add/Edit Server" form.
+- **Data Safety**: The "Add/Edit Server" window now prevents closing when clicking outside, ensuring you never accidentally lose your configuration data while typing.
+
+---
+
 # Release 1.0.13
 
 ### Improvements

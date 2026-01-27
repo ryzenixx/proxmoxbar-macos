@@ -102,6 +102,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @MainActor
     func closePopover(sender: Any?) {
+        if appState.settings.activeSheet != nil {
+            return
+        }
+        
         popover.performClose(sender)
         eventMonitor?.stop()
     }
