@@ -3,13 +3,24 @@
     <channel>
         <title>ProxmoxBar</title>
         <item>
-            <title>1.0.13</title>
-            <pubDate>Mon, 26 Jan 2026 22:15:27 +0000</pubDate>
-            <sparkle:version>1.0.13</sparkle:version>
-            <sparkle:shortVersionString>1.0.13</sparkle:shortVersionString>
+            <title>1.0.14</title>
+            <pubDate>Tue, 27 Jan 2026 18:32:28 +0000</pubDate>
+            <sparkle:version>1.0.14</sparkle:version>
+            <sparkle:shortVersionString>1.0.14</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.13/ProxmoxBar.dmg" length="1710874" type="application/octet-stream" sparkle:edSignature="3KqBFQP2t9ZiQimKA3bbEEpePcR/9XkvfSPykOHa9wf/jwgwTu0Lsm9ukL6ycOTsqFfUYBp4YiWia9gdu3IwAA=="/>
-        <description><![CDATA[<h1 id="release-1.0.13">Release 1.0.13</h1>
+            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.0.14/ProxmoxBar.dmg" length="1707362" type="application/octet-stream" sparkle:edSignature="jfUo81ag/Os8r1A98k8rcLXogFGngp3o2nwyud5gj5uFLwgJiRbQPYHFXHCZQJCeRWKxWyIl1U6FQ/fvbunDBw=="/>
+        <description><![CDATA[<h1 id="release-1.0.14">Release 1.0.14</h1>
+<h3 id="fixed">Fixed</h3>
+<ul>
+<li><strong>UI Freeze</strong>: Resolved a critical issue where the
+application would freeze when clicking outside the “Add/Edit Server”
+form.</li>
+<li><strong>Data Safety</strong>: The “Add/Edit Server” window now
+prevents closing when clicking outside, ensuring you never accidentally
+lose your configuration data while typing.</li>
+</ul>
+<hr />
+<h1 id="release-1.0.13">Release 1.0.13</h1>
 <h3 id="improvements">Improvements</h3>
 <ul>
 <li><strong>UI</strong>: Added a link to the README in the “Missing
@@ -19,7 +30,7 @@ usage of non-root users and permissions.</li>
 </ul>
 <hr />
 <h1 id="release-1.0.12">Release 1.0.12</h1>
-<h3 id="fixed">Fixed</h3>
+<h3 id="fixed-1">Fixed</h3>
 <ul>
 <li><strong>Settings Alerts</strong>: Resolved an issue where the
 “Delete Server” confirmation and other alerts were not appearing
@@ -96,7 +107,7 @@ scroll indicators and optimizing layout.</li>
 <li><strong>Form Behavior</strong>: Fixed a flickering issue when
 opening the server editor; the form now loads instantly.</li>
 </ul>
-<h3 id="fixed-1">Fixed</h3>
+<h3 id="fixed-2">Fixed</h3>
 <ul>
 <li><strong>Stale Data</strong>: Fixed a bug where data from the
 previous server would remain visible if the connection to the new server
@@ -104,7 +115,7 @@ failed. The list is now properly cleared on error.</li>
 </ul>
 <hr />
 <h1 id="release-1.0.5">Release 1.0.5</h1>
-<h3 id="fixed-2">Fixed</h3>
+<h3 id="fixed-3">Fixed</h3>
 <ul>
 <li><strong>Dark Mode Detection</strong>: Improved logic to robustly
 detect Dark Mode on all system configurations.
@@ -117,7 +128,7 @@ detection, restoring the vibrant “neon” colors for Dark Mode users.</li>
 </ul>
 <hr />
 <h1 id="release-1.0.4">Release 1.0.4</h1>
-<h3 id="fixed-3">Fixed</h3>
+<h3 id="fixed-4">Fixed</h3>
 <ul>
 <li><strong>UI Contrast</strong>: Fixed readability issue in Light Mode
 where usage statistics (CPU/RAM/Disk) appeared as white text on a light
