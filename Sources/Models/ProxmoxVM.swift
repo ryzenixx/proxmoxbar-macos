@@ -59,6 +59,8 @@ struct ProxmoxRawResource: Codable {
     let maxdisk: Int64?
     
     let storage: String?
+    let plugintype: String?
+    let content: String?
 }
 
 struct ProxmoxResourceResponse: Codable {
