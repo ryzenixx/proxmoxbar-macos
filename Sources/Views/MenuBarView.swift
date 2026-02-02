@@ -15,6 +15,13 @@ struct MenuBarView: View {
 
     @State private var currentScreen: Screen = .dashboard
     @State private var isRefreshing: Bool = false
+    
+    enum Tab {
+        case resources
+        case disks
+    }
+    
+    @State private var selectedTab: Tab = .resources
 
     private var statusColor: Color {
         switch viewModel.appState {
@@ -200,77 +207,105 @@ struct MenuBarView: View {
                 }
             }
             .background(.thinMaterial)
-
+            
+            Picker("", selection: $selectedTab) {
+                Text("Resources").tag(Tab.resources)
+                Text("Storages").tag(Tab.disks)
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            .padding(.bottom, 8)
+            .padding(.top, 8)
+            
             Divider()
 
-            HStack(spacing: 8) {
+            if selectedTab == .resources {
                 HStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.secondary)
-
-                    TextField("Search resources...", text: $viewModel.searchText)
-                        .textFieldStyle(.plain)
-                        .font(.system(size: 13))
-
-                    Menu {
-                        ForEach(ProxmoxViewModel.ResourceFilter.allCases, id: \.self) { filter in
-                            Button {
-                                viewModel.resourceFilter = filter
-                            } label: {
-                                if viewModel.resourceFilter == filter {
-                                    Label(filter.rawValue, systemImage: filter.icon)
-                                } else {
-                                    Label(filter.rawValue, systemImage: filter.icon)
-                                }
-                            }
-                        }
-                    } label: {
-                        HStack(spacing: 2) {
-                            Text(viewModel.resourceFilter.rawValue)
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.leading, 6)
-                        .padding(.vertical, 4)
-                        .contentShape(Rectangle())
-                    }
-                    .menuStyle(.borderlessButton)
-                    .fixedSize()
-                    
-                    Divider()
-                        .frame(height: 12)
-                    
-                    Menu {
-                        ForEach(ProxmoxViewModel.SortOption.allCases, id: \.self) { option in
-                            Button {
-                                viewModel.sortOption = option
-                            } label: {
-                                if viewModel.sortOption == option {
-                                    Label(option.rawValue, systemImage: "checkmark")
-                                } else {
-                                    Label(option.rawValue, systemImage: option.icon)
-                                }
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "arrow.up.arrow.down")
-                            .font(.system(size: 11, weight: .medium))
+                    HStack(spacing: 8) {
+                        Image(systemName: "magnifyingglass")
                             .foregroundColor(.secondary)
-                            .padding(.horizontal, 4)
+
+                        TextField("Search resources...", text: $viewModel.searchText)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 13))
+
+                        Menu {
+                            ForEach(ProxmoxViewModel.ResourceFilter.allCases, id: \.self) { filter in
+                                Button {
+                                    viewModel.resourceFilter = filter
+                                } label: {
+                                    if viewModel.resourceFilter == filter {
+                                        Label(filter.rawValue, systemImage: filter.icon)
+                                    } else {
+                                        Label(filter.rawValue, systemImage: filter.icon)
+                                    }
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 2) {
+                                Text(viewModel.resourceFilter.rawValue)
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(.leading, 6)
                             .padding(.vertical, 4)
                             .contentShape(Rectangle())
+                        }
+                        .menuStyle(.borderlessButton)
+                        .fixedSize()
+                        
+                        Divider()
+                            .frame(height: 12)
+                        
+                        Menu {
+                            ForEach(ProxmoxViewModel.SortOption.allCases, id: \.self) { option in
+                                Button {
+                                    viewModel.sortOption = option
+                                } label: {
+                                    if viewModel.sortOption == option {
+                                        Label(option.rawValue, systemImage: "checkmark")
+                                    } else {
+                                        Label(option.rawValue, systemImage: option.icon)
+                                    }
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "arrow.up.arrow.down")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(.secondary)
+                                .padding(.horizontal, 4)
+                                .padding(.vertical, 4)
+                                .contentShape(Rectangle())
+                        }
+                        .menuStyle(.borderlessButton)
+                        .fixedSize()
                     }
-                    .menuStyle(.borderlessButton)
-                    .fixedSize()
+                    .padding(10)
+                    .background(Color.primary.opacity(0.05))
+                    .cornerRadius(8)
                 }
-                .padding(10)
-                .background(Color.primary.opacity(0.05))
-                .cornerRadius(8)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
 
-            if viewModel.filteredVMs.isEmpty {
+            if selectedTab == .resources {
+                ResourcesView(viewModel: viewModel, settings: settings, currentScreen: $currentScreen)
+            } else {
+                DisksView(viewModel: viewModel)
+            }
+        }
+    }
+}
+
+
+
+struct ResourcesView: View {
+    @ObservedObject var viewModel: ProxmoxViewModel
+    @ObservedObject var settings: SettingsService
+    @Binding var currentScreen: MenuBarView.Screen
+    
+    var body: some View {
+        if viewModel.filteredVMs.isEmpty {
                 VStack {
                     if settings.servers.isEmpty {
                         Text("No server found")
@@ -370,7 +405,7 @@ struct MenuBarView: View {
                     }
                 }
             }
-        }
+
     }
 }
 
