@@ -138,10 +138,17 @@ actor ProxmoxService {
                         node: node,
                         status: status,
                         disk: item.disk,
-                        maxdisk: item.maxdisk
+                        maxdisk: item.maxdisk,
+                        type: item.plugintype,
+                        content: item.content
                     )
                 }
-                
+                .sorted { 
+                    if $0.diskUsage != $1.diskUsage {
+                        return $0.diskUsage > $1.diskUsage
+                    }
+                    return $0.storage < $1.storage
+                }
                 return (.running, nodes, storages, vms)
                 
             } catch {
