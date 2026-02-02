@@ -1,3 +1,13 @@
+# Release 1.0.15
+
+### Features
+- **Storages Tab**: A brand new tab dedicated to your storage infrastructure.
+  - **Visual Overhaul**: Designed to match the clean look of the Resources tab with consistent layout and typography.
+  - **Rich Details**: Displays storage type (ZFS, LVM, etc.) and usage with beautiful adaptive gauges.
+  - **Smart Sorting**: Intelligent sorting puts your fullest disks at the top, helping you identify capacity issues instantly.
+
+---
+
 # Release 1.0.14
 
 ### Fixed
