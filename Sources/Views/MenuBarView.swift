@@ -208,12 +208,19 @@ struct MenuBarView: View {
             }
             .background(.thinMaterial)
             
-            Picker("", selection: $selectedTab) {
-                Text("Resources").tag(Tab.resources)
-                Text("Storages").tag(Tab.disks)
+            HStack {
+                Spacer()
+                
+                Picker("", selection: $selectedTab) {
+                    Text("Resources").tag(Tab.resources)
+                    Text("Storages").tag(Tab.disks)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .fixedSize()
+                
+                Spacer()
             }
-            .pickerStyle(.segmented)
-            .padding(.horizontal)
             .padding(.bottom, 8)
             .padding(.top, 8)
             
