@@ -5,34 +5,34 @@ struct DisksView: View {
     @ObservedObject var viewModel: ProxmoxViewModel
     
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            LazyVStack(spacing: 0) {
-                HStack {
-                    Text("\(viewModel.storages.count) \(viewModel.storages.count == 1 ? "STORAGE" : "STORAGES")")
-                        .font(.system(size: 10, weight: .bold))
+        VStack(spacing: 0) {
+            HStack {
+                Text("\(viewModel.storages.count) \(viewModel.storages.count == 1 ? "STORAGE" : "STORAGES")")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.secondary)
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
+            
+            if viewModel.storages.isEmpty {
+                VStack {
+                    Spacer()
+                    Text("No storages found")
                         .foregroundColor(.secondary)
                     Spacer()
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 4)
-                
-                if viewModel.storages.isEmpty {
-                    VStack(spacing: 8) {
-                        Image(systemName: "internaldrive")
-                            .font(.system(size: 24))
-                            .foregroundColor(.secondary.opacity(0.5))
-                        Text("No storages found")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.top, 40)
-                } else {
-                    ForEach(Array(viewModel.storages.enumerated()), id: \.element.id) { index, storage in
-                        StorageRow(storage: storage)
-                        if index < viewModel.storages.count - 1 {
-                            Divider()
-                                .padding(.leading, 40)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView(showsIndicators: false) {
+                    LazyVStack(spacing: 0) {
+                        ForEach(Array(viewModel.storages.enumerated()), id: \.element.id) { index, storage in
+                            StorageRow(storage: storage)
+                            if index < viewModel.storages.count - 1 {
+                                Divider()
+                                    .padding(.leading, 40)
+                            }
                         }
                     }
                 }
