@@ -37,7 +37,7 @@ struct ServerFormView: View {
                     Text("Important Configuration")
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(.primary)
-                    Text("Please follow the **Permission & Security** guide in the [README](https://github.com/ryzenixx/proxmoxbar-macos#permissions--security) to configure your API Token correctly.")
+                    Text("Please follow the **Permission & Security** guide in the [README](https://github.com/ryzenixx/proxmoxbar-macos?tab=readme-ov-file#-permissions--security) to configure your API Token correctly.")
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
