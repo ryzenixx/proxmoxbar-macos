@@ -3,159 +3,18 @@
     <channel>
         <title>ProxmoxBar</title>
         <item>
-            <title>1.1.0</title>
-            <pubDate>Tue, 03 Feb 2026 19:03:13 +0000</pubDate>
-            <sparkle:version>1.1.0</sparkle:version>
-            <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
+            <title>1.1.1</title>
+            <pubDate>Thu, 05 Mar 2026 21:45:47 +0000</pubDate>
+            <sparkle:version>1.1.1</sparkle:version>
+            <sparkle:shortVersionString>1.1.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.1.0/ProxmoxBar.dmg" length="1762539" type="application/octet-stream" sparkle:edSignature="6c4CIbVeykonZhSjcy3wAB4JZ+Iof5MbvNlka06kS4PvEn6KyjDMjRYWepGNtc5iNA2uzQQdRFtMJMVGviNIBw=="/>
-        <description><![CDATA[<h1 id="release-1.0.15">Release 1.0.15</h1>
-<h3 id="features">Features</h3>
+            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v1.1.1/ProxmoxBar.dmg" length="1762504" type="application/octet-stream" sparkle:edSignature="HmphalR+PqWhNrxtJ4vKYoo4vKnLqs0NFXIxpvpKsq5CTJy2XIq6iPhLMbBpMGrahwsbtwIJy27ydNJmjm24DA=="/>
+        <description><![CDATA[<h1 id="release-1.1.1">Release 1.1.1</h1>
+<h3 id="ui">UI</h3>
 <ul>
-<li><strong>Storages Tab</strong>: A brand new tab dedicated to your
-storage infrastructure.
-<ul>
-<li><strong>Visual Overhaul</strong>: Designed to match the clean look
-of the Resources tab with consistent layout and typography.</li>
-<li><strong>Rich Details</strong>: Displays storage type (ZFS, LVM,
-etc.) and usage with beautiful adaptive gauges.</li>
-<li><strong>Smart Sorting</strong>: Intelligent sorting puts your
-fullest disks at the top, helping you identify capacity issues
-instantly.</li>
-</ul></li>
-</ul>
-<hr />
-<h1 id="release-1.0.14">Release 1.0.14</h1>
-<h3 id="fixed">Fixed</h3>
-<ul>
-<li><strong>UI Freeze</strong>: Resolved a critical issue where the
-application would freeze when clicking outside the “Add/Edit Server”
-form.</li>
-<li><strong>Data Safety</strong>: The “Add/Edit Server” window now
-prevents closing when clicking outside, ensuring you never accidentally
-lose your configuration data while typing.</li>
-</ul>
-<hr />
-<h1 id="release-1.0.13">Release 1.0.13</h1>
-<h3 id="improvements">Improvements</h3>
-<ul>
-<li><strong>UI</strong>: Added a link to the README in the “Missing
-Resources” and “Configuration” alerts.</li>
-<li><strong>Documentation</strong>: Updated the README to clarify the
-usage of non-root users and permissions.</li>
-</ul>
-<hr />
-<h1 id="release-1.0.12">Release 1.0.12</h1>
-<h3 id="fixed-1">Fixed</h3>
-<ul>
-<li><strong>Settings Alerts</strong>: Resolved an issue where the
-“Delete Server” confirmation and other alerts were not appearing
-correctly.</li>
-<li><strong>Popover Behavior</strong>: Fixed the menu bar window not
-closing when clicking outside the application.</li>
-<li><strong>Documentation</strong>: Clarified security model in README
-(Hardened Runtime support).</li>
-</ul>
-<hr />
-<h1 id="release-1.0.10">Release 1.0.10</h1>
-<h3 id="features-1">Features</h3>
-<ul>
-<li><strong>Intel Mac Support</strong>: ProxmoxBar is now a
-<strong>Universal Binary</strong>!
-<ul>
-<li>It runs natively on both <strong>Apple Silicon</strong> and
-<strong>Intel</strong> based Macs.</li>
-<li>The same application file works for everyone, no separate downloads
-needed.</li>
-</ul></li>
-</ul>
-<hr />
-<h1 id="release-1.0.8">Release 1.0.8</h1>
-<h3 id="features-2">Features</h3>
-<ul>
-<li><strong>Notifications (Beta)</strong>: Stay informed about your
-resources with native macOS notifications.
-<ul>
-<li><strong>State Monitoring</strong>: Get alerted immediately when a VM
-or LXC container starts or stops.</li>
-<li><strong>Safety First</strong>: This feature is currently in Beta and
-disabled by default. It includes a dedicated warning when enabling to
-ensure you are aware of the background monitoring involved.</li>
-<li><strong>Visual Feedback</strong>: A new settings toggle with a clear
-Beta badge helps distinguish this experimental feature.</li>
-</ul></li>
-</ul>
-<hr />
-<h1 id="release-1.0.7">Release 1.0.7</h1>
-<h3 id="features-3">Features</h3>
-<ul>
-<li><strong>Resource Sorting</strong>: Added a new sort menu to organize
-your VMs and LXCs.
-<ul>
-<li><strong>Sort Options</strong>: Choose between <strong>ID</strong>
-(default), <strong>Name</strong>, or <strong>Status</strong>.</li>
-<li><strong>Smart Status Sort</strong>: The “Status” option prioritizes
-running resources, keeping them at the top of the list for quick
-access.</li>
-<li><strong>Persistence</strong>: Your sort preference is saved
-automatically.</li>
-</ul></li>
-</ul>
-<hr />
-<h1 id="release-1.0.6">Release 1.0.6</h1>
-<h3 id="features-4">Features</h3>
-<ul>
-<li><strong>Server Management</strong>:
-<ul>
-<li><strong>Edit Servers</strong>: Added ability to edit existing server
-configurations (Host, Token, Secret) without deleting/recreating
-them.</li>
-<li><strong>Reordering</strong>: Implemented Drag &amp; Drop to reorder
-your list of servers.</li>
-<li><strong>Refined UI</strong>: Preserved the custom “Card” design
-while adding native management features.</li>
-</ul></li>
-</ul>
-<h3 id="improvements-1">Improvements</h3>
-<ul>
-<li><strong>Settings UI</strong>: Polished the Settings view by hiding
-scroll indicators and optimizing layout.</li>
-<li><strong>Form Behavior</strong>: Fixed a flickering issue when
-opening the server editor; the form now loads instantly.</li>
-</ul>
-<h3 id="fixed-2">Fixed</h3>
-<ul>
-<li><strong>Stale Data</strong>: Fixed a bug where data from the
-previous server would remain visible if the connection to the new server
-failed. The list is now properly cleared on error.</li>
-</ul>
-<hr />
-<h1 id="release-1.0.5">Release 1.0.5</h1>
-<h3 id="fixed-3">Fixed</h3>
-<ul>
-<li><strong>Dark Mode Detection</strong>: Improved logic to robustly
-detect Dark Mode on all system configurations.
-<ul>
-<li>Previously, the app could incorrectly fallback to “Light Mode”
-colors (darker/forest tones) even when Dark Mode was active.</li>
-<li>Now uses <code>NSAppearance.bestMatch</code> for 100% reliable
-detection, restoring the vibrant “neon” colors for Dark Mode users.</li>
-</ul></li>
-</ul>
-<hr />
-<h1 id="release-1.0.4">Release 1.0.4</h1>
-<h3 id="fixed-4">Fixed</h3>
-<ul>
-<li><strong>UI Contrast</strong>: Fixed readability issue in Light Mode
-where usage statistics (CPU/RAM/Disk) appeared as white text on a light
-background. Changed to adaptive system colors for perfect contrast in
-both Light and Dark modes.</li>
-<li><strong>Light Mode Colors</strong>: Adjusted Green/Red/Orange status
-colors to be less “neon” and more legible when using Light Mode, while
-retaining the vibrant look in Dark Mode.</li>
-<li><strong>Transparency</strong>: Added a subtle background tint to
-improve legibility on colorful wallpapers while maintaining the frosted
-glass effect.</li>
+<li>Renamed the tab label from <code>Storages</code> to
+<code>Storage</code> in the <code>Resources / Storage</code>
+selector.</li>
 </ul>
 ]]></description></item>
     </channel>
