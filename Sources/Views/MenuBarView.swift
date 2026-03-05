@@ -213,7 +213,7 @@ struct MenuBarView: View {
                 
                 Picker("", selection: $selectedTab) {
                     Text("Resources").tag(Tab.resources)
-                    Text("Storages").tag(Tab.disks)
+                    Text("Storage").tag(Tab.disks)
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
