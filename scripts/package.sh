@@ -1,30 +1,36 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
 
-echo "📦 Creating DMG..."
+set -euo pipefail
 
-if ! command -v create-dmg &> /dev/null; then
-    echo "ℹ️  Installing create-dmg..."
-    brew install create-dmg
-fi
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/lib/common.sh"
 
-# Ensure no existing dmg
-rm -f "ProxmoxBar.dmg"
+APP_NAME="${APP_NAME:-ProxmoxBar}"
+APP_BUNDLE_PATH="${APP_BUNDLE_PATH:-$PROJECT_ROOT/${APP_NAME}.app}"
+DMG_PATH="${DMG_PATH:-$PROJECT_ROOT/${APP_NAME}.dmg}"
+DMG_VOLNAME="${DMG_VOLNAME:-${APP_NAME} Installer}"
+DMG_FORMAT="${DMG_FORMAT:-UDZO}"
+DMG_FS="${DMG_FS:-HFS+}"
 
-create-dmg \
-  --volname "ProxmoxBar Installer" \
-  --window-pos 200 120 \
-  --window-size 800 400 \
-  --icon-size 100 \
-  --icon "ProxmoxBar.app" 200 190 \
-  --hide-extension "ProxmoxBar.app" \
-  --app-drop-link 600 185 \
-  "ProxmoxBar.dmg" \
-  "ProxmoxBar.app"
+require_command hdiutil
+require_command ln
+require_directory "$APP_BUNDLE_PATH"
 
-if [ ! -f "ProxmoxBar.dmg" ]; then
-    echo "❌ CRITICAL ERROR: DMG creation failed"
-    exit 1
-fi
+rm -f "$DMG_PATH"
 
-echo "✅ DMG Created Successfully!"
+staging_dir="$(mktemp -d "$PROJECT_ROOT/.dmg-staging.XXXXXX")"
+trap 'rm -rf "$staging_dir"' EXIT
+
+cp -R "$APP_BUNDLE_PATH" "$staging_dir/"
+ln -s /Applications "$staging_dir/Applications"
+
+hdiutil create \
+  -volname "$DMG_VOLNAME" \
+  -srcfolder "$staging_dir" \
+  -ov \
+  -format "$DMG_FORMAT" \
+  -fs "$DMG_FS" \
+  "$DMG_PATH" >/dev/null
+
+require_file "$DMG_PATH"
+log_success "DMG created at $DMG_PATH"

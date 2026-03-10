@@ -8,11 +8,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var eventMonitor: EventMonitor?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Initialize NotificationManager to ensure delegate is set
-        #if !DEBUG
-        _ = NotificationManager.shared
-        #endif
-        
         appState = ProxmoxAppState()
         
         popover = NSPopover()
@@ -79,15 +74,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func getMenuBarIcon() -> NSImage {
-        #if DEBUG
-        if let moduleUrl = Bundle.module.url(forResource: "Assets/MenuBarIcon", withExtension: "png"),
-           let image = NSImage(contentsOf: moduleUrl) {
-            image.isTemplate = true
-            image.size = CGSize(width: 15, height: 15)
-            return image
-        }
-        #endif
-        
         if let resourcePath = Bundle.main.resourcePath {
             let iconPath = resourcePath + "/MenuBarIcon.png"
             if let image = NSImage(contentsOfFile: iconPath) {
@@ -95,6 +81,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 image.size = CGSize(width: 15, height: 15)
                 return image
             }
+        }
+        
+        if let moduleUrl = Bundle.module.url(forResource: "Assets/MenuBarIcon", withExtension: "png"),
+           let image = NSImage(contentsOf: moduleUrl) {
+            image.isTemplate = true
+            image.size = CGSize(width: 15, height: 15)
+            return image
         }
         
         return NSImage(systemSymbolName: "server.rack", accessibilityDescription: nil) ?? NSImage()

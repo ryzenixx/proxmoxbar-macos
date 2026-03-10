@@ -3,71 +3,91 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
     name: Build, Sign and Release
-    runs-on: macos-latest
-    
+    runs-on: macos-26
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Toolchain Info
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          swift --version
 
       - name: Import Signing Certificate
-        uses: apple-actions/import-codesign-certs@v2
-        with: 
+        uses: apple-actions/import-codesign-certs@v5
+        with:
           p12-file-base64: ${{ secrets.MACOS_CERTIFICATE }}
           p12-password: ${{ secrets.MACOS_CERTIFICATE_PWD }}
 
-      - name: Make scripts executable
-        run: chmod +x scripts/*.sh
-
-      - name: Set App Version
+      - name: Resolve Release Version
+        shell: bash
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          sed -i '' "s/static let appVersion = \".*\"/static let appVersion = \"$VERSION\"/" Sources/App/AppConfig.swift
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          set -euo pipefail
+          echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
 
-      - name: Build Application
-        run: ./scripts/bundle.sh
+      - name: Make Scripts Executable
+        run: chmod +x scripts/*.sh release.sh
+
+      - name: Build and Test
+        run: |
+          set -euo pipefail
+          swift build
+          swift test
+
+      - name: Build, Sign, Package, Appcast
+        run: ./scripts/release_pipeline.sh
         env:
           VERSION: ${{ env.VERSION }}
-          SPARKLE_PUBLIC_KEY: ${{ secrets.MACOS_SPARKLE_PUBLIC_KEY }}
-
-      - name: Sign Application
-        run: ./scripts/sign.sh
-
-      - name: Create DMG
-        run: ./scripts/package.sh
-        
-      - name: Generate Sparkle Appcast
-        run: ./scripts/generate_appcast.sh
-        env:
-          SPARKLE_PRIVATE_KEY: ${{ secrets.MACOS_SPARKLE_PRIVATE_KEY }}
+          MIN_SYSTEM_VERSION: "14.0"
           TAG_NAME: ${{ github.ref_name }}
+          SPARKLE_PUBLIC_KEY: ${{ secrets.MACOS_SPARKLE_PUBLIC_KEY }}
+          SPARKLE_PRIVATE_KEY: ${{ secrets.MACOS_SPARKLE_PRIVATE_KEY }}
+          SPARKLE_TOOLS_VERSION: "2.9.0"
 
-      - name: Commit Appcast to Repo
+      - name: Publish appcast.xml to main
+        shell: bash
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          
-          mv release_assets/appcast.xml .
-          git add appcast.xml
-          
-          # Pull latest main to avoid conflicts
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          appcast_worktree="$(mktemp -d)"
           git fetch origin main
-          git checkout main
-          git pull origin main
-          git add appcast.xml
-          git commit -m "chore: Update appcast.xml for ${{ github.ref_name }}" || echo "No changes to appcast"
-          git push origin main
+          git worktree add "$appcast_worktree" origin/main
+          cp release_assets/appcast.xml "$appcast_worktree/appcast.xml"
+
+          (
+            cd "$appcast_worktree"
+            git add appcast.xml
+            if git diff --quiet --cached; then
+              echo "No appcast changes to push."
+            else
+              git commit -m "chore: update appcast.xml for ${{ github.ref_name }}"
+              git push origin HEAD:main
+            fi
+          )
+
+          git worktree remove "$appcast_worktree" --force
 
       - name: Upload Release Assets
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          generate_release_notes: true
           files: |
             ProxmoxBar.dmg
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

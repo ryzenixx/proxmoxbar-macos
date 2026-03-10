@@ -11,3 +11,12 @@ DerivedData/
 
 # macOS System
 .DS_Store
+
+# Local release artifacts
+ProxmoxBar.app/
+ProxmoxBar.dmg
+release_assets/
+release_notes.html
+sparkle_tools/
+sparkle.tar.xz
+.sparkle-key.*.pem

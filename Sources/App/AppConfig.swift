@@ -2,5 +2,12 @@ import Foundation
 
 struct AppConfig {
     static let appName = "Proxmox Bar"
-    static let appVersion = "0.1.0"
+
+    static var appVersion: String {
+        if let bundleVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
+           !bundleVersion.isEmpty {
+            return bundleVersion
+        }
+        return "0.0.0"
+    }
 }

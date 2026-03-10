@@ -1,112 +1,52 @@
-<div align="center">
+# ProxmoxBar
 
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/proxmoxbar_dark.png">
-    <source media="(prefers-color-scheme: light)" srcset=".github/assets/proxmoxbar_light.png">
-    <img alt="ProxmoxBar" src=".github/assets/proxmoxbar_light.png" width="300">
-  </picture>
+Native macOS menu bar app for monitoring and controlling Proxmox VE resources.
 
-  # ProxmoxBar 🖥️
+[![macOS](https://img.shields.io/badge/platform-macOS%2014%2B-000000?style=for-the-badge&logo=apple&logoColor=white)](https://www.apple.com/macos)
+[![Swift](https://img.shields.io/badge/Swift-6.2-orange?style=for-the-badge&logo=swift&logoColor=white)](https://www.swift.org/)
+[![Sparkle](https://img.shields.io/badge/Sparkle-2.9.0-blue?style=for-the-badge)](https://sparkle-project.org/)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-  **The missing native companion for Proxmox VE on macOS.**
+## Features
 
-  [![macOS](https://img.shields.io/badge/platform-macOS_14+-000000.svg?style=for-the-badge&logo=apple&logoColor=white)](https://www.apple.com/macos)
-  [![Swift](https://img.shields.io/badge/Swift-6.0-F05138.svg?style=for-the-badge&logo=swift&logoColor=white)](https://developer.apple.com/swift/)
-  [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-  [![Release](https://img.shields.io/github/v/release/ryzenixx/proxmoxbar-macos?style=for-the-badge&color=2ea44f)](https://github.com/ryzenixx/proxmoxbar-macos/releases)
+- Multi-server Proxmox configuration
+- VM/LXC status, search, filtering, and quick actions
+- Datacenter resource overview (CPU, memory, storage)
+- Sparkle-based in-app updates
 
-  <br>
+## Requirements
 
-  **ProxmoxBar** lives in your menu bar, giving you instant control over your Proxmox infrastructure.
-  Monitor your nodes, manage VMs and LXC containers, and handle power actions in style.
+- macOS 14+
+- Xcode 26+
+- Proxmox VE API token
 
-  [Download Latest Release](https://github.com/ryzenixx/proxmoxbar-macos/releases/latest) • [Report Bug](https://github.com/ryzenixx/proxmoxbar-macos/issues) • [Request Feature](https://github.com/ryzenixx/proxmoxbar-macos/issues)
+## Install
 
-</div>
-
----
-
-## ✨ Features
-
-- **Multi-Node Support** — Manage multiple Proxmox servers from a single dashboard.
-- **Instant Control** — Start, Stop, and Manage VMs/Containers in one click.
-- **Live Monitoring** — Real-time CPU, RAM, and Disk usage statistics.
-- **Native Experience** — Designed for macOS with a premium, translucent aesthetic.
-- **Power Actions** — Quickly handle start, shutdown, and reboot operations.
-- **Search & Filter** — Instantly find resources across all your nodes.
-
-## 🛠 Under the Hood
-
-**ProxmoxBar** is built with **Swift** and **SwiftUI** for maximum performance.
-It features secure auto-updates and follows modern macOS security standards.
-Requires **macOS 14 (Sonoma)** or later.
-
-## 🔐 Permissions & Security
-
-To enhance security, it is highly recommended to follow the **Principle of Least Privilege**.
-Follow these steps to create a restricted API Token for ProxmoxBar:
-
-### 1. Create a Custom Role
-Go to **Datacenter** → **Permissions** → **Roles** and click **Create**.
-- **Name**: `ProxmoxBar`
-- **Privileges**: Check **only** the following:
-  - [x] `Datastore.Audit` (View Storage)
-  - [x] `Pool.Audit` (View Pools & Members)
-  - [x] `SDN.Audit` (View Network)
-  - [x] `Sys.Audit` (View Node Stats)
-  - [x] `VM.Audit` (View VMs)
-  - [x] `VM.PowerMgmt` (Start/Stop/Reboot)
-
-### 2. Create a User
-Go to **Datacenter** → **Permissions** → **Users** → **Add**.
-- **User name**: `proxmoxbar`
-- **Realm**: `Proxmox VE authentication server`
-- **Password**: (Set a strong password, won't be used by the app)
-
-### 3. Create an API Token
-Go to **Datacenter** → **Permissions** → **API Tokens** → **Add**.
-- **User**: `proxmoxbar@pve`
-- **Token ID**: `monitor` (or anything you like)
-- **Privilege Separation**: ❌ **Uncheck**
-> ⚠️ Copy the **Secret** now, it won't be shown again!
-
-### 4. Assign Permissions
-Go to **Datacenter** → **Permissions** → **Add** → **User Permission**.
-- **Path**: `/`
-- **User**: `proxmoxbar`
-- **Role**: `ProxmoxBar`
-- **Propagate**: ✅ **Checked** (To apply to all VMs/Nodes)
-
-## 🚀 Installation
-
-### Recommended
-1. Go to the [Releases Page](https://github.com/ryzenixx/proxmoxbar-macos/releases/latest).
+1. Open the [latest release](https://github.com/ryzenixx/proxmoxbar-macos/releases/latest).
 2. Download `ProxmoxBar.dmg`.
-3. Drag the app to your **Applications** folder.
-4. Launch it! 🚀
+3. Drag `ProxmoxBar.app` to `/Applications`.
+4. Launch ProxmoxBar.
 
-## 🤝 Contributing
+## Run from Source (Xcode)
 
-We welcome contributions! Please see our [CONTRIBUTING.md](https://github.com/ryzenixx/proxmoxbar-macos?tab=contributing-ov-file) for details on how to build the project from source and submit pull requests.
+1. Clone the repository.
+2. Open `Package.swift` in Xcode.
+3. Select the `ProxmoxBar` scheme.
+4. Press `Cmd+R`.
 
-## 📄 License
+## Development
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Use Xcode for day-to-day development and debugging.
 
-## ⭐ Star History
+- Build: `Cmd+B`
+- Run: `Cmd+R`
+- Tests: `Cmd+U` (or `swift test`)
 
-<a href="https://www.star-history.com/#ryzenixx/proxmoxbar-macos&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ryzenixx/proxmoxbar-macos&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ryzenixx/proxmoxbar-macos&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ryzenixx/proxmoxbar-macos&type=date&legend=top-left" />
- </picture>
-</a>
+## Project Docs
 
----
+- [Architecture](docs/ARCHITECTURE.md)
+- [Contributing](CONTRIBUTING.md)
 
-<div align="center">
-  <p>Built with ❤️ by Mael Duret
-  <br>
-  <i>Not affiliated with Proxmox Server Solutions GmbH.</i></p>
-</div>
+## License
+
+MIT. See [LICENSE](LICENSE).

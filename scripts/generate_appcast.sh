@@ -1,65 +1,69 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
 
-echo "✨ Generating Sparkle Appcast..."
+set -euo pipefail
 
-if [ -z "$SPARKLE_PRIVATE_KEY" ]; then
-    echo "❌ CRITICAL ERROR: SPARKLE_PRIVATE_KEY not set"
-    exit 1
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/lib/common.sh"
+
+APP_NAME="${APP_NAME:-ProxmoxBar}"
+DMG_PATH="${DMG_PATH:-$PROJECT_ROOT/${APP_NAME}.dmg}"
+RELEASE_ASSETS_DIR="${RELEASE_ASSETS_DIR:-$PROJECT_ROOT/release_assets}"
+SPARKLE_TOOLS_VERSION="${SPARKLE_TOOLS_VERSION:-2.9.0}"
+
+require_env SPARKLE_PRIVATE_KEY
+require_env TAG_NAME
+require_file "$DMG_PATH"
+
+DOWNLOAD_URL_PREFIX="${DOWNLOAD_URL_PREFIX:-https://github.com/ryzenixx/proxmoxbar-macos/releases/download/${TAG_NAME}/}"
+
+resolve_sparkle_bin() {
+  local candidates=(
+    "$PROJECT_ROOT/.build/artifacts/sparkle/Sparkle/bin"
+    "$PROJECT_ROOT/.build/checkouts/Sparkle/bin"
+  )
+
+  for candidate in "${candidates[@]}"; do
+    if [ -x "$candidate/generate_appcast" ]; then
+      echo "$candidate"
+      return
+    fi
+  done
+
+  local tools_dir="$PROJECT_ROOT/sparkle_tools"
+  if [ ! -x "$tools_dir/bin/generate_appcast" ]; then
+    log_info "Downloading Sparkle tools v$SPARKLE_TOOLS_VERSION..."
+    rm -rf "$tools_dir" "$PROJECT_ROOT/sparkle.tar.xz"
+    curl -fsSL -o "$PROJECT_ROOT/sparkle.tar.xz" "https://github.com/sparkle-project/Sparkle/releases/download/$SPARKLE_TOOLS_VERSION/Sparkle-$SPARKLE_TOOLS_VERSION.tar.xz"
+    mkdir -p "$tools_dir"
+    tar -xf "$PROJECT_ROOT/sparkle.tar.xz" -C "$tools_dir"
+  fi
+
+  echo "$tools_dir/bin"
+}
+
+SPARKLE_BIN="$(resolve_sparkle_bin)"
+GENERATE_APPCAST="$SPARKLE_BIN/generate_appcast"
+
+if [ ! -x "$GENERATE_APPCAST" ]; then
+  log_error "Sparkle tools not found or not executable."
+  exit 1
 fi
 
-if [ -z "$TAG_NAME" ]; then
-    echo "❌ CRITICAL ERROR: TAG_NAME not set"
-    exit 1
+rm -rf "$RELEASE_ASSETS_DIR"
+mkdir -p "$RELEASE_ASSETS_DIR"
+cp "$DMG_PATH" "$RELEASE_ASSETS_DIR/"
+
+release_notes_source="$PROJECT_ROOT/RELEASE_NOTES.md"
+if [ -f "$release_notes_source" ]; then
+  archive_name="$(basename "$DMG_PATH")"
+  archive_base="${archive_name%.*}"
+  cp "$release_notes_source" "$RELEASE_ASSETS_DIR/$archive_base.md"
 fi
 
-# 1. Download Sparkle Tools
-# We download 2.6.0 as in the original workflow
-if [ ! -d "sparkle_tools" ]; then
-    echo "ℹ️  Downloading Sparkle Tools..."
-    curl -L -o sparkle.tar.xz https://github.com/sparkle-project/Sparkle/releases/download/2.6.0/Sparkle-2.6.0.tar.xz
-    mkdir sparkle_tools
-    tar -xf sparkle.tar.xz -C sparkle_tools
-fi
+log_info "Generating appcast..."
+printf '%s' "$SPARKLE_PRIVATE_KEY" | "$GENERATE_APPCAST" \
+  --download-url-prefix "$DOWNLOAD_URL_PREFIX" \
+  --ed-key-file - \
+  "$RELEASE_ASSETS_DIR"
 
-# 2. Sign the DMG
-echo "ℹ️  Signing DMG..."
-echo "$SPARKLE_PRIVATE_KEY" > sparkle_key.pem
-./sparkle_tools/bin/sign_update "ProxmoxBar.dmg" --ed-key-file sparkle_key.pem
-
-# 3. Prepare Release Assets
-rm -rf release_assets
-mkdir release_assets
-cp "ProxmoxBar.dmg" release_assets/
-
-DOWNLOAD_URL="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/${TAG_NAME}/"
-
-# 4. Generate Appcast
-echo "ℹ️  Generating Appcast XML..."
-echo "$SPARKLE_PRIVATE_KEY" | ./sparkle_tools/bin/generate_appcast \
-    --download-url-prefix "$DOWNLOAD_URL" \
-    --ed-key-file - \
-    release_assets
-
-# 5. Inject Release Notes
-echo "ℹ️  Processing Release Notes..."
-if ! command -v pandoc &> /dev/null; then
-    echo "ℹ️  Installing pandoc..."
-    brew install pandoc
-fi
-
-# Convert Markdown to HTML
-if [ -f "RELEASE_NOTES.md" ]; then
-    pandoc RELEASE_NOTES.md -f markdown -t html -o release_notes.html
-    
-    # Inject HTML content into the appcast as <description>
-    # Note: Using perl as in original because it works reliably for multiline replacement
-    perl -0777 -i -pe 'BEGIN { local $/; open(F, "<release_notes.html"); $notes = <F>; close(F); } s|</item>|<description><![CDATA[$notes]]></description></item>|' release_assets/appcast.xml
-else
-    echo "⚠️  RELEASE_NOTES.md not found, skipping injection."
-fi
-
-# Output for debugging
-# cat release_assets/appcast.xml
-
-echo "✅ Appcast Generated Successfully!"
+log_success "Appcast generated at $RELEASE_ASSETS_DIR/appcast.xml"

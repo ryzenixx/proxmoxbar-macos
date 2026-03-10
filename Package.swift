@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -10,7 +10,7 @@ let package = Package(
         .executable(name: "ProxmoxBar", targets: ["ProxmoxBar"])
     ],
     dependencies: [
-        .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.6.0")
+        .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.9.0")
     ],
     targets: [
         .executableTarget(
@@ -23,5 +23,10 @@ let package = Package(
                 .copy("Assets")
             ]
         ),
+        .testTarget(
+            name: "ProxmoxBarTests",
+            dependencies: ["ProxmoxBar"],
+            path: "Tests/ProxmoxBarTests"
+        )
     ]
 )

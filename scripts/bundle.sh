@@ -1,101 +1,104 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
 
-echo "📦 Bundling Application..."
+set -euo pipefail
 
-# Cleanup
-rm -rf .build
-rm -rf ProxmoxBar.app
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/lib/common.sh"
 
-# Build Universal
+APP_NAME="${APP_NAME:-ProxmoxBar}"
+APP_BUNDLE="${APP_NAME}.app"
+BUNDLE_IDENTIFIER="${BUNDLE_IDENTIFIER:-com.proxmoxbar.app}"
+VERSION="${VERSION:-0.0.0}"
+MIN_SYSTEM_VERSION="${MIN_SYSTEM_VERSION:-14.0}"
+SPARKLE_PUBLIC_KEY="${SPARKLE_PUBLIC_KEY:-}"
+SPARKLE_FEED_URL="${SPARKLE_FEED_URL:-https://raw.githubusercontent.com/ryzenixx/proxmoxbar-macos/main/appcast.xml}"
+
+BUILD_DIR="$PROJECT_ROOT/.build"
+PRODUCTS_DIR="$BUILD_DIR/apple/Products/Release"
+EXECUTABLE_PATH="$PRODUCTS_DIR/$APP_NAME"
+APP_ROOT="$PROJECT_ROOT/$APP_BUNDLE/Contents"
+MACOS_DIR="$APP_ROOT/MacOS"
+RESOURCES_DIR="$APP_ROOT/Resources"
+FRAMEWORKS_DIR="$APP_ROOT/Frameworks"
+
+log_info "Bundling $APP_NAME..."
+
+require_command swift
+require_command install_name_tool
+require_command plutil
+
+cd "$PROJECT_ROOT"
+rm -rf "$BUILD_DIR" "$PROJECT_ROOT/$APP_BUNDLE"
+
 swift build -c release --arch arm64 --arch x86_64
+require_file "$EXECUTABLE_PATH"
 
-# Define Paths
-EXECUTABLE_PATH=".build/apple/Products/Release/ProxmoxBar"
-if [ ! -f "$EXECUTABLE_PATH" ]; then
-    echo "❌ Universal binary not found at expected path: $EXECUTABLE_PATH"
+mkdir -p "$MACOS_DIR" "$RESOURCES_DIR" "$FRAMEWORKS_DIR"
+cp "$EXECUTABLE_PATH" "$MACOS_DIR/$APP_NAME"
+
+if ! otool -l "$MACOS_DIR/$APP_NAME" | grep -q "@executable_path/../Frameworks"; then
+  install_name_tool -add_rpath "@executable_path/../Frameworks" "$MACOS_DIR/$APP_NAME"
+fi
+
+for asset in AppIcon.icns MenuBarIcon.png; do
+  asset_path="$PROJECT_ROOT/Sources/Assets/$asset"
+  if [ -f "$asset_path" ]; then
+    cp "$asset_path" "$RESOURCES_DIR/"
+  else
+    log_error "Required asset missing: $asset_path"
     exit 1
+  fi
+done
+
+sparkle_framework_source="$(find "$BUILD_DIR" -name "Sparkle.framework" -type d | head -n1 || true)"
+if [ -z "$sparkle_framework_source" ]; then
+  log_error "Sparkle.framework not found in build output."
+  exit 1
 fi
-BUNDLE_PATH="./ProxmoxBar.app"
-CONTENTS_PATH="$BUNDLE_PATH/Contents"
-RESOURCES_PATH="$CONTENTS_PATH/Resources"
-MACOS_PATH="$CONTENTS_PATH/MacOS"
-FRAMEWORKS_PATH="$CONTENTS_PATH/Frameworks"
+cp -R "$sparkle_framework_source" "$FRAMEWORKS_DIR/"
 
-# Create Bundle Structure
-mkdir -p "$MACOS_PATH"
-mkdir -p "$RESOURCES_PATH"
-mkdir -p "$FRAMEWORKS_PATH"
-
-# Install Executable
-cp "$EXECUTABLE_PATH" "$MACOS_PATH/"
-install_name_tool -add_rpath "@executable_path/../Frameworks" "$MACOS_PATH/ProxmoxBar"
-
-# Install Resources (Check if they exist to avoid errors)
-if [ -f "Sources/Assets/AppIcon.icns" ]; then
-    cp "Sources/Assets/AppIcon.icns" "$RESOURCES_PATH/"
-else
-    echo "⚠️  Warning: AppIcon.icns not found in Sources/Assets/"
+if [ -z "$SPARKLE_PUBLIC_KEY" ]; then
+  log_info "SPARKLE_PUBLIC_KEY is empty. Auto-update checks will be unavailable for this build."
 fi
 
-if [ -f "Sources/Assets/MenuBarIcon.png" ]; then
-    cp "Sources/Assets/MenuBarIcon.png" "$RESOURCES_PATH/"
-else
-    echo "⚠️  Warning: MenuBarIcon.png not found in Sources/Assets/"
-fi
-
-# Install Sparkle Framework
-find .build -name "Sparkle.framework" -exec cp -R {} "$FRAMEWORKS_PATH/" \;
-if [ ! -d "$FRAMEWORKS_PATH/Sparkle.framework" ]; then
-    echo "❌ CRITICAL ERROR: Sparkle.framework not found. Ensure it is added as a dependency."
-    # We exit 0 here for now if the user hasn't added it yet, to allow the script to be saved.
-    # But strictly it should fail. The user asked to copy scripts, I assume they will add dep.
-    exit 1
-fi
-
-# Generate Info.plist
-VERSION=${VERSION:-"0.0.0"}
-
-cat > "$CONTENTS_PATH/Info.plist" <<EOF
+cat > "$APP_ROOT/Info.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleExecutable</key>
-    <string>ProxmoxBar</string>
-    <key>CFBundleIconFile</key>
-    <string>AppIcon</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.proxmoxbar.app</string>
-    <key>CFBundleName</key>
-    <string>ProxmoxBar</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleVersion</key>
-    <string>${VERSION}</string>
-    <key>CFBundleShortVersionString</key>
-    <string>${VERSION}</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>13.0</string>
-    <key>LSUIElement</key>
-    <true/>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-    <key>SUFeedURL</key>
-    <string>https://raw.githubusercontent.com/ryzenixx/proxmoxbar-macos/main/appcast.xml</string>
-    <key>SUPublicEDKey</key>
-    <string>${SPARKLE_PUBLIC_KEY}</string>
-    <key>SUEnableAutomaticChecks</key>
-    <true/>
-    <key>SUScheduledCheckInterval</key>
-    <integer>3600</integer>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
+  <key>CFBundleDisplayName</key>
+  <string>$APP_NAME</string>
+  <key>CFBundleExecutable</key>
+  <string>$APP_NAME</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon</string>
+  <key>CFBundleIdentifier</key>
+  <string>$BUNDLE_IDENTIFIER</string>
+  <key>CFBundleName</key>
+  <string>$APP_NAME</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>$VERSION</string>
+  <key>CFBundleVersion</key>
+  <string>$VERSION</string>
+  <key>LSMinimumSystemVersion</key>
+  <string>$MIN_SYSTEM_VERSION</string>
+  <key>LSUIElement</key>
+  <true/>
+  <key>NSHighResolutionCapable</key>
+  <true/>
+  <key>SUEnableAutomaticChecks</key>
+  <true/>
+  <key>SUFeedURL</key>
+  <string>$SPARKLE_FEED_URL</string>
+  <key>SUPublicEDKey</key>
+  <string>$SPARKLE_PUBLIC_KEY</string>
+  <key>SUScheduledCheckInterval</key>
+  <integer>3600</integer>
 </dict>
 </plist>
 EOF
 
-echo "✅ App Bundled Successfully!"
+plutil -lint "$APP_ROOT/Info.plist" >/dev/null
+log_success "App bundle created at $APP_BUNDLE"
