@@ -5,10 +5,28 @@ on:
     branches:
       - develop
       - main
+    paths-ignore:
+      - "README.md"
+      - "RELEASE_NOTES.md"
+      - "CONTRIBUTING.md"
+      - "LICENSE"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/FUNDING.yml"
+      - ".github/SECURITY.md"
   push:
     branches:
       - develop
       - main
+    paths-ignore:
+      - "README.md"
+      - "RELEASE_NOTES.md"
+      - "CONTRIBUTING.md"
+      - "LICENSE"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/FUNDING.yml"
+      - ".github/SECURITY.md"
 
 permissions:
   contents: read
