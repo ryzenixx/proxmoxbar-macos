@@ -10,9 +10,20 @@ require_env APP_NAME
 dmg_path="${1:-${GITHUB_WORKSPACE}/${APP_NAME}.dmg}"
 [ -f "$dmg_path" ] || die "DMG not found: $dmg_path"
 
+require_env CODESIGN_IDENTITY
 require_env NOTARY_APPLE_ID
 require_env NOTARY_APP_PASSWORD
 require_env NOTARY_TEAM_ID
+
+if ! security find-identity -v -p codesigning | grep -F "\"${CODESIGN_IDENTITY}\"" >/dev/null 2>&1; then
+  log "Available code-signing identities:"
+  security find-identity -v -p codesigning || true
+  die "Configured MACOS_CODESIGN_IDENTITY was not found after certificate import."
+fi
+
+log "Signing DMG with Developer ID Application identity."
+codesign --force --sign "$CODESIGN_IDENTITY" --timestamp --verbose=2 "$dmg_path"
+codesign --verify --verbose=2 "$dmg_path"
 
 log "Submitting DMG for notarization using Apple ID credentials."
 submit_json="$(xcrun notarytool submit "$dmg_path" \
@@ -49,11 +60,37 @@ spctl_exit="${spctl_exit:-0}"
 printf '%s\n' "$spctl_output"
 
 if [ "$spctl_exit" -ne 0 ]; then
-  if printf '%s' "$spctl_output" | grep -qi "Insufficient Context"; then
-    log "spctl returned 'Insufficient Context' on this runner; notarization and stapling already succeeded."
+  if printf '%s' "$spctl_output" | grep -Eqi "Insufficient Context|no usable signature"; then
+    log "spctl returned a non-blocking DMG assessment result on this runner; notarization and stapling already succeeded."
   else
     die "spctl assessment failed for ${dmg_path}"
   fi
+fi
+
+mount_point="$(mktemp -d "${RUNNER_TEMP}/${APP_NAME}-mount.XXXXXX")"
+mounted=0
+cleanup_mount() {
+  if [ "$mounted" -eq 1 ]; then
+    hdiutil detach "$mount_point" -quiet || true
+  fi
+  rmdir "$mount_point" 2>/dev/null || true
+}
+trap cleanup_mount EXIT
+
+hdiutil attach "$dmg_path" -nobrowse -readonly -mountpoint "$mount_point" >/dev/null
+mounted=1
+
+mounted_app="${mount_point}/${APP_NAME}.app"
+[ -d "$mounted_app" ] || die "Expected app not found in mounted DMG: $mounted_app"
+
+app_spctl_output="$(
+  spctl --assess --type execute --verbose=4 "$mounted_app" 2>&1
+)" || app_spctl_exit=$?
+app_spctl_exit="${app_spctl_exit:-0}"
+printf '%s\n' "$app_spctl_output"
+
+if [ "$app_spctl_exit" -ne 0 ]; then
+  die "spctl assessment failed for app inside DMG: ${mounted_app}"
 fi
 
 log "Notarization and stapling succeeded: $dmg_path"
