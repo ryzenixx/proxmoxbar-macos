@@ -15,12 +15,29 @@ require_env NOTARY_APP_PASSWORD
 require_env NOTARY_TEAM_ID
 
 log "Submitting DMG for notarization using Apple ID credentials."
-xcrun notarytool submit "$dmg_path" \
+submit_json="$(xcrun notarytool submit "$dmg_path" \
   --apple-id "$NOTARY_APPLE_ID" \
   --password "$NOTARY_APP_PASSWORD" \
   --team-id "$NOTARY_TEAM_ID" \
   --wait \
-  --timeout 30m
+  --timeout 30m \
+  --output-format json)"
+
+submission_id="$(printf '%s' "$submit_json" | plutil -extract id raw - 2>/dev/null || true)"
+status="$(printf '%s' "$submit_json" | plutil -extract status raw - 2>/dev/null || true)"
+
+[ -n "$submission_id" ] || die "Unable to parse notarization submission ID from notarytool output."
+[ -n "$status" ] || die "Unable to parse notarization status from notarytool output."
+
+log "Notarization submission: ${submission_id} (status: ${status})"
+if [ "$status" != "Accepted" ]; then
+  log "Notarization failed with status '${status}'. Fetching detailed notary log..."
+  xcrun notarytool log "$submission_id" \
+    --apple-id "$NOTARY_APPLE_ID" \
+    --password "$NOTARY_APP_PASSWORD" \
+    --team-id "$NOTARY_TEAM_ID" || true
+  die "Notarization was not accepted. See log above."
+fi
 
 xcrun stapler staple "$dmg_path"
 xcrun stapler validate "$dmg_path"
