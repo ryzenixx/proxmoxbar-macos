@@ -59,7 +59,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Make Scripts Executable
-        run: chmod +x scripts/*.sh release.sh
+        run: chmod +x scripts/*.sh
 
       - name: Build App Bundle
         env:
@@ -92,7 +92,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Make Scripts Executable
-        run: chmod +x scripts/*.sh release.sh
+        run: chmod +x scripts/*.sh
 
       - name: Download App Bundle Artifact
         uses: actions/download-artifact@v5
@@ -136,7 +136,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Make Scripts Executable
-        run: chmod +x scripts/*.sh release.sh
+        run: chmod +x scripts/*.sh
 
       - name: Download DMG Artifact
         uses: actions/download-artifact@v5
