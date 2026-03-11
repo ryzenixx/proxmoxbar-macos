@@ -81,7 +81,6 @@ jobs:
       VERSION: ${{ needs.preflight.outputs.version }}
       SPARKLE_PUBLIC_KEY: ${{ secrets.MACOS_SPARKLE_PUBLIC_KEY }}
       SPARKLE_PRIVATE_KEY: ${{ secrets.MACOS_SPARKLE_PRIVATE_KEY }}
-      CODESIGN_IDENTITY: ${{ secrets.MACOS_CODESIGN_IDENTITY }}
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -132,11 +131,13 @@ jobs:
           set -euo pipefail
 
           archive_path="$RUNNER_TEMP/${APP_NAME}.xcarchive"
-          signing_identity="${CODESIGN_IDENTITY:-}"
+          signing_identity="$(security find-identity -v -p codesigning | sed -n 's/.*"\(Developer ID Application:.*\)".*/\1/p' | head -n1 || true)"
           if [ -z "$signing_identity" ]; then
-            signing_identity="$(security find-identity -v -p codesigning | sed -n 's/.*"\(Developer ID Application:.*\)".*/\1/p' | head -n1 || true)"
+            echo "No Developer ID Application signing identity found after certificate import."
+            echo "Available codesigning identities:"
+            security find-identity -v -p codesigning || true
+            exit 1
           fi
-          [ -n "$signing_identity" ] || { echo "No Developer ID Application signing identity found."; exit 1; }
 
           xcodebuild \
             -project ProxmoxBar.xcodeproj \
