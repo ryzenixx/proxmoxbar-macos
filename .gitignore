@@ -8,6 +8,10 @@
 *.xcworkspace
 xcuserdata/
 DerivedData/
+!ProxmoxBar.xcodeproj/
+!ProxmoxBar.xcodeproj/**
+!ProxmoxBar.xcodeproj/project.xcworkspace/
+!ProxmoxBar.xcodeproj/project.xcworkspace/**
 
 # macOS System
 .DS_Store

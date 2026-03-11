@@ -30,7 +30,7 @@ Native macOS menu bar app for monitoring and controlling Proxmox VE resources.
 ## Run from Source (Xcode)
 
 1. Clone the repository.
-2. Open `Package.swift` in Xcode.
+2. Open `ProxmoxBar.xcodeproj` in Xcode.
 3. Select the `ProxmoxBar` scheme.
 4. Press `Cmd+R`.
 
@@ -40,7 +40,7 @@ Use Xcode for day-to-day development and debugging.
 
 - Build: `Cmd+B`
 - Run: `Cmd+R`
-- Tests: `Cmd+U` (or `swift test`)
+- Tests: `Cmd+U`
 
 ## Project Docs
 

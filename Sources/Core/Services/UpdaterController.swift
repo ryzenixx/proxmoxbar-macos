@@ -14,7 +14,6 @@ class UpdaterController: NSObject, ObservableObject, SPUUpdaterDelegate {
         let publicKey = Bundle.main.object(forInfoDictionaryKey: "SUPublicEDKey") as? String
         
         // Sparkle needs a bundled app context with update metadata in Info.plist.
-        // Local SPM runs usually don't provide that context.
         guard bundleIdentifier != nil,
               !(feedURL?.isEmpty ?? true),
               !(publicKey?.isEmpty ?? true) else {

@@ -83,13 +83,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         
-        if let moduleUrl = Bundle.module.url(forResource: "Assets/MenuBarIcon", withExtension: "png"),
-           let image = NSImage(contentsOf: moduleUrl) {
-            image.isTemplate = true
-            image.size = CGSize(width: 15, height: 15)
-            return image
-        }
-        
         return NSImage(systemSymbolName: "server.rack", accessibilityDescription: nil) ?? NSImage()
     }
     

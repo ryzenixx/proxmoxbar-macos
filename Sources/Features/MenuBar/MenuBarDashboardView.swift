@@ -269,12 +269,6 @@ private enum MenuBarAssets {
             }
         }
 
-        if let moduleURL = Bundle.module.url(forResource: "Assets/MenuBarIcon", withExtension: "png"),
-           let image = NSImage(contentsOf: moduleURL) {
-            image.isTemplate = true
-            return image
-        }
-
         return NSImage(systemSymbolName: "server.rack", accessibilityDescription: nil) ?? NSImage()
     }
 }

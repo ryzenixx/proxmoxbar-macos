@@ -4,54 +4,102 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to release (example: v2.0.2)"
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
   cancel-in-progress: false
 
+env:
+  APP_NAME: ProxmoxBar
+  SPARKLE_TOOLS_VERSION: "2.9.0"
+
 jobs:
-  guard_main_tag:
-    name: Guard (Tag Must Be On main)
+  preflight:
+    name: Preflight
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      tag_name: ${{ steps.resolve.outputs.tag_name }}
+      version: ${{ steps.resolve.outputs.version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
-      - name: Ensure Tagged Commit Is On main
+      - name: Resolve and Validate Tag
+        id: resolve
         shell: bash
         run: |
           set -euo pipefail
-          git fetch origin main
-          if git merge-base --is-ancestor "$GITHUB_SHA" "origin/main"; then
-            echo "Tag commit is on main history."
+
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            tag_name="${{ inputs.tag }}"
           else
-            echo "Tag ${GITHUB_REF_NAME} is not based on origin/main. Aborting release."
+            tag_name="${GITHUB_REF_NAME}"
+          fi
+
+          if [[ ! "$tag_name" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag '$tag_name' is not a supported release tag (expected vX.Y.Z)."
             exit 1
           fi
 
-  verify:
-    name: Verify (Build + Tests)
+          git fetch origin main --tags --force
+          if ! git rev-parse "refs/tags/$tag_name" >/dev/null 2>&1; then
+            echo "Tag '$tag_name' does not exist in this repository."
+            exit 1
+          fi
+
+          tag_sha="$(git rev-list -n 1 "refs/tags/$tag_name")"
+          if ! git merge-base --is-ancestor "$tag_sha" "origin/main"; then
+            echo "Tag '$tag_name' is not on origin/main history."
+            exit 1
+          fi
+
+          version="${tag_name#v}"
+          {
+            echo "tag_name=$tag_name"
+            echo "version=$version"
+          } >> "$GITHUB_OUTPUT"
+
+  build_sign_package:
+    name: Build, Archive, Package, Appcast
     runs-on: macos-26
-    needs: guard_main_tag
-    outputs:
-      version: ${{ steps.version.outputs.version }}
+    timeout-minutes: 60
+    needs: preflight
+    env:
+      TAG_NAME: ${{ needs.preflight.outputs.tag_name }}
+      VERSION: ${{ needs.preflight.outputs.version }}
+      SPARKLE_PUBLIC_KEY: ${{ secrets.MACOS_SPARKLE_PUBLIC_KEY }}
+      SPARKLE_PRIVATE_KEY: ${{ secrets.MACOS_SPARKLE_PRIVATE_KEY }}
+      CODESIGN_IDENTITY: ${{ secrets.MACOS_CODESIGN_IDENTITY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
-      - name: Resolve Version
-        id: version
+      - name: Checkout Release Tag
         shell: bash
         run: |
           set -euo pipefail
-          echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          git checkout "refs/tags/$TAG_NAME"
+
+      - name: Validate Required Secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          [ -n "${SPARKLE_PUBLIC_KEY:-}" ] || { echo "Missing MACOS_SPARKLE_PUBLIC_KEY"; exit 1; }
+          [ -n "${SPARKLE_PRIVATE_KEY:-}" ] || { echo "Missing MACOS_SPARKLE_PRIVATE_KEY"; exit 1; }
 
       - name: Toolchain Info
         shell: bash
@@ -60,185 +108,227 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Build
+      - name: Build and Test
         shell: bash
         run: |
           set -euo pipefail
-          swift build
-
-      - name: Test
-        shell: bash
-        run: |
-          set -euo pipefail
-          swift test
-
-  bundle:
-    name: Bundle App
-    runs-on: macos-26
-    needs: verify
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Make Scripts Executable
-        run: chmod +x scripts/*.sh
-
-      - name: Build App Bundle
-        env:
-          VERSION: ${{ needs.verify.outputs.version }}
-          MIN_SYSTEM_VERSION: "14.0"
-          SPARKLE_PUBLIC_KEY: ${{ secrets.MACOS_SPARKLE_PUBLIC_KEY }}
-        run: ./scripts/bundle.sh
-
-      - name: Archive App Bundle Artifact
-        shell: bash
-        run: |
-          set -euo pipefail
-          tar -C "$GITHUB_WORKSPACE" -czf ProxmoxBar.app.tar.gz ProxmoxBar.app
-
-      - name: Upload App Bundle Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: proxmoxbar-app-bundle
-          path: ProxmoxBar.app.tar.gz
-          retention-days: 7
-
-  sign_and_package:
-    name: Sign and Package
-    runs-on: macos-26
-    needs:
-      - verify
-      - bundle
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Make Scripts Executable
-        run: chmod +x scripts/*.sh
-
-      - name: Download App Bundle Artifact
-        uses: actions/download-artifact@v5
-        with:
-          name: proxmoxbar-app-bundle
-          path: .
-
-      - name: Extract App Bundle
-        shell: bash
-        run: |
-          set -euo pipefail
-          tar -xzf ProxmoxBar.app.tar.gz
+          xcodebuild \
+            -project ProxmoxBar.xcodeproj \
+            -scheme ProxmoxBar \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            SPARKLE_PUBLIC_ED_KEY="$SPARKLE_PUBLIC_KEY" \
+            build test
 
       - name: Import Signing Certificate
-        uses: apple-actions/import-codesign-certs@v5
+        uses: Apple-Actions/import-codesign-certs@b610f78488812c1e56b20e6df63ec42d833f2d14 # v6.0.0
         with:
           p12-file-base64: ${{ secrets.MACOS_CERTIFICATE }}
           p12-password: ${{ secrets.MACOS_CERTIFICATE_PWD }}
 
-      - name: Sign App Bundle
-        run: ./scripts/sign.sh
+      - name: Archive Signed App
+        shell: bash
+        run: |
+          set -euo pipefail
 
-      - name: Create DMG
-        run: ./scripts/package.sh
+          archive_path="$RUNNER_TEMP/${APP_NAME}.xcarchive"
+          signing_identity="${CODESIGN_IDENTITY:-}"
+          if [ -z "$signing_identity" ]; then
+            signing_identity="$(security find-identity -v -p codesigning | sed -n 's/.*"\(Developer ID Application:.*\)".*/\1/p' | head -n1 || true)"
+          fi
+          [ -n "$signing_identity" ] || { echo "No Developer ID Application signing identity found."; exit 1; }
 
-      - name: Upload DMG Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: proxmoxbar-dmg
-          path: ProxmoxBar.dmg
-          retention-days: 7
+          xcodebuild \
+            -project ProxmoxBar.xcodeproj \
+            -scheme ProxmoxBar \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -archivePath "$archive_path" \
+            MARKETING_VERSION="$VERSION" \
+            CURRENT_PROJECT_VERSION="$VERSION" \
+            SPARKLE_PUBLIC_ED_KEY="$SPARKLE_PUBLIC_KEY" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="$signing_identity" \
+            archive
 
-  appcast:
-    name: Generate Appcast
-    runs-on: macos-26
-    needs:
-      - verify
-      - sign_and_package
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+          app_path="$archive_path/Products/Applications/${APP_NAME}.app"
+          [ -d "$app_path" ] || { echo "Archived app not found: $app_path"; exit 1; }
 
-      - name: Make Scripts Executable
-        run: chmod +x scripts/*.sh
+          codesign --verify --deep --strict --verbose=2 "$app_path"
 
-      - name: Download DMG Artifact
-        uses: actions/download-artifact@v5
-        with:
-          name: proxmoxbar-dmg
-          path: .
+          sig_details="$(codesign --display --verbose=4 "$app_path/Contents/MacOS/$APP_NAME" 2>&1 || true)"
+          if ! printf '%s' "$sig_details" | grep -qi "Timestamp"; then
+            echo "Missing trusted timestamp on app signature."
+            exit 1
+          fi
+          if ! printf '%s' "$sig_details" | grep -qi "runtime"; then
+            echo "Missing hardened runtime on app signature."
+            exit 1
+          fi
+
+      - name: Package DMG
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          archive_path="$RUNNER_TEMP/${APP_NAME}.xcarchive"
+          app_path="$archive_path/Products/Applications/${APP_NAME}.app"
+          dmg_path="$GITHUB_WORKSPACE/${APP_NAME}.dmg"
+          staging_dir="$(mktemp -d "$RUNNER_TEMP/${APP_NAME}-dmg.XXXXXX")"
+
+          cp -R "$app_path" "$staging_dir/"
+          ln -s /Applications "$staging_dir/Applications"
+
+          hdiutil create \
+            -volname "${APP_NAME} Installer" \
+            -srcfolder "$staging_dir" \
+            -ov \
+            -format UDZO \
+            -fs HFS+ \
+            "$dmg_path" >/dev/null
 
       - name: Generate Sparkle Appcast
-        env:
-          TAG_NAME: ${{ github.ref_name }}
-          SPARKLE_PRIVATE_KEY: ${{ secrets.MACOS_SPARKLE_PRIVATE_KEY }}
-          SPARKLE_TOOLS_VERSION: "2.9.0"
-        run: ./scripts/generate_appcast.sh
+        shell: bash
+        run: |
+          set -euo pipefail
 
-      - name: Upload Appcast Artifact
-        uses: actions/upload-artifact@v4
+          dmg_path="$GITHUB_WORKSPACE/${APP_NAME}.dmg"
+          release_assets_dir="$GITHUB_WORKSPACE/release_assets"
+          tools_root="$RUNNER_TEMP/sparkle-tools/${SPARKLE_TOOLS_VERSION}"
+          archive_path="$RUNNER_TEMP/Sparkle-${SPARKLE_TOOLS_VERSION}.tar.xz"
+          download_url_prefix="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/${TAG_NAME}/"
+
+          mkdir -p "$tools_root"
+          curl -fsSL -o "$archive_path" \
+            "https://github.com/sparkle-project/Sparkle/releases/download/${SPARKLE_TOOLS_VERSION}/Sparkle-${SPARKLE_TOOLS_VERSION}.tar.xz"
+          tar -xf "$archive_path" -C "$tools_root"
+
+          generate_appcast_bin="$(find "$tools_root" -type f -path '*/bin/generate_appcast' | head -n1 || true)"
+          [ -n "$generate_appcast_bin" ] || { echo "Unable to locate generate_appcast"; exit 1; }
+          [ -x "$generate_appcast_bin" ] || { echo "generate_appcast not executable"; exit 1; }
+
+          rm -rf "$release_assets_dir"
+          mkdir -p "$release_assets_dir"
+          cp "$dmg_path" "$release_assets_dir/"
+
+          if [ -f "$GITHUB_WORKSPACE/RELEASE_NOTES.md" ]; then
+            cp "$GITHUB_WORKSPACE/RELEASE_NOTES.md" "$release_assets_dir/${APP_NAME}.md"
+          fi
+
+          printf '%s' "$SPARKLE_PRIVATE_KEY" | "$generate_appcast_bin" \
+            --download-url-prefix "$download_url_prefix" \
+            --ed-key-file - \
+            "$release_assets_dir"
+
+      - name: Create Checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          shasum -a 256 "${APP_NAME}.dmg" > "release_assets/${APP_NAME}.dmg.sha256"
+
+      - name: Upload Release Bundle Artifact
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
-          name: proxmoxbar-appcast
-          path: release_assets/appcast.xml
-          retention-days: 7
+          name: proxmoxbar-release-bundle
+          path: |
+            ProxmoxBar.dmg
+            release_assets/appcast.xml
+            release_assets/ProxmoxBar.dmg.sha256
+          if-no-files-found: error
+          retention-days: 14
+
+  publish_github_release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - preflight
+      - build_sign_package
+    permissions:
+      contents: write
+    env:
+      TAG_NAME: ${{ needs.preflight.outputs.tag_name }}
+      VERSION: ${{ needs.preflight.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Download Release Bundle Artifact
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
+        with:
+          name: proxmoxbar-release-bundle
+          path: release_bundle
+
+      - name: Publish Release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          dmg_path="release_bundle/ProxmoxBar.dmg"
+          sha_path="release_bundle/release_assets/ProxmoxBar.dmg.sha256"
+
+          if [ ! -f "$dmg_path" ] || [ ! -f "$sha_path" ]; then
+            echo "Missing release files in artifact bundle."
+            exit 1
+          fi
+
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" "$dmg_path" "$sha_path" --clobber
+          else
+            gh release create "$TAG_NAME" \
+              "$dmg_path" \
+              "$sha_path" \
+              --title "ProxmoxBar $VERSION" \
+              --verify-tag \
+              --generate-notes
+          fi
 
   publish_appcast:
     name: Publish Appcast to main
     runs-on: ubuntu-latest
-    needs: appcast
+    timeout-minutes: 15
+    needs:
+      - preflight
+      - publish_github_release
     permissions:
       contents: write
+    env:
+      TAG_NAME: ${{ needs.preflight.outputs.tag_name }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
-      - name: Download Appcast Artifact
-        uses: actions/download-artifact@v5
+      - name: Download Release Bundle Artifact
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
-          name: proxmoxbar-appcast
-          path: .
+          name: proxmoxbar-release-bundle
+          path: release_bundle
 
       - name: Commit and Push appcast.xml
         shell: bash
         run: |
           set -euo pipefail
+
+          appcast_path="release_bundle/release_assets/appcast.xml"
+          [ -f "$appcast_path" ] || { echo "appcast.xml missing from release bundle"; exit 1; }
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          appcast_worktree="$(mktemp -d)"
+          worktree_dir="$(mktemp -d)"
           git fetch origin main
-          git worktree add "$appcast_worktree" origin/main
-          cp appcast.xml "$appcast_worktree/appcast.xml"
+          git worktree add "$worktree_dir" origin/main
+          cp "$appcast_path" "$worktree_dir/appcast.xml"
 
           (
-            cd "$appcast_worktree"
+            cd "$worktree_dir"
             git add appcast.xml
             if git diff --quiet --cached; then
-              echo "No appcast changes to push."
+              echo "No appcast changes to publish."
             else
-              git commit -m "chore: update appcast.xml for ${{ github.ref_name }}"
+              git commit -m "chore(release): update appcast for $TAG_NAME"
               git push origin HEAD:main
             fi
           )
 
-          git worktree remove "$appcast_worktree" --force
-
-  release:
-    name: Publish GitHub Release
-    runs-on: ubuntu-latest
-    needs:
-      - sign_and_package
-      - publish_appcast
-    permissions:
-      contents: write
-    steps:
-      - name: Download DMG Artifact
-        uses: actions/download-artifact@v5
-        with:
-          name: proxmoxbar-dmg
-          path: .
-
-      - name: Upload Release Assets
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ProxmoxBar.dmg
+          git worktree remove "$worktree_dir" --force
