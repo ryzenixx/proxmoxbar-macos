@@ -1,24 +1,13 @@
-# Version 2.0.0
+# Release Notes
 
-## Internal Refactor (No UI/Behavior Changes)
+## Version 2.0.1
 
-- Full source tree reorganization into `App`, `Core`, `Features`, and `Shared`.
-- Large view files split into focused components:
-  - Menu bar dashboard
-  - Resource list / VM row
-  - Storage list
-  - Settings sections
-- `ProxmoxViewModel` split into state/computed vs operation extensions.
-- `ProxmoxService` refactored into clearer request/validation/decoding flow.
+- Settings page is clearer and easier to read.
+- Added helpful subtitle for **Launch at Login**.
+- Improved spacing/alignment in the General settings area.
 
-## Tooling and Packaging
+## Version 2.0.0
 
-- Build/package scripts were simplified and hardened.
-- DMG packaging now uses native `hdiutil`.
-- Signature checks now validate timestamp + hardened runtime on the main executable.
-
-## Compatibility
-
-- Bundle identifier unchanged (`com.proxmoxbar.app`).
-- Sparkle feed URL unchanged.
-- Update path preserved for existing installations.
+- Big app cleanup for better overall stability.
+- Same visual style and same core behavior.
+- Safe upgrade path for existing users (servers and settings are kept).
