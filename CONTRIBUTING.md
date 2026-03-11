@@ -16,10 +16,11 @@
 ## Before Opening a PR
 
 1. Keep the change focused and scoped.
-2. Build locally:
-   - `xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar -configuration Debug -destination 'platform=macOS' build`
-3. Run tests:
-   - `xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar -configuration Debug -destination 'platform=macOS' test`
+2. In Xcode:
+   - Build with `Cmd+B`
+   - Run tests with `Cmd+U`
+3. Optional CLI equivalent:
+   - `xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar -destination 'platform=macOS' build test`
 4. Include test notes in the PR description.
 
 ## Pull Request Guidelines
@@ -36,8 +37,3 @@
 - Keep feature logic in `Sources/Features/*`.
 - Keep shared services/models in `Sources/Core/*`.
 - Keep workflows deterministic and non-interactive.
-
-## Release Process
-
-- Release workflow is triggered by pushing a semantic version tag (`vX.Y.Z`) that points to `main`.
-- If needed, release can be rerun with the `Release` workflow `workflow_dispatch` input (`tag`).

@@ -36,7 +36,7 @@ Native macOS menu bar app for monitoring and controlling Proxmox VE resources.
 
 ## Development
 
-Use Xcode for day-to-day development and debugging.
+Use Xcode for development and debugging.
 
 - Build: `Cmd+B`
 - Run: `Cmd+R`
