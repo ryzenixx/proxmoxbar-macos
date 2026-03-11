@@ -7,8 +7,8 @@ source "${SCRIPT_DIR}/lib.sh"
 
 require_env APP_NAME
 
-archive_path="${ARCHIVE_PATH:-${RUNNER_TEMP}/${APP_NAME}.xcarchive}"
-app_path="${archive_path}/Products/Applications/${APP_NAME}.app"
+export_path="${EXPORT_PATH:-${RUNNER_TEMP}/${APP_NAME}-export}"
+app_path="${EXPORTED_APP_PATH:-${export_path}/${APP_NAME}.app}"
 output_tar="${OUTPUT_TAR_PATH:-${GITHUB_WORKSPACE}/${APP_NAME}.app.tar.gz}"
 
 [ -d "$app_path" ] || die "Signed app not found: $app_path"
