@@ -27,6 +27,49 @@ Native macOS menu bar app for monitoring and controlling Proxmox VE resources.
 3. Drag `ProxmoxBar.app` to `/Applications`.
 4. Launch ProxmoxBar.
 
+## Permissions & Security
+
+For better security, use the Principle of Least Privilege and create a restricted token for ProxmoxBar.
+
+### 1. Create a Custom Role
+
+Go to **Datacenter** -> **Permissions** -> **Roles** and click **Create**.
+
+- Name: `ProxmoxBar`
+- Privileges:
+  - `Datastore.Audit` (View Storage)
+  - `Pool.Audit` (View Pools and members)
+  - `SDN.Audit` (View Network)
+  - `Sys.Audit` (View Node stats)
+  - `VM.Audit` (View VMs)
+  - `VM.PowerMgmt` (Start/Stop/Reboot)
+
+### 2. Create a User
+
+Go to **Datacenter** -> **Permissions** -> **Users** -> **Add**.
+
+- User name: `proxmoxbar`
+- Realm: `Proxmox VE authentication server`
+- Password: set a strong password (not used directly by the app)
+
+### 3. Create an API Token
+
+Go to **Datacenter** -> **Permissions** -> **API Tokens** -> **Add**.
+
+- User: `proxmoxbar@pve`
+- Token ID: `monitor` (or any name you prefer)
+- Privilege Separation: unchecked
+- Copy the token secret now (it is shown only once)
+
+### 4. Assign Permissions
+
+Go to **Datacenter** -> **Permissions** -> **Add** -> **User Permission**.
+
+- Path: `/`
+- User: `proxmoxbar`
+- Role: `ProxmoxBar`
+- Propagate: checked (applies to all VMs and nodes)
+
 ## Run from Source (Xcode)
 
 1. Clone the repository.
