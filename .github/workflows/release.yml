@@ -13,9 +13,31 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  guard_main_tag:
+    name: Guard (Tag Must Be On main)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Ensure Tagged Commit Is On main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if git merge-base --is-ancestor "$GITHUB_SHA" "origin/main"; then
+            echo "Tag commit is on main history."
+          else
+            echo "Tag ${GITHUB_REF_NAME} is not based on origin/main. Aborting release."
+            exit 1
+          fi
+
   verify:
     name: Verify (Build + Tests)
     runs-on: macos-26
+    needs: guard_main_tag
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
