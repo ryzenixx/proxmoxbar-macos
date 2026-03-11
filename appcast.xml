@@ -8,7 +8,7 @@
             <sparkle:version>2.0.2</sparkle:version>
             <sparkle:shortVersionString>2.0.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <sparkle:releaseNotesLink>https://raw.githubusercontent.com/ryzenixx/proxmoxbar-macos/main/ProxmoxBar.md</sparkle:releaseNotesLink>
+            <sparkle:releaseNotesLink>https://raw.githubusercontent.com/ryzenixx/proxmoxbar-macos/main/RELEASE_NOTES.md</sparkle:releaseNotesLink>
             <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v2.0.2/ProxmoxBar.dmg" length="1684930" type="application/octet-stream" sparkle:edSignature="PIthdJSrxBOGiURCAVuKzgm1/N98NBfQZdH5faqpw0+2JF/rPDT7sU9avgDshbQRXvemKp2eaz50ag3LCb7+Dg=="/>
         </item>
     </channel>

@@ -16,6 +16,7 @@ tools_root="${RUNNER_TEMP}/sparkle-tools/${SPARKLE_TOOLS_VERSION}"
 sparkle_archive="${RUNNER_TEMP}/Sparkle-${SPARKLE_TOOLS_VERSION}.tar.xz"
 repo_slug="${GITHUB_REPOSITORY:-ryzenixx/proxmoxbar-macos}"
 download_url_prefix="https://github.com/${repo_slug}/releases/download/${TAG_NAME}/"
+release_notes_url="${RELEASE_NOTES_URL:-https://raw.githubusercontent.com/${repo_slug}/main/RELEASE_NOTES.md}"
 
 [ -f "$dmg_path" ] || die "DMG not found: $dmg_path"
 
@@ -40,5 +41,12 @@ printf '%s' "$SPARKLE_PRIVATE_KEY" | "$generate_appcast_bin" \
   --download-url-prefix "$download_url_prefix" \
   --ed-key-file - \
   "$release_assets_dir"
+
+appcast_path="${release_assets_dir}/appcast.xml"
+[ -f "$appcast_path" ] || die "Appcast file not found: $appcast_path"
+
+# Keep a stable release-notes URL for all feed items.
+escaped_url="${release_notes_url//\//\\/}"
+perl -i -pe "s#<sparkle:releaseNotesLink>[^<]*</sparkle:releaseNotesLink>#<sparkle:releaseNotesLink>${escaped_url}</sparkle:releaseNotesLink>#g" "$appcast_path"
 
 log "Appcast generated in ${release_assets_dir}"
