@@ -1,4 +1,4 @@
-name: Build and Release
+name: Release
 
 on:
   push:
@@ -6,22 +6,30 @@ on:
       - "v*"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build, Sign and Release
+  verify:
+    name: Verify (Build + Tests)
     runs-on: macos-26
-
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
+      - name: Resolve Version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - name: Toolchain Info
         shell: bash
@@ -30,38 +38,145 @@ jobs:
           xcodebuild -version
           swift --version
 
+      - name: Build
+        shell: bash
+        run: |
+          set -euo pipefail
+          swift build
+
+      - name: Test
+        shell: bash
+        run: |
+          set -euo pipefail
+          swift test
+
+  bundle:
+    name: Bundle App
+    runs-on: macos-26
+    needs: verify
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Make Scripts Executable
+        run: chmod +x scripts/*.sh release.sh
+
+      - name: Build App Bundle
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+          MIN_SYSTEM_VERSION: "14.0"
+          SPARKLE_PUBLIC_KEY: ${{ secrets.MACOS_SPARKLE_PUBLIC_KEY }}
+        run: ./scripts/bundle.sh
+
+      - name: Archive App Bundle Artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -C "$GITHUB_WORKSPACE" -czf ProxmoxBar.app.tar.gz ProxmoxBar.app
+
+      - name: Upload App Bundle Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: proxmoxbar-app-bundle
+          path: ProxmoxBar.app.tar.gz
+          retention-days: 7
+
+  sign_and_package:
+    name: Sign and Package
+    runs-on: macos-26
+    needs:
+      - verify
+      - bundle
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Make Scripts Executable
+        run: chmod +x scripts/*.sh release.sh
+
+      - name: Download App Bundle Artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: proxmoxbar-app-bundle
+          path: .
+
+      - name: Extract App Bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -xzf ProxmoxBar.app.tar.gz
+
       - name: Import Signing Certificate
         uses: apple-actions/import-codesign-certs@v5
         with:
           p12-file-base64: ${{ secrets.MACOS_CERTIFICATE }}
           p12-password: ${{ secrets.MACOS_CERTIFICATE_PWD }}
 
-      - name: Resolve Release Version
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+      - name: Sign App Bundle
+        run: ./scripts/sign.sh
+
+      - name: Create DMG
+        run: ./scripts/package.sh
+
+      - name: Upload DMG Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: proxmoxbar-dmg
+          path: ProxmoxBar.dmg
+          retention-days: 7
+
+  appcast:
+    name: Generate Appcast
+    runs-on: macos-26
+    needs:
+      - verify
+      - sign_and_package
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
 
       - name: Make Scripts Executable
         run: chmod +x scripts/*.sh release.sh
 
-      - name: Build and Test
-        run: |
-          set -euo pipefail
-          swift build
-          swift test
+      - name: Download DMG Artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: proxmoxbar-dmg
+          path: .
 
-      - name: Build, Sign, Package, Appcast
-        run: ./scripts/release_pipeline.sh
+      - name: Generate Sparkle Appcast
         env:
-          VERSION: ${{ env.VERSION }}
-          MIN_SYSTEM_VERSION: "14.0"
           TAG_NAME: ${{ github.ref_name }}
-          SPARKLE_PUBLIC_KEY: ${{ secrets.MACOS_SPARKLE_PUBLIC_KEY }}
           SPARKLE_PRIVATE_KEY: ${{ secrets.MACOS_SPARKLE_PRIVATE_KEY }}
           SPARKLE_TOOLS_VERSION: "2.9.0"
+        run: ./scripts/generate_appcast.sh
 
-      - name: Publish appcast.xml to main
+      - name: Upload Appcast Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: proxmoxbar-appcast
+          path: release_assets/appcast.xml
+          retention-days: 7
+
+  publish_appcast:
+    name: Publish Appcast to main
+    runs-on: ubuntu-latest
+    needs: appcast
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Download Appcast Artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: proxmoxbar-appcast
+          path: .
+
+      - name: Commit and Push appcast.xml
         shell: bash
         run: |
           set -euo pipefail
@@ -71,7 +186,7 @@ jobs:
           appcast_worktree="$(mktemp -d)"
           git fetch origin main
           git worktree add "$appcast_worktree" origin/main
-          cp release_assets/appcast.xml "$appcast_worktree/appcast.xml"
+          cp appcast.xml "$appcast_worktree/appcast.xml"
 
           (
             cd "$appcast_worktree"
@@ -86,8 +201,22 @@ jobs:
 
           git worktree remove "$appcast_worktree" --force
 
+  release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - sign_and_package
+      - publish_appcast
+    permissions:
+      contents: write
+    steps:
+      - name: Download DMG Artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: proxmoxbar-dmg
+          path: .
+
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            ProxmoxBar.dmg
+          files: ProxmoxBar.dmg
