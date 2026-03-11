@@ -108,7 +108,7 @@ private struct ResourceEmptyStateView: View {
                 Text("Missing Resources?")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.primary)
-                Text("Ensure you have followed the **Permission & Security** guide in the [README](https://github.com/ryzenixx/proxmoxbar-macos?tab=readme-ov-file#-permissions--security) to configure your API Token correctly.")
+                Text("Ensure you have followed the **Permission & Security** guide in the [README](https://github.com/ryzenixx/proxmoxbar-macos?tab=readme-ov-file#permissions--security) to configure your API Token correctly.")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
