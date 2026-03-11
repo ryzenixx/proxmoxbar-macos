@@ -41,6 +41,19 @@ fi
 
 xcrun stapler staple "$dmg_path"
 xcrun stapler validate "$dmg_path"
-spctl --assess --type open --verbose=4 "$dmg_path"
+
+spctl_output="$(
+  spctl --assess --type open --context context:primary-signature --verbose=4 "$dmg_path" 2>&1
+)" || spctl_exit=$?
+spctl_exit="${spctl_exit:-0}"
+printf '%s\n' "$spctl_output"
+
+if [ "$spctl_exit" -ne 0 ]; then
+  if printf '%s' "$spctl_output" | grep -qi "Insufficient Context"; then
+    log "spctl returned 'Insufficient Context' on this runner; notarization and stapling already succeeded."
+  else
+    die "spctl assessment failed for ${dmg_path}"
+  fi
+fi
 
 log "Notarization and stapling succeeded: $dmg_path"
