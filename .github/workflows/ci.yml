@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - develop
-      - main
     paths-ignore:
       - "README.md"
       - "RELEASE_NOTES.md"
@@ -17,7 +16,6 @@ on:
   push:
     branches:
       - develop
-      - main
     paths-ignore:
       - "README.md"
       - "RELEASE_NOTES.md"
