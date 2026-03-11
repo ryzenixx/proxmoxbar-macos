@@ -1,5 +1,10 @@
 # Release Notes
 
+## Version 2.0.4
+
+- Added Apple notarization for release builds.
+- Notarization means Apple scans and approves the app, so Gatekeeper warns less and installation is smoother.
+
 ## Version 2.0.1
 
 - Settings page is clearer and easier to read.
