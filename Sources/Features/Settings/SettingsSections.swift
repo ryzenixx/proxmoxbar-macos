@@ -134,7 +134,7 @@ struct SettingsGeneralSection: View {
                 .foregroundColor(.secondary)
                 .padding(.horizontal, 4)
 
-            VStack(spacing: 12) {
+            VStack(spacing: 8) {
                 launchAtLoginRow
                 notificationsRow
             }
@@ -147,8 +147,14 @@ struct SettingsGeneralSection: View {
                 .foregroundColor(.blue)
                 .font(.system(size: 16))
 
-            Text("Launch at Login")
-                .font(.system(size: 13))
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Launch at Login")
+                    .font(.system(size: 13))
+
+                Text("Start ProxmoxBar automatically when you sign in.")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+            }
 
             Spacer()
 
@@ -159,7 +165,7 @@ struct SettingsGeneralSection: View {
             .labelsHidden()
             .toggleStyle(.switch)
         }
-        .padding(12)
+        .padding(10)
         .background(Color.primary.opacity(0.03))
         .cornerRadius(8)
     }
@@ -202,7 +208,7 @@ struct SettingsGeneralSection: View {
             .toggleStyle(.switch)
             .disabled(!notificationsAvailable)
         }
-        .padding(12)
+        .padding(10)
         .background(Color.primary.opacity(0.03))
         .cornerRadius(8)
     }
