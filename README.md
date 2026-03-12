@@ -17,7 +17,6 @@ Native macOS menu bar app for monitoring and controlling Proxmox VE resources.
 ## Requirements
 
 - macOS 14+
-- Xcode 26+
 - Proxmox VE API token
 
 ## Install
@@ -81,6 +80,10 @@ Go to **Datacenter** -> **Permissions** -> **Add** -> **User Permission**.
 
 Use Xcode for development and debugging.
 
+Prerequisites:
+- Xcode 26+
+
+Commands:
 - Build: `Cmd+B`
 - Run: `Cmd+R`
 - Tests: `Cmd+U`
