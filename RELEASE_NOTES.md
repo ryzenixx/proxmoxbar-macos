@@ -1,5 +1,10 @@
 # Release Notes
 
+## Version 2.0.5
+
+- Unified the dashboard header background by removing the extra thin material tint in the VM/LXC resources screen.
+- Fixed the **Permission & Security** README links used in the app so they point to the correct section anchor.
+
 ## Version 2.0.4
 
 - Added Apple notarization for release builds.
