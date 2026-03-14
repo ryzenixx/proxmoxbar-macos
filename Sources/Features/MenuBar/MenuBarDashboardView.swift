@@ -36,7 +36,6 @@ struct MenuBarDashboardView: View {
     var body: some View {
         VStack(spacing: 0) {
             headerSection
-                .background(.thinMaterial)
 
             tabSection
 
