@@ -3,13 +3,13 @@
     <channel>
         <title>ProxmoxBar</title>
         <item>
-            <title>2.0.4</title>
-            <pubDate>Wed, 11 Mar 2026 21:24:47 +0000</pubDate>
-            <sparkle:version>2.0.4</sparkle:version>
-            <sparkle:shortVersionString>2.0.4</sparkle:shortVersionString>
+            <title>2.0.5</title>
+            <pubDate>Sat, 14 Mar 2026 01:47:06 +0000</pubDate>
+            <sparkle:version>2.0.5</sparkle:version>
+            <sparkle:shortVersionString>2.0.5</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
             <sparkle:releaseNotesLink>https://raw.githubusercontent.com/ryzenixx/proxmoxbar-macos/main/RELEASE_NOTES.md</sparkle:releaseNotesLink>
-            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v2.0.4/ProxmoxBar.dmg" length="1737305" type="application/octet-stream" sparkle:edSignature="brvi7emVtJ6ZEG6JwWi2ySQys5rhR1l26uWNzSiQXGI4BSucX2uGpMXJxemwyB3XsxGBdH4Ks/byee9erOXfAw=="/>
+            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v2.0.5/ProxmoxBar.dmg" length="1737190" type="application/octet-stream" sparkle:edSignature="GrSNUR6yooYQmyyuKtmgfmxEzyAAGzTJS1QEoOje3S5XiDQlGNaqtt3dKQOkGD4f7NYx4V51aw4/aSNzwOfSAQ=="/>
         </item>
     </channel>
 </rss>
