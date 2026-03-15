@@ -37,9 +37,9 @@ struct MenuBarDashboardView: View {
         VStack(spacing: 0) {
             headerSection
 
-            tabSection
-
             Divider()
+
+            tabSection
 
             if selectedTab == .resources {
                 resourceToolbar
@@ -254,7 +254,8 @@ struct MenuBarDashboardView: View {
             .cornerRadius(8)
         }
         .padding(.horizontal)
-        .padding(.vertical, 8)
+        .padding(.top, 0)
+        .padding(.bottom, 8)
     }
 }
 
