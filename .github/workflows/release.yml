@@ -100,7 +100,7 @@ jobs:
         run: ./scripts/release/export_signed_app.sh
 
       - name: Upload Signed App Artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: proxmoxbar-signed-app
           path: ProxmoxBar.app.tar.gz
@@ -130,7 +130,7 @@ jobs:
         run: ./scripts/release/package_dmg.sh "signed_app/${APP_NAME}.app.tar.gz"
 
       - name: Upload DMG Artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: proxmoxbar-dmg
           path: ProxmoxBar.dmg
@@ -172,7 +172,7 @@ jobs:
         run: ./scripts/release/notarize_dmg.sh "${APP_NAME}.dmg"
 
       - name: Upload Notarized DMG Artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: proxmoxbar-dmg-notarized
           path: ProxmoxBar.dmg
@@ -214,7 +214,7 @@ jobs:
         run: ./scripts/release/create_checksum.sh "${APP_NAME}.dmg"
 
       - name: Upload Release Bundle Artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: proxmoxbar-release-bundle
           path: |
