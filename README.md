@@ -26,6 +26,9 @@ Native macOS menu bar app for monitoring and controlling Proxmox VE resources.
 3. Drag `ProxmoxBar.app` to `/Applications`.
 4. Launch ProxmoxBar.
 
+> [!NOTE]
+> When adding a server, include the port (default `8006`), e.g. `https://proxmox.local:8006`.
+
 ## Permissions & Security
 
 For better security, use the Principle of Least Privilege and create a restricted token for ProxmoxBar.
