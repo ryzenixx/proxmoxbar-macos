@@ -32,6 +32,8 @@ extension ProxmoxViewModel {
             self.vms = taggedVMs
             self.nodes = snapshot.nodes
             self.storages = snapshot.storages
+        } catch is CancellationError {
+            return
         } catch {
             appState = .error(error.localizedDescription)
             errorMessage = error.localizedDescription
@@ -112,6 +114,8 @@ private extension ProxmoxViewModel {
             }
 
             await loadData()
+        } catch is CancellationError {
+            return
         } catch {
             errorMessage = "\(action.rawValue.capitalized) failed: \(error.localizedDescription)"
         }

@@ -45,8 +45,9 @@ private extension ProxmoxNode {
 private extension ProxmoxStorage {
     init?(_ resource: ClusterResource) {
         guard resource.type == "storage",
-              let storage = resource.storage,
-              let node = resource.node else {
+            let storage = resource.storage,
+            let node = resource.node
+        else {
             return nil
         }
 
@@ -73,8 +74,9 @@ private extension ProxmoxStorage {
 private extension ProxmoxGuest {
     init?(_ resource: ClusterResource) {
         guard ["qemu", "lxc", "openvz"].contains(resource.type),
-              let vmid = resource.vmid,
-              let node = resource.node else {
+            let vmid = resource.vmid,
+            let node = resource.node
+        else {
             return nil
         }
 

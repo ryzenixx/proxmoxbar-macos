@@ -114,7 +114,7 @@ xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar \
   -destination 'platform=macOS' build        # build
 xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar \
   -destination 'platform=macOS' test         # build and test
-swift-format lint --strict --recursive ProxmoxBar ProxmoxBarTests
+swift-format lint --strict --recursive ProxmoxBar ProxmoxBarTests ProxmoxCore
 ```
 
 Xcode 26 or later is required. A beta is fine, and is the only option on a beta

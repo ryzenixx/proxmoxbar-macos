@@ -9,10 +9,16 @@ public enum ProxmoxError: Error, LocalizedError, Equatable {
     case taskFailed(exitStatus: String)
     case taskTimedOut
 
+    public var isRetryable: Bool {
+        if case .networkError = self { return true }
+        return false
+    }
+
     public var errorDescription: String? {
         switch self {
         case .invalidURL:
-            return "Invalid server URL."
+            return
+                "The server URL must start with https:// and include the host, for example https://pve.local:8006"
         case .unauthorized:
             return "Unauthorized. Check the API token."
         case .apiError(let statusCode, let message):

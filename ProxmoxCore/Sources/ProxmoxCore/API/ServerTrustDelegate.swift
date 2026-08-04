@@ -7,7 +7,8 @@ final class ServerTrustDelegate: NSObject, URLSessionDelegate, @unchecked Sendab
         completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
     ) {
         guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-              let serverTrust = challenge.protectionSpace.serverTrust else {
+            let serverTrust = challenge.protectionSpace.serverTrust
+        else {
             completionHandler(.performDefaultHandling, nil)
             return
         }
