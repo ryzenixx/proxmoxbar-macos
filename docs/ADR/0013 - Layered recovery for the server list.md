@@ -2,7 +2,7 @@
 | --- | --- |
 | **Identifier** | ADR-0013 |
 | **Date** | 2026-03-11 |
-| **Status** | Accepted |
+| **Status** | Superseded by [ADR-0025](<0025 - A clean break on stored data for 3.0.0.md>) |
 
 ---
 

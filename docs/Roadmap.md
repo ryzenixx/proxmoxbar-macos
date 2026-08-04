@@ -5,62 +5,59 @@ is in [Architecture](Architecture.md); this page is the order it gets there.
 
 ---
 
-## Phase 1: structure
+## 3.0.0
 
-The application works and ships. The codebase is what holds it back, and the
-order below is the order the work is done in, because each step makes the next
-one cheaper and safer. None of it changes what the application does, and none of
-it ships as a release on its own.
+One major version, one release. It is a rebuild of the inside of the app, and it
+breaks stored data on purpose.
 
-1. **A test net first.** Lock the storage contract and the API decoding under
-   tests before moving anything. Without this, "clean the structure" means
-   "hope nothing broke". See [Quality](Quality.md).
-2. **Synchronized folders and xcconfig.** Stop listing every file by hand in the
-   Xcode project, and move build settings into reviewable text. This is what
-   makes every later step cheap, so it comes before any code moves. Fix
-   `SWIFT_VERSION` to `6` at the same time. See
-   [ADR-0016](<ADR/0016 - Synchronized folders and xcconfig over a hand-listed project.md>).
-3. **Observation.** Replace `ObservableObject` with `@Observable` and delete the
-   `objectWillChange` subscription. The redundant cluster refresh on opening the
-   settings sheet disappears as a consequence rather than as a patch. See
+The order below is the order the work is done in. Each step leaves the app
+building and running.
+
+1. **Project structure.** `Sources/` and `Tests/` become synchronized folders,
+   build settings move into `Config/*.xcconfig`, `SWIFT_VERSION` becomes `6` and
+   approachable concurrency is enabled. No Swift file changes. This comes first
+   because it makes every later move free. See
+   [ADR-0016](<ADR/0016 - Synchronized folders and xcconfig over a hand-listed project.md>)
+   and [ADR-0019](<ADR/0019 - Explicit MainActor over default isolation.md>).
+2. **The core package.** `ProxmoxCore` is created and the models, the API client
+   and the storage layer move into it, behind the `ProxmoxAPI` protocol. See
+   [ADR-0017](<ADR/0017 - A local package for the core, an Xcode project for the app.md>).
+3. **Storage, rewritten.** The new schema-versioned format, the keychain, and no
+   migration from 2.x. The eleven aliases, the four-level recovery, the corrupt
+   quarantine and the disk backup all go. See
+   [ADR-0025](<ADR/0025 - A clean break on stored data for 3.0.0.md>) and
+   [ADR-0020](<ADR/0020 - Token secrets in the data protection keychain.md>).
+4. **Observation.** `@Observable` replaces `ObservableObject`, and the
+   `objectWillChange` subscription disappears along with the redundant cluster
+   refresh it caused. Responsibilities separate: the server store stops holding
+   UI state, `AppDelegate` gives up the status item and the popover to a shell
+   and a composition root. See
    [ADR-0018](<ADR/0018 - Observation instead of ObservableObject.md>).
-4. **Separate the mixed responsibilities.** The server model, the persistence and
-   the presented sheet stop living in one type. `AppDelegate` gives up the status
-   item, the popover and the object graph to a shell and a composition root.
-5. **The core package.** Models, API client and storage move behind a module
-   boundary, with a protocol at the network edge. Tests stop launching the app.
-   See [ADR-0017](<ADR/0017 - A local package for the core, an Xcode project for the app.md>).
-6. **Hygiene.** `os.Logger` instead of `print`, remove the force unwraps, stop
-   refetching the whole cluster while waiting for one guest to change state, add
-   `swift-format` to CI. See
-   [ADR-0023](<ADR/0023 - swift-format as the only style tool.md>).
-7. **Liquid Glass.** Remove the hand-rolled background stack and let the system
-   provide the popover material, with the macOS 14 and 15 appearance kept behind
-   availability checks confined to the design system. This comes last because it
-   is the only step whose result cannot be judged by a test. See
+5. **Certificate trust.** Normal validation, with per-server trust-on-first-use
+   pinned by fingerprint, and the global exception removed. See
+   [ADR-0021](<ADR/0021 - Per-server certificate trust instead of accepting everything.md>).
+6. **Liquid Glass.** The hand-rolled background stack goes; the system provides
+   the popover material, with the macOS 14 and 15 appearance behind availability
+   checks confined to the design system. See
    [ADR-0024](<ADR/0024 - Adopting Liquid Glass while keeping the macOS 14 floor.md>).
+7. **The reset message.** The one-time explanation shown when no server list has
+   ever been written, plus the release notes. This is not optional and it does
+   not ship later than the break. See
+   [ADR-0025](<ADR/0025 - A clean break on stored data for 3.0.0.md>).
+8. **Hygiene and tests.** `os.Logger` instead of `print`, no force unwraps, stop
+   refetching the whole cluster to watch one guest, `swift-format` in CI, and the
+   test suite written against the shape that actually shipped. See
+   [ADR-0022](<ADR/0022 - Swift Testing with URLProtocol stubs at the network edge.md>)
+   and [ADR-0023](<ADR/0023 - swift-format as the only style tool.md>).
 
----
+Tests come last here, and that is a consequence of step 3, not an oversight. A
+test net exists to prove a refactor did not change behaviour; this release
+changes behaviour on purpose, so there is nothing to hold constant. Writing tests
+against the 2.x storage contract would mean testing code scheduled for deletion.
 
-## Phase 2: security
-
-Both items are real defects, documented in [Security](Security.md), and ship
-together as one release once the structure is in place. Doing them after phase 1
-is not procrastination: both touch storage and the network edge, which is exactly
-the code phase 1 puts behind a tested boundary.
-
-- **Token secrets in the keychain.** Stored in clear text today, in the
-  preference file and in the disk backup. The migration must preserve the
-  recovery order in [Data & Persistence](<Data & Persistence.md>), and a server
-  whose secret is missing must remain a server, not disappear. See
-  [ADR-0020](<ADR/0020 - Token secrets in the data protection keychain.md>).
-- **Per-server certificate trust.** Validation is disabled globally today.
-  Validate normally, and let a user accept one certificate for one host, pinned
-  by fingerprint. See
-  [ADR-0021](<ADR/0021 - Per-server certificate trust instead of accepting everything.md>).
-
-That release is the one that needs the most careful update testing, because it
-changes both stores at once.
+The trade is real and worth naming: from step 1 to step 8, correctness rests on
+review and on running the app, not on a suite. That is acceptable for one release
+of a menu bar app with three endpoints. It would not be acceptable twice.
 
 ---
 

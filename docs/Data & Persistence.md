@@ -1,24 +1,12 @@
-This page describes everything ProxmoxBar writes to disk, and the rules that keep
-an update from destroying it.
+This page describes everything ProxmoxBar writes to disk.
 
-There is no database. Server identity lives in `UserDefaults` with a copy on disk
-for recovery; token secrets live in the keychain.
+There is no database. Server identity lives in `UserDefaults`; token secrets live
+in the keychain. Nothing else is persisted.
 
----
-
-## The compatibility contract
-
-Every key and every field name on this page is part of a contract with every
-installed copy of the application. A user who updates must find their servers
-where they left them, without retyping a token they can no longer read — a
-Proxmox secret is shown once, at creation, and never again.
-
-Changing a key name, a JSON field name, or the encoded shape of a server is a
-data loss bug, not a refactor. Renaming a Swift type is free; renaming what it
-serialises to is not.
-
-Nothing here may change without a migration that reads the old form, an ADR, and
-a manual update test over a real previous build.
+Version 3.0.0 does not read anything written by 2.x. That is a deliberate clean
+break, decided in
+[ADR-0025](<ADR/0025 - A clean break on stored data for 3.0.0.md>), and it is the
+one thing on this page a reader must know before assuming compatibility.
 
 ---
 
@@ -29,8 +17,7 @@ a manual update test over a real previous build.
 | Server id, name, URL, token id | `UserDefaults` | Not secret, and needed to render the settings screen before any keychain access |
 | Pinned certificate fingerprint | `UserDefaults` | Not secret; a fingerprint is public by construction |
 | Token secret | Keychain | Confers control over virtual machines |
-| Sort order, notifications | `UserDefaults` | Preferences |
-| Nothing at all | Disk backup, for secrets | The backup exists to survive a lost preference file, and must not become a second copy of a credential |
+| Sort order, notifications | `UserDefaults` | Preferences, cheap to lose |
 
 ---
 
@@ -38,56 +25,51 @@ a manual update test over a real previous build.
 
 | Key | Type | Holds |
 | --- | --- | --- |
-| `proxmox_servers` | `Data` | The server list, JSON encoded. The source of truth |
-| `proxmox_servers_backup` | `Data` | The previous successfully decoded payload |
-| `proxmox_servers_corrupt` | `Data` | A payload that failed to decode, kept for diagnosis |
-| `enableNotifications` | `Bool` | Whether guest state changes post a notification |
-| `SortOption` | `String` | `ID`, `Name` or `Status` |
+| `ProxmoxBar.servers` | `Data` | The server list, JSON encoded, with its schema version |
+| `ProxmoxBar.sortOrder` | `String` | `id`, `name` or `status` |
+| `ProxmoxBar.notificationsEnabled` | `Bool` | Whether guest state changes post a notification |
 
-Two legacy keys are still read and migrated to `proxmox_servers` on first launch:
-`proxmoxServers` and `servers`. A legacy key is read only when the current one is
-absent or undecodable.
-
-`notificationsEnabled` is the former name of `enableNotifications`, read once when
-the current key has never been written.
+The 2.x keys — `proxmox_servers`, `proxmox_servers_backup`,
+`proxmox_servers_corrupt`, `enableNotifications`, `SortOption`, and the older
+`proxmoxServers` and `servers` — are neither read nor written nor deleted. They
+are left in place so a user who downgrades to 2.0.6 finds their configuration
+intact.
 
 ---
 
-## Server encoding
+## The stored shape
 
-A server encodes to five fields. `secret` is not one of them.
+The payload is an object, not a bare array, so the schema version has somewhere
+to live:
 
 ```json
 {
-  "id": "31D8D5D9-A695-4B98-8BC2-68A6F1C9F2CB",
-  "name": "Homelab",
-  "url": "https://pve.local:8006",
-  "tokenId": "proxmoxbar@pve!monitor",
-  "pinnedCertificate": "sha256/9f86d081884c7d65..."
+  "schemaVersion": 1,
+  "servers": [
+    {
+      "id": "31D8D5D9-A695-4B98-8BC2-68A6F1C9F2CB",
+      "name": "Homelab",
+      "url": "https://pve.local:8006",
+      "tokenId": "proxmoxbar@pve!monitor",
+      "pinnedCertificate": "sha256/9f86d081884c7d65..."
+    }
+  ]
 }
 ```
 
 `pinnedCertificate` is absent until the user accepts a certificate for that
-server.
+server. Every other field is required.
 
-Decoding is deliberately more permissive than encoding. Payloads written by
-earlier builds, or edited by hand, used other names for the same fields, so the
-decoder accepts any of them and takes the first non-empty value:
+Decoding is strict. There are no field aliases, no fallbacks, and no permissive
+defaults: a payload that does not match is a payload this version did not write.
 
-| Field | Accepted names |
-| --- | --- |
-| `tokenId` | `tokenId`, `tokenID`, `token_id`, `apiTokenId`, `api_token_id`, `token`, `apiToken` |
-| `secret` | `secret`, `tokenSecret`, `token_secret`, `apiTokenSecret`, `api_token_secret` |
+**The schema version is the whole point of this format.** A future change reads
+`schemaVersion`, and migrates one known shape into the next. That is a migration
+with a fixed input, which is a different thing from what 2.x had to do.
 
-A missing `id` is replaced by a fresh one rather than failing the decode. `name`
-and `url` are trimmed of surrounding whitespace.
-
-The `secret` aliases are decode-only and exist solely for migration. A decoded
-secret is written to the keychain and dropped from the payload; it is never
-encoded again.
-
-Once a legacy payload has been decoded, it is rewritten in the canonical shape,
-so each alias is paid for exactly once per installation.
+A payload whose `schemaVersion` is unknown — higher than this build understands,
+which means the user downgraded — is left untouched and reported, never
+overwritten.
 
 ---
 
@@ -99,7 +81,7 @@ so each alias is paid for exactly once per installation.
 | Service | The bundle identifier |
 | Account | The server's UUID |
 | Accessible | After first unlock, this device only |
-| Keychain | Data protection keychain (`kSecUseDataProtectionKeychain`) |
+| Keychain | Data protection keychain |
 
 The account is the server's identifier, not its URL: editing a server's address
 must not orphan its secret. Deleting a server deletes its item. See
@@ -113,34 +95,14 @@ constraint in [Updates](Updates.md).
 
 ---
 
-## Recovery order
-
-Loading the server list tries four sources, in order, and stops at the first that
-decodes:
-
-1. `proxmox_servers`.
-2. The legacy keys, which are then migrated.
-3. `proxmox_servers_backup`, the last payload that decoded successfully.
-4. `~/Library/Application Support/com.proxmoxbar.app/Backups/proxmox_servers.json`.
-
-A payload that fails to decode is copied to `proxmox_servers_corrupt` before the
-next source is tried, so nothing is discarded silently.
-
-The disk copy exists for the case the preference domain itself is lost or reset,
-which `UserDefaults` alone cannot survive. It is rewritten atomically on every
-save, and contains no secrets. See
-[ADR-0013](<ADR/0013 - Layered recovery for the server list.md>).
-
----
-
 ## Writing
 
-Every mutation of the server list writes the whole list. There is no partial
-update and no merge.
+Every mutation writes the whole list. There is no partial update and no merge.
 
-Before overwriting `proxmox_servers`, the current payload is promoted to
-`proxmox_servers_backup`, so the backup is always one generation behind rather
-than a copy of what is being written.
+There is no backup key and no backup file. A preference domain that is lost takes
+the server list with it, and the keychain items it referenced become orphans.
+That is an accepted consequence of keeping this layer small; the mitigation is
+that re-adding a server is a documented procedure, not a mystery.
 
 An encoding failure is logged and leaves the stored payload untouched.
 
@@ -161,6 +123,25 @@ prompt the user dismissed.
 
 ---
 
+## The 3.0.0 reset
+
+An existing user updates and finds an empty list. That is expected, and it is not
+allowed to look like a bug.
+
+The app detects that it has never written `ProxmoxBar.servers` and shows a
+one-time explanation: 3.0.0 resets stored servers, here is how to add one, and
+2.x data is still on disk if you downgrade. That message ships in the same
+release as the break.
+
+The release notes say it first, before anyone installs.
+
+Re-adding a server is not just retyping a URL. A Proxmox token secret is shown
+once at creation and cannot be read back, so the user has to create a new token
+in the Proxmox web interface. The message links to that procedure rather than
+assuming it is obvious.
+
+---
+
 ## What is not persisted
 
 - Cluster state. Nodes, guests and datastores are read live and thrown away.
@@ -170,10 +151,11 @@ prompt the user dismissed.
 
 ---
 
-## Verifying a change
+## Changing this page
 
-A change to anything on this page is verified by installing the previous public
-release, configuring a real server, updating to the new build in place, and
-confirming the server, its token and the preferences survived. Tests cover the
-encoding and the recovery order; only that manual test covers the keychain and
-the code signature together.
+From 3.0.0 onward, the shape above is a contract again, and the schema version is
+how it is changed: bump it, write the migration from the previous version, and
+say so in an ADR.
+
+The clean break was a one-time decision that spent the users' goodwill once. It
+does not get to happen twice.

@@ -49,7 +49,12 @@ the server's identifier, accessible after first unlock on that device only and
 never synchronised.
 
 Everything else about a server — name, URL, token id, pinned fingerprint — is not
-secret and lives in `UserDefaults`. The disk backup contains no secrets.
+secret and lives in `UserDefaults`.
+
+Secrets are written to the keychain the moment a server is created. They are
+never written anywhere else, and no clear-text copy is migrated forward: 3.0.0
+starts from an empty list rather than importing 2.x payloads, per
+[ADR-0025](<ADR/0025 - A clean break on stored data for 3.0.0.md>).
 
 Keychain access is bound to the application's designated requirement, so a build
 signed by a different identity cannot read the items silently. See

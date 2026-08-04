@@ -62,15 +62,22 @@ machines, silently, and no rollback reaches them.
 - `PRODUCT_NAME`, currently `ProxmoxBar`.
 - `MACOSX_DEPLOYMENT_TARGET`, currently `14.0`. Raising it silently stops
   offering updates to users below it.
-- Every `UserDefaults` key, every JSON field name, every legacy field alias, and
-  the four-step recovery order, all listed in
-  [Data & Persistence](<docs/Data & Persistence.md>).
+- Every `UserDefaults` key and JSON field name listed in
+  [Data & Persistence](<docs/Data & Persistence.md>), and the schema version that
+  governs them.
 
 Renaming a Swift type is free. Renaming what it serialises to is data loss on
 someone else's machine. A Proxmox token secret is displayed once at creation and
 never again, so a user who loses theirs has to go create a new one.
 
 Never change any of it without an ADR and an explicit go-ahead.
+
+**One exception, already decided:** 3.0.0 deliberately does not read anything
+written by 2.x, per
+[ADR-0025](<docs/ADR/0025 - A clean break on stored data for 3.0.0.md>). That was
+a one-time break, paid for with an in-app message and release notes shipping in
+the same release. It is not a precedent. From 3.0.0 on, the schema version is how
+the format changes.
 
 ---
 

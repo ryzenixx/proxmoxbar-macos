@@ -37,8 +37,13 @@ implementation and a note are never allowed to diverge; when they do, the note i
 the specification and the code is the bug.
 
 A change touching [Data & Persistence](<Data & Persistence.md>) has been verified
-by updating over a previous public build with real data present. No test replaces
-that one.
+by installing a previous public build, configuring a real server, and updating
+over it. No test replaces that one.
+
+For 3.0.0 the expected result of that test is not "the servers survived" but
+"the reset was explained, and the 2.x keys are still on disk". Verifying that the
+break behaves as designed matters exactly as much as verifying continuity would
+have. See [ADR-0025](<ADR/0025 - A clean break on stored data for 3.0.0.md>).
 
 ---
 
@@ -84,10 +89,12 @@ is tested.
 
 Concretely:
 
-- Every storage key, every legacy field alias, every step of the recovery order.
-  Those tests are the reason a refactor can move code without fear.
-- The migration of a secret from a legacy payload into the keychain, including a
-  payload that has already been migrated.
+- Every storage key and every field of the stored shape, encoded and decoded
+  round trip. A payload with an unknown `schemaVersion` is reported, never
+  overwritten.
+- A server whose keychain item is missing stays in the list and is marked as
+  needing a token, rather than disappearing.
+- Deleting a server deletes its keychain item and leaves no orphan.
 - Decoding a real `/cluster/resources` payload, and one with a missing field, and
   one with an unknown resource type.
 - Every branch of certificate trust: valid chain, untrusted chain with a matching

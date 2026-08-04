@@ -93,15 +93,16 @@ it was written down.
 | 0010 | [A global event monitor to dismiss the popover](<ADR/0010 - A global event monitor to dismiss the popover.md>) | 2026-01-15 | Accepted |
 | 0011 | [An Xcode project as the build system](<ADR/0011 - An Xcode project as the build system.md>) | 2026-03-11 | Accepted |
 | 0012 | [macOS 14 as the minimum version](<ADR/0012 - macOS 14 as the minimum version.md>) | 2026-03-11 | Accepted |
-| 0013 | [Layered recovery for the server list](<ADR/0013 - Layered recovery for the server list.md>) | 2026-03-11 | Accepted |
+| 0013 | [Layered recovery for the server list](<ADR/0013 - Layered recovery for the server list.md>) | 2026-03-11 | Superseded by 0025 |
 | 0014 | [Developer ID signing and notarization outside the App Store](<ADR/0014 - Developer ID signing and notarization outside the App Store.md>) | 2026-03-11 | Accepted |
 | 0015 | [A tag-triggered release pipeline in isolated jobs](<ADR/0015 - A tag-triggered release pipeline in isolated jobs.md>) | 2026-03-11 | Accepted |
 | 0016 | [Synchronized folders and xcconfig over a hand-listed project](<ADR/0016 - Synchronized folders and xcconfig over a hand-listed project.md>) | 2026-08-04 | Accepted |
 | 0017 | [A local package for the core, an Xcode project for the app](<ADR/0017 - A local package for the core, an Xcode project for the app.md>) | 2026-08-04 | Accepted |
 | 0018 | [Observation instead of ObservableObject](<ADR/0018 - Observation instead of ObservableObject.md>) | 2026-08-04 | Accepted |
 | 0019 | [Explicit MainActor over default isolation](<ADR/0019 - Explicit MainActor over default isolation.md>) | 2026-08-04 | Accepted |
-| 0020 | [Token secrets in the data protection keychain](<ADR/0020 - Token secrets in the data protection keychain.md>) | 2026-08-04 | Accepted |
+| 0020 | [Token secrets in the data protection keychain](<ADR/0020 - Token secrets in the data protection keychain.md>) | 2026-08-04 | Accepted, migration path replaced by 0025 |
 | 0021 | [Per-server certificate trust instead of accepting everything](<ADR/0021 - Per-server certificate trust instead of accepting everything.md>) | 2026-08-04 | Accepted |
 | 0022 | [Swift Testing with URLProtocol stubs at the network edge](<ADR/0022 - Swift Testing with URLProtocol stubs at the network edge.md>) | 2026-08-04 | Accepted |
 | 0023 | [swift-format as the only style tool](<ADR/0023 - swift-format as the only style tool.md>) | 2026-08-04 | Accepted |
 | 0024 | [Adopting Liquid Glass while keeping the macOS 14 floor](<ADR/0024 - Adopting Liquid Glass while keeping the macOS 14 floor.md>) | 2026-08-04 | Accepted |
+| 0025 | [A clean break on stored data for 3.0.0](<ADR/0025 - A clean break on stored data for 3.0.0.md>) | 2026-08-04 | Accepted |

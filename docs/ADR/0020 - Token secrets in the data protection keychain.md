@@ -2,7 +2,7 @@
 | --- | --- |
 | **Identifier** | ADR-0020 |
 | **Date** | 2026-08-04 |
-| **Status** | Accepted |
+| **Status** | Accepted, migration path replaced by [ADR-0025](<0025 - A clean break on stored data for 3.0.0.md>) |
 
 ---
 
