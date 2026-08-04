@@ -13,9 +13,7 @@ extension ProxmoxViewModel {
             return
         }
 
-        if case .running = appState {
-            // Keep the running indicator visible while refreshing.
-        } else {
+        if case .running = appState {} else {
             appState = .loading("LOADING...")
         }
         errorMessage = nil
@@ -43,16 +41,15 @@ extension ProxmoxViewModel {
         }
     }
 
-    func toggleVMState(_ vm: ProxmoxVM) async {
-        let action = vm.isRunning ? "shutdown" : "start"
-        await performAction(action, on: vm, verifyFinalStatus: true)
+    func toggleVMState(_ vm: ProxmoxGuest) async {
+        await performAction(vm.isRunning ? .shutdown : .start, on: vm, verifyFinalStatus: true)
     }
 
-    func restartVM(_ vm: ProxmoxVM) async {
-        await performAction("reboot", on: vm, verifyFinalStatus: false)
+    func restartVM(_ vm: ProxmoxGuest) async {
+        await performAction(.reboot, on: vm, verifyFinalStatus: false)
     }
 
-    func openVMInBrowser(_ vm: ProxmoxVM) {
+    func openVMInBrowser(_ vm: ProxmoxGuest) {
         guard let serverId = vm.serverId,
               let server = settings.servers.first(where: { $0.id == serverId }),
               let baseURL = server.baseWebURL else {
@@ -75,7 +72,7 @@ private extension ProxmoxViewModel {
         }
     }
 
-    func tag(vms: [ProxmoxVM], with serverId: UUID) -> [ProxmoxVM] {
+    func tag(vms: [ProxmoxGuest], with serverId: UUID) -> [ProxmoxGuest] {
         vms.map { vm in
             var tagged = vm
             tagged.serverId = serverId
@@ -84,7 +81,7 @@ private extension ProxmoxViewModel {
         .sorted { $0.vmid < $1.vmid }
     }
 
-    func performAction(_ action: String, on vm: ProxmoxVM, verifyFinalStatus: Bool) async {
+    func performAction(_ action: GuestAction, on vm: ProxmoxGuest, verifyFinalStatus: Bool) async {
         guard let serverId = vm.serverId,
               let server = settings.servers.first(where: { $0.id == serverId }) else {
             return
@@ -94,11 +91,11 @@ private extension ProxmoxViewModel {
         defer { processingVMIDs.remove(vm.vmid) }
 
         do {
-            let upid = try await service.performNodeAction(
+            let upid = try await service.performGuestAction(
+                action,
                 node: vm.node,
                 vmid: vm.vmid,
                 type: vm.type,
-                action: action,
                 url: server.url,
                 authHeader: server.authHeader
             )
@@ -116,11 +113,11 @@ private extension ProxmoxViewModel {
 
             await loadData()
         } catch {
-            errorMessage = "\(action.capitalized) failed: \(error.localizedDescription)"
+            errorMessage = "\(action.rawValue.capitalized) failed: \(error.localizedDescription)"
         }
     }
 
-    func waitForFinalStatus(for vm: ProxmoxVM) async {
+    func waitForFinalStatus(for vm: ProxmoxGuest) async {
         let targetStatus = vm.isRunning ? "stopped" : "running"
         for _ in 0..<30 {
             await loadData()
@@ -131,7 +128,7 @@ private extension ProxmoxViewModel {
         }
     }
 
-    func notifyStateChanges(from oldVMs: [ProxmoxVM], to newVMs: [ProxmoxVM]) {
+    func notifyStateChanges(from oldVMs: [ProxmoxGuest], to newVMs: [ProxmoxGuest]) {
         for vm in newVMs {
             guard let oldVM = oldVMs.first(where: { $0.id == vm.id }),
                   oldVM.status != vm.status else {
@@ -140,7 +137,7 @@ private extension ProxmoxViewModel {
 
             let status = vm.isRunning ? "Running" : "Stopped"
             NotificationManager.shared.sendNotification(
-                title: "\(vm.name) (\(vm.vmid))",
+                title: "\(vm.displayName) (\(vm.vmid))",
                 body: "is now \(status)."
             )
         }

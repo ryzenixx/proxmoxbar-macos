@@ -2,7 +2,7 @@ import SwiftUI
 import ProxmoxCore
 
 struct VMRowView: View {
-    let vm: ProxmoxVM
+    let vm: ProxmoxGuest
     @ObservedObject var viewModel: ProxmoxViewModel
 
     @State private var isHovered = false
@@ -39,7 +39,7 @@ struct VMRowView: View {
     private var details: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 4) {
-                Text(vm.name)
+                Text(vm.displayName)
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.primary)
 

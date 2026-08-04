@@ -1,130 +1,90 @@
 import Foundation
 
-/// Accepts any server certificate, for any host.
-///
-/// This is what makes a stock Proxmox install reachable, and it is the weakest
-/// part of the security model: an attacker able to intercept the connection can
-/// present any certificate and read the token. It is replaced by per-server
-/// trust-on-first-use with a pinned fingerprint. See docs/ADR/0021.
-final class InsecureServerTrustDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
-    func urlSession(
-        _ session: URLSession,
-        didReceive challenge: URLAuthenticationChallenge,
-        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
-    ) {
-        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-           let serverTrust = challenge.protectionSpace.serverTrust {
-            completionHandler(.useCredential, URLCredential(trust: serverTrust))
-        } else {
-            completionHandler(.performDefaultHandling, nil)
-        }
-    }
-}
-
 public actor ProxmoxAPIClient: ProxmoxAPI {
-    private enum Constants {
+    private enum Limits {
         static let requestTimeout: TimeInterval = 10
-        static let refreshRetries = 3
-        static let refreshRetryDelayNanoseconds: UInt64 = 500_000_000
-        static let taskPollingIntervalNanoseconds: UInt64 = 1_000_000_000
-        static let taskPollingRetries = 30
+        static let snapshotAttempts = 3
+        static let retryDelay: Duration = .milliseconds(500)
+        static let taskPollInterval: Duration = .seconds(1)
+        static let taskPollAttempts = 30
     }
 
     private let session: URLSession
-    private let delegateProxy: InsecureServerTrustDelegate
+    private let trustDelegate: ServerTrustDelegate
 
     public init() {
-        let configuration = URLSessionConfiguration.default
-        delegateProxy = InsecureServerTrustDelegate()
-        session = URLSession(configuration: configuration, delegate: delegateProxy, delegateQueue: nil)
+        trustDelegate = ServerTrustDelegate()
+        session = URLSession(
+            configuration: .default,
+            delegate: trustDelegate,
+            delegateQueue: nil
+        )
     }
 
     public func snapshot(url: String, authHeader: String) async throws -> ClusterSnapshot {
-        guard let baseURL = URL(string: url) else {
-            throw ProxmoxError.invalidURL
-        }
-
-        let endpoint = baseURL.appendingPathComponent("/api2/json/cluster/resources")
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "GET"
-        request.cachePolicy = .reloadIgnoringLocalCacheData
-        request.timeoutInterval = Constants.requestTimeout
-        request.setValue(authHeader, forHTTPHeaderField: "Authorization")
+        let request = try makeRequest(
+            url: url,
+            path: "/api2/json/cluster/resources",
+            method: "GET",
+            authHeader: authHeader
+        )
 
         var lastError: Error?
 
-        for _ in 1...Constants.refreshRetries {
+        for _ in 1...Limits.snapshotAttempts {
             do {
-                let (data, response) = try await session.data(for: request)
-                try validateHTTPResponse(response, data: data)
-
-                let decoded = try JSONDecoder().decode(ClusterResourcesResponse.self, from: data)
-                return decodeResources(decoded.data)
-            } catch {
+                let data = try await send(request)
+                let response = try decode(ClusterResourcesResponse.self, from: data)
+                return ClusterSnapshot(response.data)
+            } catch let error as ProxmoxError {
+                if case .apiError = error { throw error }
+                if case .unauthorized = error { throw error }
                 lastError = error
-
-                if let proxmoxError = error as? ProxmoxError, case .apiError = proxmoxError {
-                    throw error
-                }
-                try? await Task.sleep(nanoseconds: Constants.refreshRetryDelayNanoseconds)
+                try? await Task.sleep(for: Limits.retryDelay)
             }
         }
 
-        if let proxmoxError = lastError as? ProxmoxError {
-            throw proxmoxError
-        }
-        throw ProxmoxError.networkError(lastError?.localizedDescription ?? "Unknown error")
+        throw lastError ?? ProxmoxError.networkError("Unknown error")
     }
 
-    public func performNodeAction(
+    public func performGuestAction(
+        _ action: GuestAction,
         node: String,
         vmid: Int,
         type: String,
-        action: String,
         url: String,
         authHeader: String
     ) async throws -> String {
-        guard let baseURL = URL(string: url) else {
-            throw ProxmoxError.invalidURL
-        }
+        let request = try makeRequest(
+            url: url,
+            path: "/api2/json/nodes/\(node)/\(type)/\(vmid)/status/\(action.rawValue)",
+            method: "POST",
+            authHeader: authHeader
+        )
 
-        let endpoint = baseURL.appendingPathComponent("/api2/json/nodes/\(node)/\(type)/\(vmid)/status/\(action)")
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "POST"
-        request.setValue(authHeader, forHTTPHeaderField: "Authorization")
-
-        let (data, response) = try await session.data(for: request)
-        try validateHTTPResponse(response, data: data)
-
-        do {
-            return try JSONDecoder().decode(UPIDResponse.self, from: data).data
-        } catch {
-            throw ProxmoxError.decodingError(error.localizedDescription)
-        }
+        let data = try await send(request)
+        return try decode(TaskIdentifierResponse.self, from: data).data
     }
 
     public func waitForTask(node: String, upid: String, url: String, authHeader: String) async throws {
-        guard let baseURL = URL(string: url) else {
-            throw ProxmoxError.invalidURL
-        }
+        let request = try makeRequest(
+            url: url,
+            path: "/api2/json/nodes/\(node)/tasks/\(upid)/status",
+            method: "GET",
+            authHeader: authHeader
+        )
 
-        let endpoint = baseURL.appendingPathComponent("/api2/json/nodes/\(node)/tasks/\(upid)/status")
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "GET"
-        request.cachePolicy = .reloadIgnoringLocalCacheData
-        request.setValue(authHeader, forHTTPHeaderField: "Authorization")
-
-        for _ in 0..<Constants.taskPollingRetries {
-            let (data, _) = try await session.data(for: request)
-
-            if let task = try? JSONDecoder().decode(TaskStatusResponse.self, from: data).data, task.isStopped {
-                guard task.isSuccess else {
-                    throw ProxmoxError.taskFailed(task.exitstatus ?? "Unknown")
-                }
-                return
+        for _ in 0..<Limits.taskPollAttempts {
+            let data = try await send(request)
+            guard let task = try? decode(TaskStatusResponse.self, from: data).data, task.hasStopped else {
+                try? await Task.sleep(for: Limits.taskPollInterval)
+                continue
             }
 
-            try? await Task.sleep(nanoseconds: Constants.taskPollingIntervalNanoseconds)
+            guard task.hasSucceeded else {
+                throw ProxmoxError.taskFailed(exitStatus: task.exitstatus ?? "unknown")
+            }
+            return
         }
 
         throw ProxmoxError.taskTimedOut
@@ -132,96 +92,50 @@ public actor ProxmoxAPIClient: ProxmoxAPI {
 }
 
 private extension ProxmoxAPIClient {
-    func validateHTTPResponse(_ response: URLResponse, data: Data) throws {
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw ProxmoxError.networkError("Invalid response")
+    func makeRequest(url: String, path: String, method: String, authHeader: String) throws -> URLRequest {
+        guard let baseURL = URL(string: url) else {
+            throw ProxmoxError.invalidURL
         }
 
-        if httpResponse.statusCode == 401 {
-            throw ProxmoxError.apiError(401, "Unauthorized (Check Token)")
-        }
-
-        guard (200...299).contains(httpResponse.statusCode) else {
-            let errorPayload = String(data: data, encoding: .utf8) ?? "Unknown Error"
-            throw ProxmoxError.apiError(httpResponse.statusCode, "Status: \(httpResponse.statusCode) - \(errorPayload)")
-        }
+        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        request.httpMethod = method
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        request.timeoutInterval = Limits.requestTimeout
+        request.setValue(authHeader, forHTTPHeaderField: "Authorization")
+        return request
     }
 
-    func decodeResources(_ rawResources: [ProxmoxRawResource]) -> ClusterSnapshot {
-        let guests = rawResources
-            .compactMap { item -> ProxmoxVM? in
-                guard let vmid = item.vmid,
-                      let name = item.name,
-                      let status = item.status,
-                      let type = item.type,
-                      let node = item.node,
-                      (type == "qemu" || type == "lxc") else {
-                    return nil
-                }
+    func send(_ request: URLRequest) async throws -> Data {
+        let data: Data
+        let response: URLResponse
 
-                return ProxmoxVM(
-                    vmid: vmid,
-                    name: name,
-                    status: status,
-                    type: type,
-                    node: node,
-                    cpu: item.cpu,
-                    maxcpu: item.maxcpu,
-                    mem: item.mem,
-                    maxmem: item.maxmem,
-                    disk: item.disk,
-                    maxdisk: item.maxdisk
-                )
-            }
-            .sorted { $0.vmid < $1.vmid }
-
-        let nodes = rawResources.compactMap { item -> ProxmoxNode? in
-            guard let type = item.type,
-                  type == "node",
-                  let node = item.node,
-                  let status = item.status else {
-                return nil
-            }
-
-            return ProxmoxNode(
-                node: node,
-                status: status,
-                cpu: item.cpu,
-                maxcpu: item.maxcpu,
-                mem: item.mem,
-                maxmem: item.maxmem,
-                disk: item.disk,
-                maxdisk: item.maxdisk
-            )
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch {
+            throw ProxmoxError.networkError(error.localizedDescription)
         }
 
-        let storages = rawResources
-            .compactMap { item -> ProxmoxStorage? in
-                guard let type = item.type,
-                      type == "storage",
-                      let storage = item.storage,
-                      let node = item.node,
-                      let status = item.status else {
-                    return nil
-                }
+        guard let http = response as? HTTPURLResponse else {
+            throw ProxmoxError.networkError("The response was not HTTP.")
+        }
 
-                return ProxmoxStorage(
-                    storage: storage,
-                    node: node,
-                    status: status,
-                    disk: item.disk,
-                    maxdisk: item.maxdisk,
-                    type: item.plugintype,
-                    content: item.content
-                )
-            }
-            .sorted {
-                if $0.diskUsage != $1.diskUsage {
-                    return $0.diskUsage > $1.diskUsage
-                }
-                return $0.storage < $1.storage
-            }
+        if http.statusCode == 401 {
+            throw ProxmoxError.unauthorized
+        }
 
-        return ClusterSnapshot(nodes: nodes, storages: storages, guests: guests)
+        guard (200...299).contains(http.statusCode) else {
+            let body = String(data: data, encoding: .utf8) ?? "no body"
+            throw ProxmoxError.apiError(statusCode: http.statusCode, message: body)
+        }
+
+        return data
+    }
+
+    func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
+        do {
+            return try JSONDecoder().decode(type, from: data)
+        } catch {
+            throw ProxmoxError.decodingError(error.localizedDescription)
+        }
     }
 }

@@ -1,33 +1,37 @@
 import Foundation
 
 public struct ProxmoxStorage: Identifiable, Codable, Hashable, Sendable {
-    public var id: String { "\(node)-\(storage)" }
     public let storage: String
     public let node: String
     public let status: String
 
     public let disk: Int64?
     public let maxdisk: Int64?
-    public let type: String?
-    public let content: String?
+    public let pluginType: String?
+    public let contentTypes: [String]
+    public let isShared: Bool
 
     public init(
         storage: String,
         node: String,
         status: String,
-        disk: Int64?,
-        maxdisk: Int64?,
-        type: String?,
-        content: String?
+        disk: Int64? = nil,
+        maxdisk: Int64? = nil,
+        pluginType: String? = nil,
+        contentTypes: [String] = [],
+        isShared: Bool = false
     ) {
         self.storage = storage
         self.node = node
         self.status = status
         self.disk = disk
         self.maxdisk = maxdisk
-        self.type = type
-        self.content = content
+        self.pluginType = pluginType
+        self.contentTypes = contentTypes
+        self.isShared = isShared
     }
+
+    public var id: String { "\(node)-\(storage)" }
 
     public var isAvailable: Bool { status == "available" }
 
@@ -37,8 +41,7 @@ public struct ProxmoxStorage: Identifiable, Codable, Hashable, Sendable {
     }
 
     public var diskUsageFormatted: String {
-        guard let disk, let maxdisk, maxdisk > 0 else { return "-" }
-        let percent = (Double(disk) / Double(maxdisk)) * 100
-        return String(format: "%.0f%%", percent)
+        guard disk != nil, let maxdisk, maxdisk > 0 else { return "-" }
+        return String(format: "%.0f%%", diskUsage * 100)
     }
 }

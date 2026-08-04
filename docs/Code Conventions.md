@@ -155,9 +155,18 @@ repository root and enforced in CI. Formatting is never a review topic. See
 
 ## Comments
 
-Prefer clear names and small functions over comments.
+Write no comments.
 
-A comment that explains what the code does is a naming failure. A comment that
-explains why a decision was made belongs in an ADR. A comment that records a
-non-obvious external constraint — a Proxmox behaviour, an AppKit quirk — is worth
-keeping, and should say which one.
+A comment that explains what the code does is a naming failure: rename the thing
+or extract a function until the code says it. A comment that explains why a
+decision was made belongs in an ADR, where it is dated, reviewed and findable —
+not buried in a file nobody greps.
+
+That includes external constraints. A Proxmox quirk or an AppKit workaround goes
+in the ADR or the page that owns the subject, and the code expresses it through a
+named type or function. `ServerTrustDelegate` says what it is; a paragraph above
+it explaining Proxmox certificate authorities belongs in
+[Security](Security.md).
+
+The exception is machine-readable annotation — `// swift-format-ignore` and the
+like — which is instruction, not prose.

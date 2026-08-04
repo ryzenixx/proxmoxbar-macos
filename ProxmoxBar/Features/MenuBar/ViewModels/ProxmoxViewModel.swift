@@ -32,7 +32,7 @@ final class ProxmoxViewModel: ObservableObject {
         }
     }
 
-    @Published var vms: [ProxmoxVM] = []
+    @Published var vms: [ProxmoxGuest] = []
     @Published var nodes: [ProxmoxNode] = []
     @Published var storages: [ProxmoxStorage] = []
     @Published var appState: ProxmoxServiceStatus = .stopped
@@ -66,27 +66,27 @@ final class ProxmoxViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    var filteredVMs: [ProxmoxVM] {
+    var filteredVMs: [ProxmoxGuest] {
         var candidates = vms
 
         if !searchText.isEmpty {
-            candidates = candidates.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+            candidates = candidates.filter { $0.displayName.localizedCaseInsensitiveContains(searchText) }
         }
 
         switch resourceFilter {
         case .all:
             break
         case .vm:
-            candidates = candidates.filter { $0.type == "qemu" }
+            candidates = candidates.filter(\.isVirtualMachine)
         case .lxc:
-            candidates = candidates.filter { $0.type == "lxc" }
+            candidates = candidates.filter(\.isContainer)
         }
 
         switch sortOption {
         case .id:
             candidates.sort { $0.vmid < $1.vmid }
         case .name:
-            candidates.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+            candidates.sort { $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending }
         case .status:
             candidates.sort {
                 if $0.isRunning != $1.isRunning {

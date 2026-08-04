@@ -71,11 +71,17 @@ for that name because few apps use xcconfig at all, so it is a judgement call:
 | `ProxmoxBar/Info.plist` | Bundle keys, excluded from the target's resources by a membership exception |
 | `ProxmoxBarTests/` | The application-hosted test target |
 | `Configurations/` | `Shared`, `Debug`, `Release`, `App`, `Tests` xcconfig |
-| `ProxmoxCore/Sources/ProxmoxCore/Models/` | Domain types and the API payloads they decode from |
-| `ProxmoxCore/Sources/ProxmoxCore/API/` | The `ProxmoxAPI` protocol, its client, and its errors |
-| `ProxmoxCore/Sources/ProxmoxCore/Storage/` | Server store, secret store, preferences |
-| `ProxmoxCore/Sources/ProxmoxCore/Trust/` | Certificate evaluation and pinning |
+| `ProxmoxCore/…/Models/` | `ProxmoxGuest`, `ProxmoxNode`, `ProxmoxStorage`, `ClusterSnapshot` |
+| `ProxmoxCore/…/API/` | `ProxmoxAPI`, its client, `ProxmoxError`, `GuestAction`, the trust delegate |
+| `ProxmoxCore/…/API/Payloads/` | The wire format, internal to the package |
+| `ProxmoxCore/…/Storage/` | Server store, secret store, preferences |
+| `ProxmoxCore/…/Trust/` | Certificate evaluation and pinning |
 | `ProxmoxCore/Tests/` | Everything testable without an application |
+
+One type per file, named after the type, per the
+[Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/)
+and the [Google Swift Style Guide](https://google.github.io/swift/). An extension
+adding a distinct responsibility is `Type+Responsibility.swift`.
 
 Both directories are synchronized folders: the target references the directory,
 not a list of files. Adding a file adds it to the build. See

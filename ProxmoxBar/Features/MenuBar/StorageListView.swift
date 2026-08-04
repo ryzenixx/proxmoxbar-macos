@@ -84,7 +84,7 @@ private struct StorageRowView: View {
             }
 
             HStack(spacing: 4) {
-                if let type = storage.type {
+                if let type = storage.pluginType {
                     Text(type.uppercased())
                         .font(.system(size: 10, design: .monospaced))
                         .padding(.horizontal, 4)
