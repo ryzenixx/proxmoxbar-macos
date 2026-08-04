@@ -70,7 +70,7 @@ at a boundary the app does not own.
 | Under test | Real | Substituted |
 | --- | --- | --- |
 | `ProxmoxAPIClient` | Session, request building, decoding, retries, error mapping | The bytes on the wire, via a stubbed `URLProtocol` |
-| `ServerStore` | Encoding, decoding, migration, recovery order, a real `UserDefaults` suite and a real temporary file | The keychain, via an in-memory secret store |
+| `ServerStore` | Encoding, decoding, schema version handling, a real `UserDefaults` suite | The keychain, via an in-memory secret store |
 | Models | Selection, filtering, sorting, error presentation | The API, via the `ProxmoxAPI` protocol |
 | `KeychainSecretStore` | Everything, against the real keychain | Nothing |
 | Trust evaluation | Certificate chains from fixtures | Nothing |

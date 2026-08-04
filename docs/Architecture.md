@@ -194,17 +194,25 @@ anything that serialises.
 
 The code has not caught up with this page yet. Today:
 
-- There is one module, not two. `ProxmoxCore` does not exist.
+- There is one module, not two. `ProxmoxCore` does not exist, and the Swift files
+  still sit under `App/`, `Core/`, `Features/` and `Shared/` inside
+  `ProxmoxBar/`.
 - State uses `ObservableObject`, and the view model subscribes to the settings
   service's `objectWillChange`, which is why opening the settings sheet triggers
   a redundant cluster refresh.
 - `SettingsService` holds a domain model, the persistence and the presented sheet
-  at once.
+  at once, and still reads the 2.x storage format.
 - Token secrets are stored in clear text, and certificate validation is disabled
   globally.
 - `AppDelegate` owns the status item, the popover, the event monitor and the
   object graph.
-- Every file is listed by hand in the Xcode project.
+- **There are no tests.** The 2.x migration suite was deleted rather than
+  maintained against a format being replaced; the suite is written back in the
+  last step, against what ships. Until then, nothing but review and running the
+  app catches a regression.
 
-The order this is being closed in, and why that order, is in
+The project structure itself is done: synchronized folders, xcconfig, and the
+conventional layout are in place.
+
+The order the rest is being closed in, and why that order, is in
 [Roadmap](Roadmap.md).
