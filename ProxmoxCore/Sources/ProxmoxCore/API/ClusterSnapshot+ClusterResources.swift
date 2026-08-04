@@ -13,14 +13,6 @@ extension ClusterSnapshot {
     }
 }
 
-extension String {
-    var proxmoxList: [String] {
-        split(whereSeparator: { $0 == ";" || $0 == "," || $0 == " " })
-            .map(String.init)
-            .filter { !$0.isEmpty }
-    }
-}
-
 private extension ProxmoxNode {
     init?(_ resource: ClusterResource) {
         guard resource.type == "node", let node = resource.node else { return nil }
@@ -109,9 +101,7 @@ private extension ProxmoxGuest {
 
 private extension ProxmoxPool {
     init?(_ resource: ClusterResource) {
-        guard resource.type == "pool", let pool = resource.pool ?? resource.id.poolIdentifier else {
-            return nil
-        }
+        guard resource.type == "pool", let pool = resource.pool else { return nil }
         self.init(pool: pool)
     }
 }
@@ -140,13 +130,5 @@ private extension ProxmoxNetwork {
             networkType: resource.networkType,
             networkProtocol: resource.netProtocol
         )
-    }
-}
-
-private extension String {
-    var poolIdentifier: String? {
-        guard hasPrefix("/pool/") else { return nil }
-        let name = dropFirst("/pool/".count)
-        return name.isEmpty ? nil : String(name)
     }
 }

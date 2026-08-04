@@ -110,7 +110,7 @@ private extension ProxmoxViewModel {
             )
 
             if verifyFinalStatus {
-                await waitForFinalStatus(for: vm)
+                await waitForFinalStatus(for: vm, on: server)
             }
 
             await loadData()
@@ -121,14 +121,23 @@ private extension ProxmoxViewModel {
         }
     }
 
-    func waitForFinalStatus(for vm: ProxmoxGuest) async {
+    func waitForFinalStatus(for vm: ProxmoxGuest, on server: ProxmoxServerConfig) async {
         let targetStatus = vm.isRunning ? "stopped" : "running"
+
         for _ in 0..<30 {
-            await loadData()
-            if vms.first(where: { $0.vmid == vm.vmid })?.status == targetStatus {
-                return
-            }
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            if Task.isCancelled { return }
+
+            let status = try? await service.guestStatus(
+                node: vm.node,
+                vmid: vm.vmid,
+                type: vm.type,
+                url: server.url,
+                authHeader: server.authHeader
+            )
+
+            if status?.status == targetStatus { return }
+
+            try? await Task.sleep(for: .seconds(1))
         }
     }
 

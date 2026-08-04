@@ -21,6 +21,18 @@ public actor ProxmoxAPIClient: ProxmoxAPI {
         )
     }
 
+    public func version(url: String, authHeader: String) async throws -> ServerVersion {
+        let request = try makeRequest(
+            url: url,
+            path: "/api2/json/version",
+            method: .get,
+            authHeader: authHeader
+        )
+
+        let data = try await send(request)
+        return ServerVersion(try decode(ServerVersionResponse.self, from: data).data)
+    }
+
     public func snapshot(url: String, authHeader: String) async throws -> ClusterSnapshot {
         let request = try makeRequest(
             url: url,
@@ -31,6 +43,24 @@ public actor ProxmoxAPIClient: ProxmoxAPI {
 
         let data = try await sendWithRetries(request)
         return ClusterSnapshot(try decode(ClusterResourcesResponse.self, from: data).data)
+    }
+
+    public func guestStatus(
+        node: String,
+        vmid: Int,
+        type: String,
+        url: String,
+        authHeader: String
+    ) async throws -> GuestStatus {
+        let request = try makeRequest(
+            url: url,
+            path: "/api2/json/nodes/\(node)/\(type)/\(vmid)/status/current",
+            method: .get,
+            authHeader: authHeader
+        )
+
+        let data = try await send(request)
+        return GuestStatus(try decode(GuestStatusResponse.self, from: data).data)
     }
 
     public func performGuestAction(
