@@ -102,7 +102,17 @@ Commands:
 
 ## Project Docs
 
-- [Architecture](docs/ARCHITECTURE.md)
+The `docs/` folder is an Obsidian vault. Start with [Vision](docs/Vision.md), or
+open the folder in Obsidian to browse it with backlinks.
+
+- [Vision](docs/Vision.md) and [Objectives](docs/Objectives.md) — what this is for
+- [Features](docs/Features.md) — what it does today
+- [Architecture](docs/Architecture.md) — how it is put together
+- [Proxmox Integration](<docs/Proxmox Integration.md>) — how it talks to your cluster
+- [Security](docs/Security.md) — threat model and known gaps
+- [Packaging](docs/Packaging.md) and [Updates](docs/Updates.md) — how it ships
+- [ADR](<docs/ADR (Architecture Decision Records).md>) — why it became this way
+- [Code Conventions](<docs/Code Conventions.md>) and [Glossary](docs/Glossary.md)
 - [Contributing](CONTRIBUTING.md)
 
 ## License

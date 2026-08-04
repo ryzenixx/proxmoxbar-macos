@@ -32,8 +32,20 @@
 
 ## Project Conventions
 
+Conventions live in the `docs/` vault so there is one copy of each rule:
+
+- [Code Conventions](<docs/Code Conventions.md>) for Swift, concurrency, errors
+  and logging.
+- [Interface](docs/Interface.md) for views and AppKit bridges.
+- [Quality](docs/Quality.md) for what "done" means and how to test.
+- [Architecture](docs/Architecture.md) for where code belongs.
+
+Two rules matter more than the rest:
+
 - Keep behavior stable unless the PR explicitly changes it.
-- Prefer small composable views over large files.
-- Keep feature logic in `Sources/Features/*`.
-- Keep shared services/models in `Sources/Core/*`.
-- Keep workflows deterministic and non-interactive.
+- Read [Data & Persistence](<docs/Data & Persistence.md>) before touching
+  anything that is stored. Its keys and encoded shapes are a contract with
+  every installed copy of the app.
+
+A change that shapes the project durably needs an ADR. See
+[ADR](<docs/ADR (Architecture Decision Records).md>).
