@@ -112,9 +112,17 @@ Colours come from the design system, which resolves against the effective
 appearance rather than a stored light or dark flag. Never hardcode a colour that
 has to differ between appearances.
 
-The popover background is a system material under a translucent window
-background. Individual rows do not add their own material on top; layering two
-materials is what made the header look wrong before it was removed in 2.0.5.
+The popover background comes from the system. The app does not draw its own
+translucency underneath it, and individual rows do not add a material on top;
+layering two materials is what made the header look wrong before it was removed
+in 2.0.5, and it is what the hand-rolled background stack still does today.
+
+Releases are built against the macOS 26 SDK, so they adopt Liquid Glass. Users
+below macOS 26 keep the earlier appearance, and both have to be right. The
+difference is expressed with availability checks that live **only** in the design
+system layer — never in a feature view, never in a model. A view asks for a
+surface; the design system decides what that means on the running OS. See
+[ADR-0024](<ADR/0024 - Adopting Liquid Glass while keeping the macOS 14 floor.md>).
 
 Status colours are semantic: running is green, stopped is secondary, an error is
 red. Usage gauges shift with the ratio rather than with the resource.

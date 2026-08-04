@@ -34,6 +34,11 @@ it ships as a release on its own.
    refetching the whole cluster while waiting for one guest to change state, add
    `swift-format` to CI. See
    [ADR-0023](<ADR/0023 - swift-format as the only style tool.md>).
+7. **Liquid Glass.** Remove the hand-rolled background stack and let the system
+   provide the popover material, with the macOS 14 and 15 appearance kept behind
+   availability checks confined to the design system. This comes last because it
+   is the only step whose result cannot be judged by a test. See
+   [ADR-0024](<ADR/0024 - Adopting Liquid Glass while keeping the macOS 14 floor.md>).
 
 ---
 

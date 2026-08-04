@@ -87,3 +87,4 @@ it was written down.
 | 0021 | [Per-server certificate trust instead of accepting everything](<ADR/0021 - Per-server certificate trust instead of accepting everything.md>) | 2026-08-04 | Proposed |
 | 0022 | [Swift Testing with URLProtocol stubs at the network edge](<ADR/0022 - Swift Testing with URLProtocol stubs at the network edge.md>) | 2026-08-04 | Proposed |
 | 0023 | [swift-format as the only style tool](<ADR/0023 - swift-format as the only style tool.md>) | 2026-08-04 | Proposed |
+| 0024 | [Adopting Liquid Glass while keeping the macOS 14 floor](<ADR/0024 - Adopting Liquid Glass while keeping the macOS 14 floor.md>) | 2026-08-04 | Proposed |
