@@ -99,9 +99,11 @@ and [Proxmox Integration](<Proxmox Integration.md>).
 
 ### Why
 
-It is the only place on macOS a credential belongs, it needs no entitlement for a
-non-sandboxed Developer ID app, and Apple recommends it over the file-based login
-keychain for new code.
+It is the only place on macOS a credential belongs, and Apple recommends the data
+protection keychain over the file-based login keychain for new code. Whether a
+non-sandboxed Developer ID app needs an entitlement for it is unverified and is
+settled at implementation time, per
+[ADR-0020](<ADR/0020 - Token secrets in the data protection keychain.md>).
 
 No third-party keychain wrapper. The wrappers exist to hide a dictionary-building
 API that this app touches in exactly one file. See

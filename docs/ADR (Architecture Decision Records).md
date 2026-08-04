@@ -43,6 +43,13 @@ history.
 Numbers are sequential and never reused. The file name is
 `NNNN - Short title.md`.
 
+A **factual error** in an accepted ADR is a different matter from a change of
+decision. Correct it in place and leave a dated note saying what was wrong.
+Immutability protects the decision and the reasoning behind it; it does not
+protect a mistake, and propagating one because the record is sealed serves
+nobody. If correcting the fact changes the decision, that is a supersession, not
+a correction.
+
 ---
 
 ## Status values

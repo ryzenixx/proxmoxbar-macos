@@ -23,9 +23,15 @@ before Tahoe, against a different set of materials. On macOS 26 it sits on top o
 a material that is already doing the job, which is the same class of mistake that
 produced the doubled header removed in 2.0.5.
 
-The escape hatch is closing. `UIDesignRequiresCompatibility` opts an app out
-under Xcode 26, and Apple has said it goes away in the next major Xcode. Opting
-out buys one release cycle and costs the redesign anyway.
+There is no escape hatch to rely on. A compatibility opt-out,
+`UIDesignRequiresCompatibility`, is documented for iOS and is reported to be
+ignored when building against the iOS 27 SDK. Whether an equivalent ever existed
+for AppKit is **unverified**: every source found is iOS-facing, and the key
+appears nowhere in Xcode 27.
+
+*Corrected 2026-08-04, during a verification pass: an earlier revision of this
+ADR asserted that key as a macOS opt-out. It was not verified and should not have
+been stated as fact. The decision below never depended on it.*
 
 The deployment target stays at macOS 14, per
 [ADR-0012](<0012 - macOS 14 as the minimum version.md>) and confirmed on

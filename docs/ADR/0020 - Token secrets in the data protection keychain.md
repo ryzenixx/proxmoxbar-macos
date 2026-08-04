@@ -16,9 +16,16 @@ Proxmox token can power off virtual machines.
 
 macOS has two keychains. The file-based login keychain is the historical one. The
 data protection keychain is the modern one, the same implementation as iOS, and
-Apple's technote TN3137 recommends it for new code. For a non-sandboxed
-Developer ID application it requires no entitlement and no additional signing
-configuration: passing `kSecUseDataProtectionKeychain` in the query is enough.
+Apple's technote TN3137 recommends it for new code, and it is selected by passing
+`kSecUseDataProtectionKeychain` in the query.
+
+**Unverified, and it must be settled before this is implemented:** whether a
+non-sandboxed Developer ID application needs an entitlement to use it. TN3137 is
+the authority and has to be read directly, not summarised. If an entitlement is
+required and cannot be obtained without sandboxing, the fallback is the
+file-based keychain, which is still a decisive improvement over clear text and
+leaves the rest of this decision — what is stored, keyed how, and how it migrates
+— unchanged.
 
 One property of the keychain matters more than the API choice. Access control is
 bound to the creating application's designated requirement, which derives from
