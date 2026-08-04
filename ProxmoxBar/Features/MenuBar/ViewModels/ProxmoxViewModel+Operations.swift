@@ -1,6 +1,6 @@
 import Foundation
 import AppKit
-import ProxmoxCore
+import ProxmoxBarCore
 
 extension ProxmoxViewModel {
     func loadData() async {

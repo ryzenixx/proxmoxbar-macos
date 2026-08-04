@@ -2,23 +2,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "ProxmoxCore",
+    name: "ProxmoxBarCore",
     platforms: [
         .macOS(.v14)
     ],
     products: [
-        .library(name: "ProxmoxCore", targets: ["ProxmoxCore"])
+        .library(name: "ProxmoxBarCore", targets: ["ProxmoxBarCore"])
     ],
     targets: [
         .target(
-            name: "ProxmoxCore",
+            name: "ProxmoxBarCore",
             swiftSettings: [
                 .swiftLanguageMode(.v6)
             ]
         ),
         .testTarget(
-            name: "ProxmoxCoreTests",
-            dependencies: ["ProxmoxCore"],
+            name: "ProxmoxBarCoreTests",
+            dependencies: ["ProxmoxBarCore"],
             resources: [
                 .process("Fixtures")
             ],

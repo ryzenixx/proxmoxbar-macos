@@ -30,7 +30,7 @@ to the Proxmox API over HTTPS. There is no server, no database and no cache.
 The logic lives in a local Swift package. The application depends on it and keeps
 everything that touches AppKit, SwiftUI, Sparkle or the bundle.
 
-`ProxmoxCore` imports Foundation and Security, and nothing else. That is enforced
+`ProxmoxBarCore` imports Foundation and Security, and nothing else. That is enforced
 by the compiler, not by discipline: a view cannot be added to it, and a request
 cannot be made from outside it. See
 [ADR-0017](<ADR/0017 - A local package for the core, an Xcode project for the app.md>).
@@ -41,9 +41,19 @@ lines.
 ```
 ProxmoxBar/          the application target, an Xcode synchronized folder
 ProxmoxBarTests/     its tests, also a synchronized folder
-ProxmoxCore/         a local Swift package: models, API, storage, trust
+ProxmoxBarCore/      a local Swift package: models, API, storage, trust
 Configurations/      xcconfig files, and nothing else
 ```
+
+The package is `ProxmoxBarCore`, not `ProxmoxKit`. The community convention is a
+`Kit` suffix, and it is meant for redistributable frameworks. This one holds
+ProxmoxBar's own storage and preferences alongside the API client, so it is not
+reusable elsewhere and should not pretend to be. `Core` says what it is: the core
+of this application.
+
+Its job is not "the API" either. It is everything that compiles against
+Foundation alone — which is what makes it testable without launching a menu bar
+app, the reason it exists at all.
 
 The folder carrying a target is named after that target, and its `Info.plist`
 lives inside it. That is Xcode's own template convention and what Ice, Maccy,
@@ -71,12 +81,12 @@ for that name because few apps use xcconfig at all, so it is a judgement call:
 | `ProxmoxBar/Info.plist` | Bundle keys, excluded from the target's resources by a membership exception |
 | `ProxmoxBarTests/` | The application-hosted test target |
 | `Configurations/` | `Shared`, `Debug`, `Release`, `App`, `Tests` xcconfig |
-| `ProxmoxCore/…/Models/` | `ProxmoxGuest`, `ProxmoxNode`, `ProxmoxStorage`, `ClusterSnapshot` |
-| `ProxmoxCore/…/API/` | `ProxmoxAPI`, its client, `ProxmoxError`, `GuestAction`, the trust delegate |
-| `ProxmoxCore/…/API/Payloads/` | The wire format, internal to the package |
-| `ProxmoxCore/…/Storage/` | Server store, secret store, preferences |
-| `ProxmoxCore/…/Trust/` | Certificate evaluation and pinning |
-| `ProxmoxCore/Tests/` | Everything testable without an application |
+| `ProxmoxBarCore/…/Models/` | `ProxmoxGuest`, `ProxmoxNode`, `ProxmoxStorage`, `ClusterSnapshot` |
+| `ProxmoxBarCore/…/API/` | `ProxmoxAPI`, its client, `ProxmoxError`, `GuestAction`, the trust delegate |
+| `ProxmoxBarCore/…/API/Payloads/` | The wire format, internal to the package |
+| `ProxmoxBarCore/…/Storage/` | Server store, secret store, preferences |
+| `ProxmoxBarCore/…/Trust/` | Certificate evaluation and pinning |
+| `ProxmoxBarCore/Tests/` | Everything testable without an application |
 
 One type per file, named after the type, per the
 [Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/)
@@ -200,7 +210,7 @@ anything that serialises.
 
 The code has not caught up with this page yet. Today:
 
-- `ProxmoxCore` exists and holds the models and the API client, but not the
+- `ProxmoxBarCore` exists and holds the models and the API client, but not the
   storage layer: `SettingsService` is still in the app, because step 3 replaces
   it outright rather than moving it. The app's own files still sit under `App/`,
   `Core/`, `Features/` and `Shared/`.
@@ -213,7 +223,7 @@ The code has not caught up with this page yet. Today:
   globally.
 - `AppDelegate` owns the status item, the popover, the event monitor and the
   object graph.
-- **Only the package is tested.** `ProxmoxCore` has 22 tests covering decoding
+- **Only the package is tested.** `ProxmoxBarCore` has 22 tests covering decoding
   and the client, against a fixture captured from a real cluster and a stubbed
   `URLProtocol`. The application target has none: the 2.x migration suite was
   deleted rather than maintained against a format being replaced, and its

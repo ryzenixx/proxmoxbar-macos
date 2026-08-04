@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import ProxmoxCore
+@testable import ProxmoxBarCore
 
 @Suite("Single-guest status and server version")
 struct GuestStatusTests {

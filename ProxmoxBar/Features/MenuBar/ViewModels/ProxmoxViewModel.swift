@@ -1,6 +1,6 @@
 import SwiftUI
 import Combine
-import ProxmoxCore
+import ProxmoxBarCore
 
 @MainActor
 final class ProxmoxViewModel: ObservableObject {

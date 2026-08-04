@@ -50,12 +50,12 @@ have. See [ADR-0025](<ADR/0025 - A clean break on stored data for 3.0.0.md>).
 ## Commands
 
 ```bash
-swift test --package-path ProxmoxCore        # logic tests, no app, seconds
+swift test --package-path ProxmoxBarCore        # logic tests, no app, seconds
 
 xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar \
   -destination 'platform=macOS' build test   # everything
 
-swift-format lint --strict --recursive ProxmoxBar ProxmoxCore
+swift-format lint --strict --recursive ProxmoxBar ProxmoxBarCore
 ```
 
 In Xcode, `Cmd+B` and `Cmd+U` do the same as the second command.

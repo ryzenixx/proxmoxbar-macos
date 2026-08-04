@@ -1,5 +1,5 @@
 import SwiftUI
-import ProxmoxCore
+import ProxmoxBarCore
 
 struct VMRowView: View {
     let vm: ProxmoxGuest

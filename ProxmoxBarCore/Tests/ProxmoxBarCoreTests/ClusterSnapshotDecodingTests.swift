@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import ProxmoxCore
+@testable import ProxmoxBarCore
 
 @Suite("Decoding a real /cluster/resources payload")
 struct ClusterSnapshotDecodingTests {

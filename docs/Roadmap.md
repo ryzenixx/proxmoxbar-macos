@@ -21,7 +21,7 @@ building and running.
    because it makes every later move free. See
    [ADR-0016](<ADR/0016 - Synchronized folders and xcconfig over a hand-listed project.md>)
    and [ADR-0019](<ADR/0019 - Explicit MainActor over default isolation.md>).
-2. **The core package.** `ProxmoxCore` is created and the models, the API client
+2. **The core package.** `ProxmoxBarCore` is created and the models, the API client
    and the storage layer move into it, behind the `ProxmoxAPI` protocol. See
    [ADR-0017](<ADR/0017 - A local package for the core, an Xcode project for the app.md>).
 3. **Storage, rewritten.** The new schema-versioned format, the keychain, and no

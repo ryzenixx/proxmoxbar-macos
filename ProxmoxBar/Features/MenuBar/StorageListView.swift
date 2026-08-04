@@ -1,5 +1,5 @@
 import SwiftUI
-import ProxmoxCore
+import ProxmoxBarCore
 
 struct StorageListView: View {
     @ObservedObject var viewModel: ProxmoxViewModel

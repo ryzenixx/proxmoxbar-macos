@@ -33,7 +33,7 @@ final class StubTransport: Sendable {
 }
 
 final class StubURLProtocol: URLProtocol, @unchecked Sendable {
-    static let keyHeader = "X-ProxmoxCore-Stub"
+    static let keyHeader = "X-ProxmoxBarCore-Stub"
 
     private struct Entry {
         let handler: @Sendable (URLRequest) throws -> StubResponse

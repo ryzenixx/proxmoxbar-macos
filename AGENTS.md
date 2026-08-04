@@ -100,7 +100,7 @@ a macOS convention, and both were removed deliberately.
 `ProxmoxBar/` and `ProxmoxBarTests/` are Xcode synchronized folders. Adding a
 file adds it to the build; there is nothing to register in the project.
 
-A local `ProxmoxCore` package is still to be created. The target layout is in
+A local `ProxmoxBarCore` package is still to be created. The target layout is in
 [Architecture](docs/Architecture.md), and the order of the work is in
 [Roadmap](docs/Roadmap.md). Follow that order; it exists because each step makes
 the next one safe.
@@ -114,7 +114,7 @@ xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar \
   -destination 'platform=macOS' build        # build
 xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar \
   -destination 'platform=macOS' test         # build and test
-swift-format lint --strict --recursive ProxmoxBar ProxmoxBarTests ProxmoxCore
+swift-format lint --strict --recursive ProxmoxBar ProxmoxBarTests ProxmoxBarCore
 ```
 
 Xcode 26 or later is required. A beta is fine, and is the only option on a beta
