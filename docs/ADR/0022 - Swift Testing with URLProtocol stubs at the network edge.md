@@ -2,7 +2,7 @@
 | --- | --- |
 | **Identifier** | ADR-0022 |
 | **Date** | 2026-08-04 |
-| **Status** | Proposed |
+| **Status** | Accepted |
 
 ---
 

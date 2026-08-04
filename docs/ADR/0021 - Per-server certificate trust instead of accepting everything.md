@@ -2,7 +2,7 @@
 | --- | --- |
 | **Identifier** | ADR-0021 |
 | **Date** | 2026-08-04 |
-| **Status** | Proposed |
+| **Status** | Accepted |
 
 ---
 
@@ -53,7 +53,7 @@ reported and not offered for acceptance.
 self-signed certificates work, and leaving it behind weakens transport security
 for no benefit.
 
-This supersedes ADR-0006 once accepted.
+This supersedes [ADR-0006](<0006 - Accepting any TLS certificate.md>).
 
 ---
 

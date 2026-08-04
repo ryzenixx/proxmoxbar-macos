@@ -50,9 +50,19 @@ Numbers are sequential and never reused. The file name is
 | Status | Meaning |
 | --- | --- |
 | Proposed | Written, not yet agreed |
-| Accepted | In force |
+| Accepted | Agreed and binding |
 | Superseded | Replaced by a later ADR, which must be linked |
 | Deprecated | No longer applies, with no replacement |
+
+**Accepted is about the decision, not the code.** An accepted ADR is the rule to
+follow from now on; it does not claim the code already follows it. Several
+accepted decisions are still being implemented, and where the code diverges is
+recorded in [Architecture](Architecture.md) and [Security](Security.md), with the
+order of the work in [Roadmap](Roadmap.md).
+
+A superseded ADR can likewise still describe what the shipped app does, until its
+replacement is implemented. That is the case for
+[0006](<ADR/0006 - Accepting any TLS certificate.md>) today.
 
 ---
 
@@ -69,7 +79,7 @@ it was written down.
 | 0003 | [API tokens instead of a user password](<ADR/0003 - API tokens instead of a user password.md>) | 2026-01-11 | Accepted |
 | 0004 | [One cluster resources call instead of per-node endpoints](<ADR/0004 - One cluster resources call instead of per-node endpoints.md>) | 2026-01-11 | Accepted |
 | 0005 | [Sparkle for in-app updates](<ADR/0005 - Sparkle for in-app updates.md>) | 2026-01-11 | Accepted |
-| 0006 | [Accepting any TLS certificate](<ADR/0006 - Accepting any TLS certificate.md>) | 2026-01-11 | Accepted, to be superseded by 0021 |
+| 0006 | [Accepting any TLS certificate](<ADR/0006 - Accepting any TLS certificate.md>) | 2026-01-11 | Superseded by 0021 |
 | 0007 | [Polling on a fixed interval while the popover is open](<ADR/0007 - Polling on a fixed interval while the popover is open.md>) | 2026-01-12 | Accepted |
 | 0008 | [Waiting on Proxmox task identifiers after an action](<ADR/0008 - Waiting on Proxmox task identifiers after an action.md>) | 2026-01-12 | Accepted |
 | 0009 | [A universal binary for Apple silicon and Intel](<ADR/0009 - A universal binary for Apple silicon and Intel.md>) | 2026-01-13 | Accepted |
@@ -79,12 +89,12 @@ it was written down.
 | 0013 | [Layered recovery for the server list](<ADR/0013 - Layered recovery for the server list.md>) | 2026-03-11 | Accepted |
 | 0014 | [Developer ID signing and notarization outside the App Store](<ADR/0014 - Developer ID signing and notarization outside the App Store.md>) | 2026-03-11 | Accepted |
 | 0015 | [A tag-triggered release pipeline in isolated jobs](<ADR/0015 - A tag-triggered release pipeline in isolated jobs.md>) | 2026-03-11 | Accepted |
-| 0016 | [Synchronized folders and xcconfig over a hand-listed project](<ADR/0016 - Synchronized folders and xcconfig over a hand-listed project.md>) | 2026-08-04 | Proposed |
-| 0017 | [A local package for the core, an Xcode project for the app](<ADR/0017 - A local package for the core, an Xcode project for the app.md>) | 2026-08-04 | Proposed |
-| 0018 | [Observation instead of ObservableObject](<ADR/0018 - Observation instead of ObservableObject.md>) | 2026-08-04 | Proposed |
-| 0019 | [Explicit MainActor over default isolation](<ADR/0019 - Explicit MainActor over default isolation.md>) | 2026-08-04 | Proposed |
-| 0020 | [Token secrets in the data protection keychain](<ADR/0020 - Token secrets in the data protection keychain.md>) | 2026-08-04 | Proposed |
-| 0021 | [Per-server certificate trust instead of accepting everything](<ADR/0021 - Per-server certificate trust instead of accepting everything.md>) | 2026-08-04 | Proposed |
-| 0022 | [Swift Testing with URLProtocol stubs at the network edge](<ADR/0022 - Swift Testing with URLProtocol stubs at the network edge.md>) | 2026-08-04 | Proposed |
-| 0023 | [swift-format as the only style tool](<ADR/0023 - swift-format as the only style tool.md>) | 2026-08-04 | Proposed |
-| 0024 | [Adopting Liquid Glass while keeping the macOS 14 floor](<ADR/0024 - Adopting Liquid Glass while keeping the macOS 14 floor.md>) | 2026-08-04 | Proposed |
+| 0016 | [Synchronized folders and xcconfig over a hand-listed project](<ADR/0016 - Synchronized folders and xcconfig over a hand-listed project.md>) | 2026-08-04 | Accepted |
+| 0017 | [A local package for the core, an Xcode project for the app](<ADR/0017 - A local package for the core, an Xcode project for the app.md>) | 2026-08-04 | Accepted |
+| 0018 | [Observation instead of ObservableObject](<ADR/0018 - Observation instead of ObservableObject.md>) | 2026-08-04 | Accepted |
+| 0019 | [Explicit MainActor over default isolation](<ADR/0019 - Explicit MainActor over default isolation.md>) | 2026-08-04 | Accepted |
+| 0020 | [Token secrets in the data protection keychain](<ADR/0020 - Token secrets in the data protection keychain.md>) | 2026-08-04 | Accepted |
+| 0021 | [Per-server certificate trust instead of accepting everything](<ADR/0021 - Per-server certificate trust instead of accepting everything.md>) | 2026-08-04 | Accepted |
+| 0022 | [Swift Testing with URLProtocol stubs at the network edge](<ADR/0022 - Swift Testing with URLProtocol stubs at the network edge.md>) | 2026-08-04 | Accepted |
+| 0023 | [swift-format as the only style tool](<ADR/0023 - swift-format as the only style tool.md>) | 2026-08-04 | Accepted |
+| 0024 | [Adopting Liquid Glass while keeping the macOS 14 floor](<ADR/0024 - Adopting Liquid Glass while keeping the macOS 14 floor.md>) | 2026-08-04 | Accepted |

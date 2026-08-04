@@ -2,7 +2,7 @@
 | -------------- | ------------------------------------------------------------------------------------------------------------------ |
 | **Identifier** | ADR-0006                                                                                                           |
 | **Date**       | 2026-01-11                                                                                                         |
-| **Status**     | Accepted, to be superseded by [ADR-0021](<0021 - Per-server certificate trust instead of accepting everything.md>) |
+| **Status**     | Superseded by [ADR-0021](<0021 - Per-server certificate trust instead of accepting everything.md>) |
 
 ---
 
