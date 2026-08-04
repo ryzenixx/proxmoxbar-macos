@@ -213,10 +213,12 @@ The code has not caught up with this page yet. Today:
   globally.
 - `AppDelegate` owns the status item, the popover, the event monitor and the
   object graph.
-- **There are no tests.** The 2.x migration suite was deleted rather than
-  maintained against a format being replaced; the suite is written back in the
-  last step, against what ships. Until then, nothing but review and running the
-  app catches a regression.
+- **Only the package is tested.** `ProxmoxCore` has 22 tests covering decoding
+  and the client, against a fixture captured from a real cluster and a stubbed
+  `URLProtocol`. The application target has none: the 2.x migration suite was
+  deleted rather than maintained against a format being replaced, and its
+  replacement is written in the last step, against what ships. Until then,
+  nothing but review and running the app catches a regression there.
 
 The project structure itself is done: synchronized folders, xcconfig, and the
 conventional layout are in place.

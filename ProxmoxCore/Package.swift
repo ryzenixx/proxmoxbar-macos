@@ -15,6 +15,16 @@ let package = Package(
             swiftSettings: [
                 .swiftLanguageMode(.v6)
             ]
-        )
+        ),
+        .testTarget(
+            name: "ProxmoxCoreTests",
+            dependencies: ["ProxmoxCore"],
+            resources: [
+                .process("Fixtures")
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6)
+            ]
+        ),
     ]
 )

@@ -12,10 +12,10 @@ public actor ProxmoxAPIClient: ProxmoxAPI {
     private let session: URLSession
     private let trustDelegate: ServerTrustDelegate
 
-    public init() {
+    public init(configuration: URLSessionConfiguration = .default) {
         trustDelegate = ServerTrustDelegate()
         session = URLSession(
-            configuration: .default,
+            configuration: configuration,
             delegate: trustDelegate,
             delegateQueue: nil
         )
