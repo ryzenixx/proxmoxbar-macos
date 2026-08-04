@@ -40,9 +40,20 @@ lines.
 
 ```
 ProxmoxBar/          the application target, an Xcode synchronized folder
+ProxmoxBarTests/     its tests, also a synchronized folder
 ProxmoxCore/         a local Swift package: models, API, storage, trust
-Config/              xcconfig files and Info.plist
+Configurations/      xcconfig files, and nothing else
 ```
+
+The folder carrying a target is named after that target, and its `Info.plist`
+lives inside it. That is Xcode's own template convention and what Ice, Maccy,
+Rectangle and Stats all do; a folder called `Sources` or `Config` at the root of
+a macOS app is not a thing anyone else does, and reads as a Swift package that
+went wrong.
+
+`Configurations/` holds build configuration files only. There is no convention
+for that name because few apps use xcconfig at all, so it is a judgement call:
+"configurations" is Xcode's own word for what those files configure.
 
 ---
 
@@ -57,6 +68,9 @@ Config/              xcconfig files and Info.plist
 | `ProxmoxBar/Platform/` | Login item, notifications, updater: everything bound to the bundle |
 | `ProxmoxBar/DesignSystem/` | Reusable views, adaptive colours, and the four AppKit bridges |
 | `ProxmoxBar/Resources/` | Menu bar icon and application icon |
+| `ProxmoxBar/Info.plist` | Bundle keys, excluded from the target's resources by a membership exception |
+| `ProxmoxBarTests/` | The application-hosted test target |
+| `Configurations/` | `Shared`, `Debug`, `Release`, `App`, `Tests` xcconfig |
 | `ProxmoxCore/Sources/ProxmoxCore/Models/` | Domain types and the API payloads they decode from |
 | `ProxmoxCore/Sources/ProxmoxCore/API/` | The `ProxmoxAPI` protocol, its client, and its errors |
 | `ProxmoxCore/Sources/ProxmoxCore/Storage/` | Server store, secret store, preferences |

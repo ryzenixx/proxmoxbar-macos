@@ -9,7 +9,7 @@ described in [Data & Persistence](<Data & Persistence.md>).
 
 ## Build settings
 
-Build settings live in `Config/*.xcconfig`, not in the Xcode project. They are
+Build settings live in `Configurations/*.xcconfig`, not in the Xcode project. They are
 plain text, so a change to the deployment target or the hardened runtime shows up
 in a diff as one line. See
 [ADR-0016](<ADR/0016 - Synchronized folders and xcconfig over a hand-listed project.md>).
@@ -35,7 +35,7 @@ The ones that carry meaning:
 | `SWIFT_APPROACHABLE_CONCURRENCY` | `YES` | See [ADR-0019](<ADR/0019 - Explicit MainActor over default isolation.md>) |
 | `SWIFT_DEFAULT_ACTOR_ISOLATION` | unset | Isolation is written explicitly |
 | `ENABLE_HARDENED_RUNTIME` | `YES` | Required for notarization |
-| `INFOPLIST_FILE` | `Config/Info.plist` | With `GENERATE_INFOPLIST_FILE = NO` |
+| `INFOPLIST_FILE` | `ProxmoxBar/Info.plist` | With `GENERATE_INFOPLIST_FILE = NO` |
 | `SPARKLE_PUBLIC_ED_KEY` | empty | Overridden on the command line at release |
 
 Rules for the xcconfig files: they belong to no target and appear in no copy
@@ -51,7 +51,7 @@ by the pipeline.
 
 ## Info.plist
 
-`Config/Info.plist` is checked in and used verbatim; `GENERATE_INFOPLIST_FILE` is
+`ProxmoxBar/Info.plist` is checked in and used verbatim; `GENERATE_INFOPLIST_FILE` is
 off, so this file is the only source of bundle keys.
 
 | Key | Value | Effect |

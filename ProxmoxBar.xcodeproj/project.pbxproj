@@ -7,40 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D4A271AE3D7D72B0DAD5E4F4 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A1F94E7B0A4A4F8DA7A2B1C1 /* AppIcon.icns */; };
-		E5B382BF4E8E83C1EBE6F505 /* MenuBarIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = B2E05F8C1B5B509EB8B3C2D2 /* MenuBarIcon.png */; };
-		05F1AA8932F372D2C757D078 /* SettingsServiceMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF3741C8DE67744D2560D6D /* SettingsServiceMigrationTests.swift */; };
-		0D16DFFBE4303C0BE2F41AA3 /* UpdaterController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA9687001CFA8086308B0A4 /* UpdaterController.swift */; };
-		0F0FE11104CDAEBCA966B02D /* ProxmoxViewModel+Operations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16774D6FC54965C602E71060 /* ProxmoxViewModel+Operations.swift */; };
-		1257AE4D926729C701F34BAC /* Color+Adaptive.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65FA5037839938CD4F81746 /* Color+Adaptive.swift */; };
-		14ED38F65E8E664E78AA3B8A /* SettingsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439369E5DF9F9986ED9721F8 /* SettingsService.swift */; };
-		197166A9ED90437DCBE5CB7E /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 904B3B19722B1C3498A98185 /* EventMonitor.swift */; };
-		1BD04AD5E78CEC0B3BCEF571 /* CursorFixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F089ADE33FAB6F47DA761D9 /* CursorFixView.swift */; };
-		1BE7FC758ED0886300CE7E71 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20D7B2ACFA063CCAFF1B765 /* MenuBarView.swift */; };
-		3D3D22F0783A16FDF0602992 /* ResourceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF5DA251D2D08E38A8739A8 /* ResourceListView.swift */; };
-		489D08209D2154BA4D28A9E3 /* ProxmoxViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB6A8E40444479027C634794 /* ProxmoxViewModel.swift */; };
-		4D239C53111D9A4B25321328 /* WindowAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29BCAB2C69DB9DE069D8222 /* WindowAccessor.swift */; };
-		4F6BD8FC52C63FAAD3B25111 /* ProxmoxNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42FFC69600448C9D06C6F14B /* ProxmoxNode.swift */; };
-		5699CC7C66059C3445123BDA /* ProxmoxStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5DA2405AF7DA4BEDB7BAD4C /* ProxmoxStorage.swift */; };
-		6F94CC57755280591E7E9E4E /* MenuBarDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044D085ABEE66E3B3898D48C /* MenuBarDashboardView.swift */; };
-		7718C01361AD80DEA573C957 /* ProxmoxVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67740131D178CC2E22FB11F /* ProxmoxVM.swift */; };
-		88F826860E5D4DEDC3EDCE5C /* ProxmoxBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A04D964C029A0D14D3116BCA /* ProxmoxBarApp.swift */; };
-		92759EC8D97ECE9C167C0D35 /* ServerFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED4B329C85B354CFECDD8FC /* ServerFormView.swift */; };
-		9FA8F2428663A10FA71EC448 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECE2926ADC9F10EB60CCCB3E /* SettingsView.swift */; };
-		A3D95327FFBE15B2111CEC47 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA134D094BEF80DF72B469E /* NotificationManager.swift */; };
-		AA6C66B8893FD77C330CFB9D /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C9649017BADD8628254DE /* LaunchAtLoginService.swift */; };
-		B3F48C29EC434868CA603291 /* StorageListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED2BA149DF68E8A10922B46 /* StorageListView.swift */; };
-		B6B0A0BC2BCD35CD9AE7C53A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6611B5DABA517B4F0E3975FC /* AppDelegate.swift */; };
-		BD4C8843BFC26C767A54D5E6 /* ProxmoxService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED5E897D1E00D828FB4D399 /* ProxmoxService.swift */; };
-		C3FACF96D28A3FF371DC7EBE /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C664427D5D98B605A25098C4 /* VisualEffectView.swift */; };
-		C7A3E08BD5805DC5BA789416 /* VMRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB54E8F965A07952AA62775 /* VMRowView.swift */; };
 		CA8EB8A4AC501DE493151E22 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9B46B23EDC0B6466E862CBCD /* Sparkle */; };
-		D48983FEFF6F5A6185CF251B /* ProxmoxAPIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B939E946071C592B6375FF3 /* ProxmoxAPIModels.swift */; };
-		DA38BD11E49298B1707C9041 /* ServerReorderDropDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBF79B72F2A211CF65C59312 /* ServerReorderDropDelegate.swift */; };
-		E228D7977894DEB19563803A /* ProxmoxAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85938309842B13F7053797A8 /* ProxmoxAppState.swift */; };
-		E727F02D650759CCDF3948DF /* ClusterStatsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DD8B91D083BCE90A474A9B1 /* ClusterStatsRow.swift */; };
-		EA84618AC316B88136CEEA1A /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27098F23C61AFED56EE53C42 /* AppConfig.swift */; };
-		EFFE6B6B882A3145377717C4 /* SettingsSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE433B4F6ECA43BF4EE419E1 /* SettingsSections.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,42 +21,40 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A1F94E7B0A4A4F8DA7A2B1C1 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
-		B2E05F8C1B5B509EB8B3C2D2 /* MenuBarIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MenuBarIcon.png; sourceTree = "<group>"; };
-		044D085ABEE66E3B3898D48C /* MenuBarDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarDashboardView.swift; sourceTree = "<group>"; };
-		0B939E946071C592B6375FF3 /* ProxmoxAPIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxmoxAPIModels.swift; sourceTree = "<group>"; };
-		16774D6FC54965C602E71060 /* ProxmoxViewModel+Operations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProxmoxViewModel+Operations.swift"; sourceTree = "<group>"; };
-		1EB54E8F965A07952AA62775 /* VMRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VMRowView.swift; sourceTree = "<group>"; };
 		20BBDD5C0B2316B5BB199DE0 /* ProxmoxBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProxmoxBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		27098F23C61AFED56EE53C42 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
-		2F089ADE33FAB6F47DA761D9 /* CursorFixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorFixView.swift; sourceTree = "<group>"; };
-		42FFC69600448C9D06C6F14B /* ProxmoxNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxmoxNode.swift; sourceTree = "<group>"; };
-		439369E5DF9F9986ED9721F8 /* SettingsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsService.swift; sourceTree = "<group>"; };
-		5EA134D094BEF80DF72B469E /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
-		5FF3741C8DE67744D2560D6D /* SettingsServiceMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsServiceMigrationTests.swift; sourceTree = "<group>"; };
-		6611B5DABA517B4F0E3975FC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		7DD8B91D083BCE90A474A9B1 /* ClusterStatsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClusterStatsRow.swift; sourceTree = "<group>"; };
-		85938309842B13F7053797A8 /* ProxmoxAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxmoxAppState.swift; sourceTree = "<group>"; };
-		904B3B19722B1C3498A98185 /* EventMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitor.swift; sourceTree = "<group>"; };
-		A04D964C029A0D14D3116BCA /* ProxmoxBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxmoxBarApp.swift; sourceTree = "<group>"; };
-		AE433B4F6ECA43BF4EE419E1 /* SettingsSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSections.swift; sourceTree = "<group>"; };
-		B22C9649017BADD8628254DE /* LaunchAtLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginService.swift; sourceTree = "<group>"; };
-		B29BCAB2C69DB9DE069D8222 /* WindowAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowAccessor.swift; sourceTree = "<group>"; };
-		BB6A8E40444479027C634794 /* ProxmoxViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxmoxViewModel.swift; sourceTree = "<group>"; };
-		BDF5DA251D2D08E38A8739A8 /* ResourceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceListView.swift; sourceTree = "<group>"; };
-		C20D7B2ACFA063CCAFF1B765 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
-		C664427D5D98B605A25098C4 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
-		CEA9687001CFA8086308B0A4 /* UpdaterController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdaterController.swift; sourceTree = "<group>"; };
-		CED4B329C85B354CFECDD8FC /* ServerFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerFormView.swift; sourceTree = "<group>"; };
+		5B0A1C2D3E4F506172839404 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
+		5B0A1C2D3E4F506172839405 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		5B0A1C2D3E4F506172839406 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		5B0A1C2D3E4F506172839407 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
+		5B0A1C2D3E4F506172839408 /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
 		D301AE309A09F3B023797229 /* ProxmoxBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProxmoxBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D65FA5037839938CD4F81746 /* Color+Adaptive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Adaptive.swift"; sourceTree = "<group>"; };
-		E5DA2405AF7DA4BEDB7BAD4C /* ProxmoxStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxmoxStorage.swift; sourceTree = "<group>"; };
-		EBF79B72F2A211CF65C59312 /* ServerReorderDropDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerReorderDropDelegate.swift; sourceTree = "<group>"; };
-		ECE2926ADC9F10EB60CCCB3E /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		F67740131D178CC2E22FB11F /* ProxmoxVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxmoxVM.swift; sourceTree = "<group>"; };
-		FED2BA149DF68E8A10922B46 /* StorageListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageListView.swift; sourceTree = "<group>"; };
-		FED5E897D1E00D828FB4D399 /* ProxmoxService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProxmoxService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5B0A1C2D3E4F50617283940A /* Exceptions for "ProxmoxBar" folder in "ProxmoxBar" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 90DF879BDB8E8FBD0273DE71 /* ProxmoxBar */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		5B0A1C2D3E4F506172839401 /* ProxmoxBar */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5B0A1C2D3E4F50617283940A /* Exceptions for "ProxmoxBar" folder in "ProxmoxBar" target */,
+			);
+			path = ProxmoxBar;
+			sourceTree = "<group>";
+		};
+		5B0A1C2D3E4F506172839402 /* ProxmoxBarTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ProxmoxBarTests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		627A563376DC44951B0F2065 /* Frameworks */ = {
@@ -103,161 +68,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1E2E38C98C66E9FA63D6ED9A /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				C3F1609D2C6C61AFC9C4D3E3 /* Assets */,
-				95D655F4DA2EC030E16C5E44 /* App */,
-				392E7204691AB4271EB9FA82 /* Core */,
-				D55630CAA19AA24F8C3A2EBB /* Features */,
-				9A527D70340A567497C7BF9C /* Shared */,
-			);
-			path = Sources;
-			sourceTree = "<group>";
-		};
-		37C1280A86E70BE9816B8D8A /* MenuBar */ = {
-			isa = PBXGroup;
-			children = (
-				044D085ABEE66E3B3898D48C /* MenuBarDashboardView.swift */,
-				C20D7B2ACFA063CCAFF1B765 /* MenuBarView.swift */,
-				BDF5DA251D2D08E38A8739A8 /* ResourceListView.swift */,
-				FED2BA149DF68E8A10922B46 /* StorageListView.swift */,
-				1EB54E8F965A07952AA62775 /* VMRowView.swift */,
-				45693AAEADC2C7184DE49BAB /* ViewModels */,
-			);
-			path = MenuBar;
-			sourceTree = "<group>";
-		};
-		392E7204691AB4271EB9FA82 /* Core */ = {
-			isa = PBXGroup;
-			children = (
-				60851903A421DCE49EEE8F4E /* Models */,
-				74ABD584E03ACBB228D8CAF2 /* Services */,
-			);
-			path = Core;
-			sourceTree = "<group>";
-		};
-		45693AAEADC2C7184DE49BAB /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				BB6A8E40444479027C634794 /* ProxmoxViewModel.swift */,
-				16774D6FC54965C602E71060 /* ProxmoxViewModel+Operations.swift */,
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
 		4570C9F74E75E7487E5C0F12 = {
 			isa = PBXGroup;
 			children = (
-				1E2E38C98C66E9FA63D6ED9A /* Sources */,
-				CB124EF60E28324C2FC8EE81 /* Tests */,
+				5B0A1C2D3E4F506172839401 /* ProxmoxBar */,
+				5B0A1C2D3E4F506172839402 /* ProxmoxBarTests */,
+				5B0A1C2D3E4F506172839403 /* Configurations */,
 				E548BFDE2EADB265E47472A3 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		60851903A421DCE49EEE8F4E /* Models */ = {
+		5B0A1C2D3E4F506172839403 /* Configurations */ = {
 			isa = PBXGroup;
 			children = (
-				0B939E946071C592B6375FF3 /* ProxmoxAPIModels.swift */,
-				42FFC69600448C9D06C6F14B /* ProxmoxNode.swift */,
-				E5DA2405AF7DA4BEDB7BAD4C /* ProxmoxStorage.swift */,
-				F67740131D178CC2E22FB11F /* ProxmoxVM.swift */,
+				5B0A1C2D3E4F506172839404 /* Shared.xcconfig */,
+				5B0A1C2D3E4F506172839405 /* Debug.xcconfig */,
+				5B0A1C2D3E4F506172839406 /* Release.xcconfig */,
+				5B0A1C2D3E4F506172839407 /* App.xcconfig */,
+				5B0A1C2D3E4F506172839408 /* Tests.xcconfig */,
 			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		74ABD584E03ACBB228D8CAF2 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				B22C9649017BADD8628254DE /* LaunchAtLoginService.swift */,
-				5EA134D094BEF80DF72B469E /* NotificationManager.swift */,
-				85938309842B13F7053797A8 /* ProxmoxAppState.swift */,
-				FED5E897D1E00D828FB4D399 /* ProxmoxService.swift */,
-				439369E5DF9F9986ED9721F8 /* SettingsService.swift */,
-				CEA9687001CFA8086308B0A4 /* UpdaterController.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		95D655F4DA2EC030E16C5E44 /* App */ = {
-			isa = PBXGroup;
-			children = (
-				27098F23C61AFED56EE53C42 /* AppConfig.swift */,
-				6611B5DABA517B4F0E3975FC /* AppDelegate.swift */,
-				A04D964C029A0D14D3116BCA /* ProxmoxBarApp.swift */,
-			);
-			path = App;
-			sourceTree = "<group>";
-		};
-		9A527D70340A567497C7BF9C /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				E975211E0480CED9789E5F8B /* AppKit */,
-				E279B2A82AA9A9FEC4021514 /* Components */,
-				9F8CC2E71D84FC225FC4F333 /* Styling */,
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
-		9F8CC2E71D84FC225FC4F333 /* Styling */ = {
-			isa = PBXGroup;
-			children = (
-				D65FA5037839938CD4F81746 /* Color+Adaptive.swift */,
-			);
-			path = Styling;
-			sourceTree = "<group>";
-		};
-		B83630A24576D604939635B4 /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				CED4B329C85B354CFECDD8FC /* ServerFormView.swift */,
-				EBF79B72F2A211CF65C59312 /* ServerReorderDropDelegate.swift */,
-				AE433B4F6ECA43BF4EE419E1 /* SettingsSections.swift */,
-				ECE2926ADC9F10EB60CCCB3E /* SettingsView.swift */,
-			);
-			path = Settings;
-			sourceTree = "<group>";
-		};
-		C3F1609D2C6C61AFC9C4D3E3 /* Assets */ = {
-			isa = PBXGroup;
-			children = (
-				A1F94E7B0A4A4F8DA7A2B1C1 /* AppIcon.icns */,
-				B2E05F8C1B5B509EB8B3C2D2 /* MenuBarIcon.png */,
-			);
-			path = Assets;
-			sourceTree = "<group>";
-		};
-		C38FA064B0EFDC39D397C197 /* ProxmoxBarTests */ = {
-			isa = PBXGroup;
-			children = (
-				5FF3741C8DE67744D2560D6D /* SettingsServiceMigrationTests.swift */,
-			);
-			path = ProxmoxBarTests;
-			sourceTree = "<group>";
-		};
-		CB124EF60E28324C2FC8EE81 /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-				C38FA064B0EFDC39D397C197 /* ProxmoxBarTests */,
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		D55630CAA19AA24F8C3A2EBB /* Features */ = {
-			isa = PBXGroup;
-			children = (
-				37C1280A86E70BE9816B8D8A /* MenuBar */,
-				B83630A24576D604939635B4 /* Settings */,
-			);
-			path = Features;
-			sourceTree = "<group>";
-		};
-		E279B2A82AA9A9FEC4021514 /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				7DD8B91D083BCE90A474A9B1 /* ClusterStatsRow.swift */,
-			);
-			path = Components;
+			path = Configurations;
 			sourceTree = "<group>";
 		};
 		E548BFDE2EADB265E47472A3 /* Products */ = {
@@ -267,17 +97,6 @@
 				20BBDD5C0B2316B5BB199DE0 /* ProxmoxBarTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		E975211E0480CED9789E5F8B /* AppKit */ = {
-			isa = PBXGroup;
-			children = (
-				2F089ADE33FAB6F47DA761D9 /* CursorFixView.swift */,
-				904B3B19722B1C3498A98185 /* EventMonitor.swift */,
-				C664427D5D98B605A25098C4 /* VisualEffectView.swift */,
-				B29BCAB2C69DB9DE069D8222 /* WindowAccessor.swift */,
-			);
-			path = AppKit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -293,6 +112,9 @@
 			);
 			dependencies = (
 				6E795AA2AD328C36C751A268 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				5B0A1C2D3E4F506172839402 /* ProxmoxBarTests */,
 			);
 			name = ProxmoxBarTests;
 			packageProductDependencies = (
@@ -312,6 +134,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5B0A1C2D3E4F506172839401 /* ProxmoxBar */,
 			);
 			name = ProxmoxBar;
 			packageProductDependencies = (
@@ -360,8 +185,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D4A271AE3D7D72B0DAD5E4F4 /* AppIcon.icns in Resources */,
-				E5B382BF4E8E83C1EBE6F505 /* MenuBarIcon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,36 +195,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EA84618AC316B88136CEEA1A /* AppConfig.swift in Sources */,
-				B6B0A0BC2BCD35CD9AE7C53A /* AppDelegate.swift in Sources */,
-				E727F02D650759CCDF3948DF /* ClusterStatsRow.swift in Sources */,
-				1257AE4D926729C701F34BAC /* Color+Adaptive.swift in Sources */,
-				1BD04AD5E78CEC0B3BCEF571 /* CursorFixView.swift in Sources */,
-				197166A9ED90437DCBE5CB7E /* EventMonitor.swift in Sources */,
-				AA6C66B8893FD77C330CFB9D /* LaunchAtLoginService.swift in Sources */,
-				6F94CC57755280591E7E9E4E /* MenuBarDashboardView.swift in Sources */,
-				1BE7FC758ED0886300CE7E71 /* MenuBarView.swift in Sources */,
-				A3D95327FFBE15B2111CEC47 /* NotificationManager.swift in Sources */,
-				D48983FEFF6F5A6185CF251B /* ProxmoxAPIModels.swift in Sources */,
-				E228D7977894DEB19563803A /* ProxmoxAppState.swift in Sources */,
-				88F826860E5D4DEDC3EDCE5C /* ProxmoxBarApp.swift in Sources */,
-				4F6BD8FC52C63FAAD3B25111 /* ProxmoxNode.swift in Sources */,
-				BD4C8843BFC26C767A54D5E6 /* ProxmoxService.swift in Sources */,
-				5699CC7C66059C3445123BDA /* ProxmoxStorage.swift in Sources */,
-				7718C01361AD80DEA573C957 /* ProxmoxVM.swift in Sources */,
-				0F0FE11104CDAEBCA966B02D /* ProxmoxViewModel+Operations.swift in Sources */,
-				489D08209D2154BA4D28A9E3 /* ProxmoxViewModel.swift in Sources */,
-				3D3D22F0783A16FDF0602992 /* ResourceListView.swift in Sources */,
-				92759EC8D97ECE9C167C0D35 /* ServerFormView.swift in Sources */,
-				DA38BD11E49298B1707C9041 /* ServerReorderDropDelegate.swift in Sources */,
-				EFFE6B6B882A3145377717C4 /* SettingsSections.swift in Sources */,
-				14ED38F65E8E664E78AA3B8A /* SettingsService.swift in Sources */,
-				9FA8F2428663A10FA71EC448 /* SettingsView.swift in Sources */,
-				B3F48C29EC434868CA603291 /* StorageListView.swift in Sources */,
-				0D16DFFBE4303C0BE2F41AA3 /* UpdaterController.swift in Sources */,
-				C7A3E08BD5805DC5BA789416 /* VMRowView.swift in Sources */,
-				C3FACF96D28A3FF371DC7EBE /* VisualEffectView.swift in Sources */,
-				4D239C53111D9A4B25321328 /* WindowAccessor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -409,7 +202,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				05F1AA8932F372D2C757D078 /* SettingsServiceMigrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,196 +218,43 @@
 /* Begin XCBuildConfiguration section */
 		3DF7E3CB8962FABA8F4E4DBD /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5B0A1C2D3E4F506172839407 /* App.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				COMBINE_HIDPI_IMAGES = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
 		5AEC9B6B900C746CC5E6FAAB /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5B0A1C2D3E4F506172839408 /* Tests.xcconfig */;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				COMBINE_HIDPI_IMAGES = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.proxmoxbar.app.tests;
-				PRODUCT_NAME = ProxmoxBarTests;
-				SDKROOT = macosx;
-				SWIFT_MODULE_NAME = ProxmoxBarTests;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ProxmoxBar.app/Contents/MacOS/ProxmoxBar";
 			};
 			name = Debug;
 		};
 		65A9AC83B98F3D321AC8CEA8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5B0A1C2D3E4F506172839408 /* Tests.xcconfig */;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				COMBINE_HIDPI_IMAGES = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@loader_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.proxmoxbar.app.tests;
-				PRODUCT_NAME = ProxmoxBarTests;
-				SDKROOT = macosx;
-				SWIFT_MODULE_NAME = ProxmoxBarTests;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ProxmoxBar.app/Contents/MacOS/ProxmoxBar";
 			};
 			name = Release;
 		};
 		9605AF90AD29E03663335539 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5B0A1C2D3E4F506172839407 /* App.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				COMBINE_HIDPI_IMAGES = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
 		B67CE78EE27C8520D8D9BE69 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5B0A1C2D3E4F506172839405 /* Debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 0;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"DEBUG=1",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Config/Info.plist;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.0.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.proxmoxbar.app;
-				PRODUCT_NAME = ProxmoxBar;
-				SDKROOT = macosx;
-				SPARKLE_PUBLIC_ED_KEY = "";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 6.2;
 			};
 			name = Debug;
 		};
 		F74D9368518E22D8006FF53C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5B0A1C2D3E4F506172839406 /* Release.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 0;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Config/Info.plist;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.0.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.proxmoxbar.app;
-				PRODUCT_NAME = ProxmoxBar;
-				SDKROOT = macosx;
-				SPARKLE_PUBLIC_ED_KEY = "";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 6.2;
 			};
 			name = Release;
 		};

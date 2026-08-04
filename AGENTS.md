@@ -84,16 +84,23 @@ the format changes.
 ## Repository structure
 
 ```
-Sources/       the application, grouped by responsibility
-Config/        Info.plist
-Tests/         unit tests, currently hosted by the application
-scripts/       one shell script per release step
-docs/          the Obsidian vault: pages and ADRs
-.github/       CI and the release pipeline
+ProxmoxBar/           the application target, grouped by responsibility
+  Info.plist          bundle keys, excluded from the target's resources
+ProxmoxBarTests/      unit tests, currently hosted by the application
+Configurations/       xcconfig files, and nothing else
+scripts/              one shell script per release step
+docs/                 the Obsidian vault: pages and ADRs
+.github/              CI and the release pipeline
 ```
 
-This layout is being reworked into an application target plus a local
-`ProxmoxCore` package. The target is described in
+A folder carrying a target is named after that target, and its `Info.plist` lives
+inside it. Do not reintroduce a `Sources/` or a `Config/` at the root: neither is
+a macOS convention, and both were removed deliberately.
+
+`ProxmoxBar/` and `ProxmoxBarTests/` are Xcode synchronized folders. Adding a
+file adds it to the build; there is nothing to register in the project.
+
+A local `ProxmoxCore` package is still to be created. The target layout is in
 [Architecture](docs/Architecture.md), and the order of the work is in
 [Roadmap](docs/Roadmap.md). Follow that order; it exists because each step makes
 the next one safe.
@@ -107,7 +114,7 @@ xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar \
   -destination 'platform=macOS' build        # build
 xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar \
   -destination 'platform=macOS' test         # build and test
-swift-format lint --strict --recursive Sources Tests
+swift-format lint --strict --recursive ProxmoxBar ProxmoxBarTests
 ```
 
 Xcode 26 or later is required. A beta is fine, and is the only option on a beta

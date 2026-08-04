@@ -13,9 +13,11 @@ breaks stored data on purpose.
 The order below is the order the work is done in. Each step leaves the app
 building and running.
 
-1. **Project structure.** `Sources/` and `Tests/` become synchronized folders,
-   build settings move into `Config/*.xcconfig`, `SWIFT_VERSION` becomes `6` and
-   approachable concurrency is enabled. No Swift file changes. This comes first
+1. **Project structure.** The target folders are renamed after their targets and
+   become synchronized folders, build settings move into
+   `Configurations/*.xcconfig`, `Info.plist` moves into the app folder,
+   `SWIFT_VERSION` becomes `6` and approachable concurrency is enabled. No Swift
+   file changes. This comes first
    because it makes every later move free. See
    [ADR-0016](<ADR/0016 - Synchronized folders and xcconfig over a hand-listed project.md>)
    and [ADR-0019](<ADR/0019 - Explicit MainActor over default isolation.md>).
