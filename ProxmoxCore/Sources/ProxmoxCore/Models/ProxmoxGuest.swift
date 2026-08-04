@@ -4,7 +4,7 @@ public struct ProxmoxGuest: Identifiable, Codable, Hashable, Sendable {
     public let vmid: Int
     public let name: String?
     public let status: String
-    public let type: String
+    public let type: GuestKind
     public let node: String
 
     public let pool: String?
@@ -33,7 +33,7 @@ public struct ProxmoxGuest: Identifiable, Codable, Hashable, Sendable {
         vmid: Int,
         name: String?,
         status: String,
-        type: String,
+        type: GuestKind,
         node: String,
         pool: String? = nil,
         tags: [String] = [],
@@ -93,9 +93,9 @@ public struct ProxmoxGuest: Identifiable, Codable, Hashable, Sendable {
 
     public var isRunning: Bool { status == "running" }
 
-    public var isVirtualMachine: Bool { type == "qemu" }
+    public var isVirtualMachine: Bool { type.isVirtualMachine }
 
-    public var isContainer: Bool { type == "lxc" || type == "openvz" }
+    public var isContainer: Bool { type.isContainer }
 
     public var isLocked: Bool { !(lock ?? "").isEmpty }
 

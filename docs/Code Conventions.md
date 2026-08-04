@@ -65,8 +65,14 @@ Anything that publishes state to SwiftUI is `@MainActor`. Anything that owns a
 shared mutable resource is an `actor`. Everything else is nonisolated and says
 so by saying nothing.
 
-Never annotate a type `@unchecked Sendable` to silence an error. Fix the design
-instead.
+Never annotate a type `@unchecked Sendable` to silence an error. Reach for it
+only when the type genuinely protects its own state — a lock it owns, an
+invariant the compiler cannot see — and say which one in the pull request.
+
+Most of the time the annotation is not needed at all. A `final` class with no
+mutable stored properties conforms to `Sendable` outright, and `NSObject` is the
+one superclass that does not block that conformance, so an AppKit or Foundation
+delegate rarely needs the escape hatch.
 
 Never block a thread. `Task.sleep` for a delay, never `sleep` and never a
 semaphore.

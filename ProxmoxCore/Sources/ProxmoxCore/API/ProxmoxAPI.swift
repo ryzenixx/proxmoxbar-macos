@@ -8,7 +8,7 @@ public protocol ProxmoxAPI: Sendable {
     func guestStatus(
         node: String,
         vmid: Int,
-        type: String,
+        type: GuestKind,
         url: String,
         authHeader: String
     ) async throws -> GuestStatus
@@ -17,7 +17,7 @@ public protocol ProxmoxAPI: Sendable {
         _ action: GuestAction,
         node: String,
         vmid: Int,
-        type: String,
+        type: GuestKind,
         url: String,
         authHeader: String
     ) async throws -> String

@@ -41,11 +41,13 @@ a CSRF token, which is why no session handling exists in the app. See
 
 ## Endpoints
 
-Three, and no more.
+Five, and no more.
 
 | Method | Path | Purpose |
 | --- | --- | --- |
+| `GET` | `/api2/json/version` | Prove a URL, a certificate and a token work, with no side effect |
 | `GET` | `/api2/json/cluster/resources` | The entire dashboard, in one call |
+| `GET` | `/api2/json/nodes/{node}/{type}/{vmid}/status/current` | One guest, in detail |
 | `POST` | `/api2/json/nodes/{node}/{type}/{vmid}/status/{action}` | `start`, `shutdown`, `reboot` |
 | `GET` | `/api2/json/nodes/{node}/tasks/{upid}/status` | Whether the action finished, and how |
 
@@ -53,6 +55,15 @@ Three, and no more.
 heterogeneous array. One call renders the whole popover, on a cluster of any
 size, and works identically on a single host. See
 [ADR-0004](<ADR/0004 - One cluster resources call instead of per-node endpoints.md>).
+
+`status/current` exists so that watching one guest change state does not mean
+refetching the whole cluster thirty times. It also carries what
+`/cluster/resources` does not: whether the QEMU guest agent is running, and the
+container's swap.
+
+The same notion is spelled differently on the two endpoints, which is a property
+of the API rather than a choice: `/cluster/resources` reports high availability
+as a `hastate` string, `status/current` as an `ha` object with a `managed` flag.
 
 ---
 

@@ -97,7 +97,7 @@ struct ProxmoxAPIClientTests {
             .start,
             node: "pve",
             vmid: 100,
-            type: "lxc",
+            type: .lxc,
             url: url,
             authHeader: auth
         )

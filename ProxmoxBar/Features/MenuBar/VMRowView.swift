@@ -29,7 +29,7 @@ struct VMRowView: View {
                 .fill(vm.isRunning ? Color.adaptiveGreen.opacity(0.1) : Color.gray.opacity(0.1))
                 .frame(width: 28, height: 28)
 
-            Image(systemName: vm.type == "lxc" ? "cube.box" : "display")
+            Image(systemName: vm.isContainer ? "cube.box" : "display")
                 .font(.system(size: 12))
                 .foregroundColor(vm.isRunning ? .adaptiveGreen : .gray)
                 .frame(width: 14)
@@ -91,7 +91,7 @@ struct VMRowView: View {
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
                 .foregroundColor(usageColor(for: memoryValue))
 
-            if vm.type != "qemu", let diskRatio = vm.diskRatio {
+            if vm.isContainer, let diskRatio = vm.diskRatio {
                 Image(systemName: "internaldrive")
                     .font(.system(size: 10))
                     .foregroundColor(usageColor(for: diskRatio))

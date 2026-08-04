@@ -59,7 +59,7 @@ extension ProxmoxViewModel {
         }
 
         var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
-        components?.percentEncodedFragment = "v1:0:=\(vm.type)%2F\(vm.vmid)"
+        components?.percentEncodedFragment = "v1:0:=\(vm.type.rawValue)%2F\(vm.vmid)"
 
         if let url = components?.url {
             NSWorkspace.shared.open(url)

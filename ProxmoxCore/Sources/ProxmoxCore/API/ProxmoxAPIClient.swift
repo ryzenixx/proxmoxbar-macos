@@ -48,13 +48,13 @@ public actor ProxmoxAPIClient: ProxmoxAPI {
     public func guestStatus(
         node: String,
         vmid: Int,
-        type: String,
+        type: GuestKind,
         url: String,
         authHeader: String
     ) async throws -> GuestStatus {
         let request = try makeRequest(
             url: url,
-            path: "/api2/json/nodes/\(node)/\(type)/\(vmid)/status/current",
+            path: "/api2/json/nodes/\(node)/\(type.rawValue)/\(vmid)/status/current",
             method: .get,
             authHeader: authHeader
         )
@@ -67,13 +67,13 @@ public actor ProxmoxAPIClient: ProxmoxAPI {
         _ action: GuestAction,
         node: String,
         vmid: Int,
-        type: String,
+        type: GuestKind,
         url: String,
         authHeader: String
     ) async throws -> String {
         let request = try makeRequest(
             url: url,
-            path: "/api2/json/nodes/\(node)/\(type)/\(vmid)/status/\(action.rawValue)",
+            path: "/api2/json/nodes/\(node)/\(type.rawValue)/\(vmid)/status/\(action.rawValue)",
             method: .post,
             authHeader: authHeader
         )

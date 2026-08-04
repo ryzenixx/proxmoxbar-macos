@@ -25,7 +25,7 @@ struct GuestStatusTests {
         let status = try await client.guestStatus(
             node: "pve",
             vmid: 100,
-            type: "lxc",
+            type: .lxc,
             url: url,
             authHeader: auth
         )
@@ -51,7 +51,7 @@ struct GuestStatusTests {
         let status = try await client.guestStatus(
             node: "pve",
             vmid: 106,
-            type: "qemu",
+            type: .qemu,
             url: url,
             authHeader: auth
         )
@@ -68,7 +68,7 @@ struct GuestStatusTests {
         let status = try await client.guestStatus(
             node: "pve",
             vmid: 1,
-            type: "lxc",
+            type: .lxc,
             url: url,
             authHeader: auth
         )
@@ -82,7 +82,7 @@ struct GuestStatusTests {
         _ = try await client.guestStatus(
             node: "pve",
             vmid: 42,
-            type: "qemu",
+            type: .qemu,
             url: url,
             authHeader: auth
         )

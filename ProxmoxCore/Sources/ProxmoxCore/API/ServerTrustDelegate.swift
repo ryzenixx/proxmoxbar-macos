@@ -1,6 +1,6 @@
 import Foundation
 
-final class ServerTrustDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
+final class ServerTrustDelegate: NSObject, URLSessionDelegate, Sendable {
     func urlSession(
         _ session: URLSession,
         didReceive challenge: URLAuthenticationChallenge,
