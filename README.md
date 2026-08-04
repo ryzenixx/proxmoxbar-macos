@@ -1,3 +1,12 @@
+> [!IMPORTANT]
+> After a few months of inactivity, I'm happy to announce that a new update is coming in the next few weeks! 🎉
+>
+> This release brings a cleaner design, brand-new widgets, and even more customization options to make the app feel truly yours.
+>
+> I also want to sincerely apologize for the lack of updates and maintenance over the past few months. Life got busy, and I simply didn't have enough time to give the project the attention it deserved.
+>
+> Thank you all for your patience and continued support. I can't wait to share what's coming next!
+
 # ProxmoxBar
 
 Native macOS menu bar app for monitoring and controlling Proxmox VE resources.
