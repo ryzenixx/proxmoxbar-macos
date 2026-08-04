@@ -20,7 +20,7 @@ concurrency:
 
 env:
   APP_NAME: ProxmoxBar
-  SPARKLE_TOOLS_VERSION: "2.9.0"
+  SPARKLE_TOOLS_VERSION: "2.9.5"
 
 jobs:
   preflight:
