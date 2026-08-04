@@ -103,9 +103,13 @@ xcodebuild -project ProxmoxBar.xcodeproj -scheme ProxmoxBar \
 swift-format lint --strict --recursive Sources Tests
 ```
 
-Xcode 26 or later is required, from the App Store rather than a beta. A beta can
-upgrade the project file to a format the CI runner cannot read, which breaks the
-build for everyone else.
+Xcode 26 or later is required. A beta is fine, and is the only option on a beta
+macOS.
+
+What must not change silently is the project format: `objectVersion` in
+`project.pbxproj` is `77`, and the CI runner has to be able to read what is
+committed. Decline "update to recommended settings", and never commit a format
+bump without moving CI in the same change. See [Quality](docs/Quality.md).
 
 Run the build, the tests and the format check for every area a change touches.
 

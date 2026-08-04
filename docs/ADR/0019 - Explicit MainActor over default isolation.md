@@ -75,6 +75,12 @@ rather than a silent hop, which is the acceptable failure.
 This diverges from Xcode's new-project default, so a contributor generating code
 from a template will produce files that need an annotation added.
 
-Fixing `SWIFT_VERSION` to `6` may surface diagnostics that the current
-undeclared behaviour was hiding. That is the point of fixing it, and it has to be
-verified against a real build before merging, not assumed.
+Fixing `SWIFT_VERSION` to `6` changes nothing about how the code compiles.
+Measured against Xcode 27 on 2026-08-04, the project already reports
+`EFFECTIVE_SWIFT_VERSION = 6`: Xcode resolves the invalid `6.2` down to the
+language mode it corresponds to. The fix is for clarity, so the declared value
+and the effective one agree and nobody has to run `-showBuildSettings` to learn
+which mode the project is in.
+
+Enabling approachable concurrency is the part that can surface new diagnostics,
+and it has to be verified against a real build before merging, not assumed.

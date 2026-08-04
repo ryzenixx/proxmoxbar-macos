@@ -5,14 +5,21 @@ This page describes how ProxmoxBar is tested and what "done" means.
 ## Prerequisites
 
 - macOS 14 or later
-- Xcode 26 or later, from the App Store rather than a beta
+- Xcode 26 or later. A beta is fine, and is the only option on a beta macOS
 
 Nothing else. `swift-format` is in the toolchain, Sparkle is resolved by Xcode,
 and the core package is local.
 
-A beta Xcode is specifically discouraged: it can upgrade the project file to a
-format the CI runner cannot read, which breaks the build for everyone but the
-person who opened it.
+What matters is not which Xcode you run but **which project format it writes**.
+`objectVersion` in `project.pbxproj` is currently `77`, which is what Xcode 16
+and later read and what synchronized folders require. The CI runner has to be
+able to read whatever is committed.
+
+So: decline "update to recommended settings" when Xcode offers it, and if a
+newer Xcode raises `objectVersion`, either revert that hunk or move CI to a
+matching runner image in the same change. Never commit a format the runner
+cannot open — it breaks the build for everyone except the person who opened the
+project.
 
 ---
 
