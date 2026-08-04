@@ -1,8 +1,8 @@
-| Field | Value |
-| --- | --- |
-| **Identifier** | ADR-0002 |
-| **Date** | 2026-01-11 |
-| **Status** | Accepted |
+| Field          | Value      |
+| -------------- | ---------- |
+| **Identifier** | ADR-0002   |
+| **Date**       | 2026-01-11 |
+| **Status**     | Accepted   |
 
 ---
 

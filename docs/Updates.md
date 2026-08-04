@@ -40,7 +40,7 @@ does not break the build, it breaks updates on machines you cannot reach.
 | `CFBundleIdentifier` | `com.proxmoxbar.app` | The new build is a different app; the old one keeps updating itself |
 | `SUFeedURL` | Raw `appcast.xml` on `main` | Installed copies keep polling the old URL forever |
 | EdDSA public key | The one embedded at build time | Signature verification fails and the update is refused |
-| Developer ID certificate | The current one | Sparkle refuses an update signed by a different team |
+| Developer ID certificate | The current one | Sparkle refuses an update signed by a different team, **and** macOS prompts every user for keychain access |
 | `PRODUCT_NAME` | `ProxmoxBar` | Sparkle's helper paths inside the bundle no longer resolve |
 | Minimum system version | `14.0` in the appcast and the build | Raising it silently stops offering updates to users below it |
 
@@ -52,6 +52,26 @@ every installed copy stops updating.
 
 If both must change, ship two releases and let users pass through the
 intermediate one.
+
+The certificate carries a second consequence that has nothing to do with Sparkle.
+Keychain items are bound to the creating application's designated requirement,
+which derives from its signature, so a build signed by a different identity makes
+macOS ask each user to authorise access to their own stored tokens. A certificate
+change therefore needs a release note explaining that dialog, or users will
+refuse it and lose their credentials. See
+[Data & Persistence](<Data & Persistence.md>) and
+[ADR-0020](<ADR/0020 - Token secrets in the data protection keychain.md>).
+
+---
+
+## The Sparkle version lives in two places
+
+The framework is a package dependency of the app. `generate_appcast`, which signs
+the feed, is downloaded by the release workflow from `SPARKLE_TOOLS_VERSION`.
+
+Both must be bumped together. A feed signed by one version of the tools and read
+by another version of the framework is a failure mode that only appears after a
+release is published.
 
 ---
 

@@ -135,8 +135,16 @@ can never be cut from a commit that failed.
 Adding a dependency requires a reason that survives the question "what does this
 save that Foundation does not do".
 
-There is exactly one runtime dependency, Sparkle, pinned to a major version and
-recorded in `Package.resolved`. See [Tech Stack](<Tech Stack.md>).
+There is exactly one runtime dependency, Sparkle, declared with a minimum version
+inside a major range and locked in `Package.resolved`. See
+[Tech Stack](<Tech Stack.md>).
+
+Bumping it means raising the declared `minimumVersion`, not deleting
+`Package.resolved`. Resolution keeps the locked version even when the lock file
+is removed and the package cache is cleared, so a bump that only touches the lock
+silently does nothing. Raising the declared minimum is also what records which
+version was actually tested. Sparkle is bumped in two places, per
+[Updates](Updates.md).
 
 GitHub Actions are pinned by commit hash, not by tag, and updated by Dependabot,
 which also watches the Swift package ecosystem.
