@@ -1,4 +1,5 @@
 import SwiftUI
+import ProxmoxCore
 
 struct ClusterStatsRow: View {
     let node: ProxmoxNode

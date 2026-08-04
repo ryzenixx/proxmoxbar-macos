@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import ProxmoxCore
 
 extension ProxmoxViewModel {
     func loadData() async {
@@ -20,19 +21,19 @@ extension ProxmoxViewModel {
         errorMessage = nil
 
         do {
-            let (status, nodes, storages, vms) = try await service.refreshData(
+            let snapshot = try await service.snapshot(
                 url: server.url,
                 authHeader: server.authHeader
             )
-            let taggedVMs = tag(vms: vms, with: server.id)
+            let taggedVMs = tag(vms: snapshot.guests, with: server.id)
 
-            appState = status
+            appState = .running
             if settings.enableNotifications {
                 notifyStateChanges(from: self.vms, to: taggedVMs)
             }
             self.vms = taggedVMs
-            self.nodes = nodes
-            self.storages = storages
+            self.nodes = snapshot.nodes
+            self.storages = snapshot.storages
         } catch {
             appState = .error(error.localizedDescription)
             errorMessage = error.localizedDescription

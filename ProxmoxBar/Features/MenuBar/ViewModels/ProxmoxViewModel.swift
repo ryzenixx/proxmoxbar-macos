@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import ProxmoxCore
 
 @MainActor
 final class ProxmoxViewModel: ObservableObject {
@@ -48,10 +49,10 @@ final class ProxmoxViewModel: ObservableObject {
     }
 
     let settings: SettingsService
-    let service: ProxmoxService
+    let service: any ProxmoxAPI
     private var cancellables = Set<AnyCancellable>()
 
-    init(settings: SettingsService, service: ProxmoxService = ProxmoxService()) {
+    init(settings: SettingsService, service: any ProxmoxAPI = ProxmoxAPIClient()) {
         self.settings = settings
         self.service = service
 

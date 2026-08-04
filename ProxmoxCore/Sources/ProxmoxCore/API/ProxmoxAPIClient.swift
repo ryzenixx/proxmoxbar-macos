@@ -1,35 +1,11 @@
 import Foundation
 
-enum ProxmoxServiceStatus {
-    case running
-    case stopped
-    case loading(String)
-    case error(String)
-}
-
-enum ProxmoxError: Error, LocalizedError {
-    case invalidURL
-    case networkError(Error)
-    case decodingError(Error)
-    case apiError(Int, String)
-    case invalidCredentials
-
-    var errorDescription: String? {
-        switch self {
-        case .invalidURL:
-            return "Invalid Server URL"
-        case .networkError(let error):
-            return "Network error: \(error.localizedDescription)"
-        case .decodingError(let error):
-            return "Received invalid data: \(error.localizedDescription)"
-        case .apiError(let statusCode, let message):
-            return "Proxmox API Error (\(statusCode)): \(message)"
-        case .invalidCredentials:
-            return "Invalid Credentials / Missing Config"
-        }
-    }
-}
-
+/// Accepts any server certificate, for any host.
+///
+/// This is what makes a stock Proxmox install reachable, and it is the weakest
+/// part of the security model: an attacker able to intercept the connection can
+/// present any certificate and read the token. It is replaced by per-server
+/// trust-on-first-use with a pinned fingerprint. See docs/ADR/0021.
 final class InsecureServerTrustDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
     func urlSession(
         _ session: URLSession,
@@ -45,7 +21,7 @@ final class InsecureServerTrustDelegate: NSObject, URLSessionDelegate, @unchecke
     }
 }
 
-actor ProxmoxService {
+public actor ProxmoxAPIClient: ProxmoxAPI {
     private enum Constants {
         static let requestTimeout: TimeInterval = 10
         static let refreshRetries = 3
@@ -57,13 +33,13 @@ actor ProxmoxService {
     private let session: URLSession
     private let delegateProxy: InsecureServerTrustDelegate
 
-    init() {
+    public init() {
         let configuration = URLSessionConfiguration.default
         delegateProxy = InsecureServerTrustDelegate()
         session = URLSession(configuration: configuration, delegate: delegateProxy, delegateQueue: nil)
     }
 
-    func refreshData(url: String, authHeader: String) async throws -> (ProxmoxServiceStatus, [ProxmoxNode], [ProxmoxStorage], [ProxmoxVM]) {
+    public func snapshot(url: String, authHeader: String) async throws -> ClusterSnapshot {
         guard let baseURL = URL(string: url) else {
             throw ProxmoxError.invalidURL
         }
@@ -82,9 +58,8 @@ actor ProxmoxService {
                 let (data, response) = try await session.data(for: request)
                 try validateHTTPResponse(response, data: data)
 
-                let decoded = try JSONDecoder().decode(ProxmoxResourceResponse.self, from: data)
-                let resources = decodeResources(decoded.data)
-                return (.running, resources.nodes, resources.storages, resources.vms)
+                let decoded = try JSONDecoder().decode(ClusterResourcesResponse.self, from: data)
+                return decodeResources(decoded.data)
             } catch {
                 lastError = error
 
@@ -98,13 +73,10 @@ actor ProxmoxService {
         if let proxmoxError = lastError as? ProxmoxError {
             throw proxmoxError
         }
-        if let error = lastError {
-            throw ProxmoxError.networkError(error)
-        }
-        throw ProxmoxError.networkError(NSError(domain: "Unknown Error", code: -1))
+        throw ProxmoxError.networkError(lastError?.localizedDescription ?? "Unknown error")
     }
 
-    func performNodeAction(
+    public func performNodeAction(
         node: String,
         vmid: Int,
         type: String,
@@ -127,11 +99,11 @@ actor ProxmoxService {
         do {
             return try JSONDecoder().decode(UPIDResponse.self, from: data).data
         } catch {
-            throw ProxmoxError.decodingError(error)
+            throw ProxmoxError.decodingError(error.localizedDescription)
         }
     }
 
-    func waitForTask(node: String, upid: String, url: String, authHeader: String) async throws {
+    public func waitForTask(node: String, upid: String, url: String, authHeader: String) async throws {
         guard let baseURL = URL(string: url) else {
             throw ProxmoxError.invalidURL
         }
@@ -147,7 +119,7 @@ actor ProxmoxService {
 
             if let task = try? JSONDecoder().decode(TaskStatusResponse.self, from: data).data, task.isStopped {
                 guard task.isSuccess else {
-                    throw ProxmoxError.apiError(500, "Task failed: \(task.exitstatus ?? "Unknown")")
+                    throw ProxmoxError.taskFailed(task.exitstatus ?? "Unknown")
                 }
                 return
             }
@@ -155,22 +127,14 @@ actor ProxmoxService {
             try? await Task.sleep(nanoseconds: Constants.taskPollingIntervalNanoseconds)
         }
 
-        throw ProxmoxError.networkError(
-            NSError(
-                domain: "Task Timeout",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Task timed out"]
-            )
-        )
+        throw ProxmoxError.taskTimedOut
     }
 }
 
-private extension ProxmoxService {
-    typealias DecodedResources = (nodes: [ProxmoxNode], storages: [ProxmoxStorage], vms: [ProxmoxVM])
-
+private extension ProxmoxAPIClient {
     func validateHTTPResponse(_ response: URLResponse, data: Data) throws {
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw ProxmoxError.networkError(NSError(domain: "Invalid Response", code: 0))
+            throw ProxmoxError.networkError("Invalid response")
         }
 
         if httpResponse.statusCode == 401 {
@@ -183,8 +147,8 @@ private extension ProxmoxService {
         }
     }
 
-    func decodeResources(_ rawResources: [ProxmoxRawResource]) -> DecodedResources {
-        let vms = rawResources
+    func decodeResources(_ rawResources: [ProxmoxRawResource]) -> ClusterSnapshot {
+        let guests = rawResources
             .compactMap { item -> ProxmoxVM? in
                 guard let vmid = item.vmid,
                       let name = item.name,
@@ -258,6 +222,6 @@ private extension ProxmoxService {
                 return $0.storage < $1.storage
             }
 
-        return (nodes, storages, vms)
+        return ClusterSnapshot(nodes: nodes, storages: storages, guests: guests)
     }
 }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5B0A1C2D3E4F50617283940D /* ProxmoxCore in Frameworks */ = {isa = PBXBuildFile; productRef = 5B0A1C2D3E4F50617283940C /* ProxmoxCore */; };
 		CA8EB8A4AC501DE493151E22 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 9B46B23EDC0B6466E862CBCD /* Sparkle */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B0A1C2D3E4F50617283940D /* ProxmoxCore in Frameworks */,
 				CA8EB8A4AC501DE493151E22 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -140,6 +142,7 @@
 			);
 			name = ProxmoxBar;
 			packageProductDependencies = (
+				5B0A1C2D3E4F50617283940C /* ProxmoxCore */,
 				9B46B23EDC0B6466E862CBCD /* Sparkle */,
 			);
 			productName = ProxmoxBar;
@@ -167,6 +170,7 @@
 			mainGroup = 4570C9F74E75E7487E5C0F12;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				5B0A1C2D3E4F50617283940B /* XCLocalSwiftPackageReference "ProxmoxCore" */,
 				A846F652FA450833163B400B /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -290,6 +294,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		5B0A1C2D3E4F50617283940B /* XCLocalSwiftPackageReference "ProxmoxCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ProxmoxCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		A846F652FA450833163B400B /* XCRemoteSwiftPackageReference "Sparkle" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -302,6 +313,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		5B0A1C2D3E4F50617283940C /* ProxmoxCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ProxmoxCore;
+		};
 		9B46B23EDC0B6466E862CBCD /* Sparkle */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A846F652FA450833163B400B /* XCRemoteSwiftPackageReference "Sparkle" */;

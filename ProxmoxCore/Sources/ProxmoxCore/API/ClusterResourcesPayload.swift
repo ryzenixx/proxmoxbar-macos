@@ -1,5 +1,13 @@
 import Foundation
 
+// The wire format of the Proxmox endpoints this app calls. Internal on purpose:
+// nothing outside the package should know what the API looks like.
+//
+// `/cluster/resources` returns one heterogeneous array, so nearly every field is
+// optional and the `type` discriminator decides which ones are meaningful. An
+// entry missing a field its kind requires is dropped rather than failing the
+// whole response. See docs/ADR/0004.
+
 struct ProxmoxRawResource: Codable {
     let id: String?
     let vmid: Int?
@@ -20,7 +28,7 @@ struct ProxmoxRawResource: Codable {
     let content: String?
 }
 
-struct ProxmoxResourceResponse: Codable {
+struct ClusterResourcesResponse: Codable {
     let data: [ProxmoxRawResource]
 }
 

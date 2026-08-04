@@ -1,4 +1,5 @@
 import SwiftUI
+import ProxmoxCore
 
 struct StorageListView: View {
     @ObservedObject var viewModel: ProxmoxViewModel

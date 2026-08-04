@@ -194,9 +194,10 @@ anything that serialises.
 
 The code has not caught up with this page yet. Today:
 
-- There is one module, not two. `ProxmoxCore` does not exist, and the Swift files
-  still sit under `App/`, `Core/`, `Features/` and `Shared/` inside
-  `ProxmoxBar/`.
+- `ProxmoxCore` exists and holds the models and the API client, but not the
+  storage layer: `SettingsService` is still in the app, because step 3 replaces
+  it outright rather than moving it. The app's own files still sit under `App/`,
+  `Core/`, `Features/` and `Shared/`.
 - State uses `ObservableObject`, and the view model subscribes to the settings
   service's `objectWillChange`, which is why opening the settings sheet triggers
   a redundant cluster refresh.
