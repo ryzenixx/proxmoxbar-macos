@@ -2,13 +2,210 @@ import SwiftUI
 
 struct AddServerPage: View {
     @Environment(PanelRouter.self) private var router
+    @Environment(ServerStore.self) private var store
+
+    @State private var model: AddServerModel?
 
     var body: some View {
         VStack(spacing: 0) {
             PageHeader(title: PanelPage.addServer.title) {
                 router.goBack()
             }
-            PagePlaceholder(symbol: "plus.rectangle.on.folder", message: "The form comes next")
+            if let model {
+                AddServerForm(model: model) {
+                    router.reset()
+                }
+            }
         }
+        .task {
+            guard model == nil else { return }
+            model = AddServerModel(api: ProxmoxAPIClient(), store: store)
+        }
+    }
+}
+
+private struct AddServerForm: View {
+    @Bindable var model: AddServerModel
+    let onAdded: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            SectionLabel("Server")
+            FieldGroup {
+                FormRow(label: "Name", hint: "Homelab", text: $model.name)
+                Divider()
+                FormRow(
+                    label: "Address",
+                    hint: "https://192.168.1.1:8006",
+                    text: $model.address,
+                    isValid: model.hasUsableAddress
+                )
+            }
+
+            SectionLabel("Access")
+                .padding(.top, 18)
+            FieldGroup {
+                FormRow(label: "Token ID", hint: "user@realm!name", text: $model.tokenIdentifier)
+                Divider()
+                FormRow(
+                    label: "Secret",
+                    hint: "Shown once, when the token is created",
+                    text: $model.secret,
+                    isSecret: true
+                )
+            }
+
+            reassurance
+                .padding(.top, 10)
+
+            if case .failed(let message) = model.phase {
+                ErrorNote(message: message)
+                    .padding(.top, 12)
+            }
+
+            Spacer(minLength: 12)
+
+            connectButton
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 10)
+        .padding(.bottom, 18)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .onChange(of: model.phase) { _, phase in
+            guard phase == .added else { return }
+            onAdded()
+        }
+        .sheet(isPresented: .constant(isAwaitingTrust)) {
+            if case .awaitingTrust(let certificate, let problems) = model.phase {
+                CertificateApprovalView(
+                    certificate: certificate,
+                    problems: problems,
+                    onTrust: { Task { await model.trustPresentedCertificate() } },
+                    onCancel: { model.cancelTrust() }
+                )
+            }
+        }
+    }
+
+    private var reassurance: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Label {
+                Text("The secret goes straight to your keychain. It never leaves this Mac.")
+                    .fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: "lock.fill")
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+
+            if let guide = WelcomeLinks.tokenGuide {
+                Link(destination: guide) {
+                    HStack(spacing: 3) {
+                        Text("How to create a token")
+                        Image(systemName: "arrow.up.forward")
+                            .imageScale(.small)
+                    }
+                    .font(.caption)
+                }
+                .padding(.leading, 20)
+            }
+        }
+    }
+
+    private var connectButton: some View {
+        Button {
+            Task { await model.connect() }
+        } label: {
+            Group {
+                if model.isChecking {
+                    ProgressView().controlSize(.small)
+                } else {
+                    Text("Connect")
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
+        .disabled(model.canSubmit == false)
+        .keyboardShortcut(.defaultAction)
+    }
+
+    private var isAwaitingTrust: Bool {
+        if case .awaitingTrust = model.phase { return true }
+        return false
+    }
+}
+
+private struct SectionLabel: View {
+    let text: String
+
+    init(_ text: String) {
+        self.text = text
+    }
+
+    var body: some View {
+        Text(text.uppercased())
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(.tertiary)
+            .tracking(0.6)
+            .padding(.leading, 2)
+            .padding(.bottom, 5)
+    }
+}
+
+private struct FieldGroup<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(spacing: 0) { content }
+            .background(.quaternary.opacity(0.35), in: .rect(cornerRadius: 10))
+    }
+}
+
+private struct FormRow: View {
+    let label: String
+    let hint: String
+    @Binding var text: String
+    var isSecret = false
+    var isValid = false
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Text(label)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .frame(width: 64, alignment: .leading)
+            Group {
+                if isSecret {
+                    SecureField(hint, text: $text)
+                } else {
+                    TextField(hint, text: $text)
+                }
+            }
+            .textFieldStyle(.plain)
+            .font(.callout)
+            if isValid {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+                    .imageScale(.small)
+            }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 12)
+    }
+}
+
+private struct ErrorNote: View {
+    let message: String
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 7) {
+            Image(systemName: "exclamationmark.circle.fill")
+            Text(message)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .font(.caption)
+        .foregroundStyle(.red)
     }
 }
