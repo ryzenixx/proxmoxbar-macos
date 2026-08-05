@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct MenuBarPanel: View {
+    private static let width: CGFloat = 360
+    private static let minimumContentHeight: CGFloat = 320
+
     @State private var router = PanelRouter()
 
     var body: some View {
@@ -8,10 +11,11 @@ struct MenuBarPanel: View {
             PanelHeader()
             Divider()
             page
+                .frame(maxWidth: .infinity, minHeight: Self.minimumContentHeight, alignment: .top)
             Divider()
             PanelFooter()
         }
-        .frame(width: 320)
+        .frame(width: Self.width)
         .fixedSize(horizontal: false, vertical: true)
         .environment(router)
     }
