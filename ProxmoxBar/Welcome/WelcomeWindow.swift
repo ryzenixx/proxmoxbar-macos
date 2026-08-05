@@ -1,46 +1,17 @@
 import SwiftUI
 
 struct WelcomeWindow: View {
-    static let identifier = "welcome"
-
-    @Environment(WelcomeState.self) private var welcome
-    @Environment(\.dismissWindow) private var dismissWindow
+    let onDismiss: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
             WelcomeHeader()
             WelcomeWhereToFindIt()
             Divider()
-            WelcomeFooter(dismiss: dismiss)
+            WelcomeFooter(dismiss: onDismiss)
         }
         .frame(width: 420)
         .fixedSize(horizontal: false, vertical: true)
-        .background(WindowAccessor(onWindow: bringToFront))
-        .onDisappear { NSApp.setActivationPolicy(.accessory) }
-    }
-
-    private func bringToFront(_ window: NSWindow) {
-        NSApp.setActivationPolicy(.regular)
-        window.center()
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(150))
-            if let frontmost = NSWorkspace.shared.frontmostApplication {
-                NSRunningApplication.current.activate(
-                    from: frontmost,
-                    options: [.activateAllWindows]
-                )
-            }
-            NSRunningApplication.current.activate(options: [.activateAllWindows])
-            NSApp.activate()
-            window.makeKeyAndOrderFront(nil)
-            window.orderFrontRegardless()
-            window.makeKey()
-        }
-    }
-
-    private func dismiss() {
-        welcome.markSeen()
-        dismissWindow(id: Self.identifier)
     }
 }
 

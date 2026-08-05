@@ -1,7 +1,16 @@
 import AppKit
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+    private let welcome = WelcomePresenter()
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        welcome.presentIfNeeded()
+    }
+
+    nonisolated func applicationShouldTerminateAfterLastWindowClosed(
+        _ sender: NSApplication
+    ) -> Bool {
         false
     }
 }
