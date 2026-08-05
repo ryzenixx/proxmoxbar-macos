@@ -7,8 +7,11 @@ struct NoServersView: View {
         VStack(spacing: 0) {
             Spacer(minLength: 12)
 
-            Image(systemName: "server.rack")
-                .font(.system(size: 32, weight: .light))
+            Image(.menuBarIcon)
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(height: 34)
                 .foregroundStyle(.tint)
 
             Text("Keep an eye on your cluster")
