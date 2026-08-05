@@ -6,6 +6,7 @@ struct ServerCertificate: Hashable, Sendable {
     let fingerprint: String
     let subject: String
     let issuer: String?
+    let notBefore: Date?
     let expiry: Date?
 
     var isExpired: Bool {
@@ -19,8 +20,9 @@ extension ServerCertificate {
         let data = SecCertificateCopyData(certificate) as Data
         self.fingerprint = Self.fingerprint(of: data)
         self.subject = (SecCertificateCopySubjectSummary(certificate) as String?) ?? "Unknown"
-        self.issuer = Self.value(of: kSecOIDX509V1IssuerName, in: certificate) as? String
-        self.expiry = Self.expiry(of: certificate)
+        self.issuer = Self.commonName(of: kSecOIDX509V1IssuerName, in: certificate)
+        self.notBefore = Self.date(kSecOIDX509V1ValidityNotBefore, of: certificate)
+        self.expiry = Self.date(kSecOIDX509V1ValidityNotAfter, of: certificate)
     }
 
     static func fingerprint(of derData: Data) -> String {
@@ -38,9 +40,18 @@ extension ServerCertificate {
         return entry[kSecPropertyKeyValue]
     }
 
-    private static func expiry(of certificate: SecCertificate) -> Date? {
-        guard let raw = value(of: kSecOIDX509V1ValidityNotAfter, in: certificate) as? Double
-        else { return nil }
+    private static func commonName(of oid: CFString, in certificate: SecCertificate) -> String? {
+        guard let components = value(of: oid, in: certificate) as? [[CFString: Any]] else {
+            return nil
+        }
+        let named = components.first { entry in
+            (entry[kSecPropertyKeyLabel] as? String) == (kSecOIDCommonName as String)
+        }
+        return (named ?? components.last)?[kSecPropertyKeyValue] as? String
+    }
+
+    private static func date(_ oid: CFString, of certificate: SecCertificate) -> Date? {
+        guard let raw = value(of: oid, in: certificate) as? Double else { return nil }
         return Date(timeIntervalSinceReferenceDate: raw)
     }
 }

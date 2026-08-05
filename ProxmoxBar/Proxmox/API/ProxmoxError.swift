@@ -6,7 +6,7 @@ enum ProxmoxError: Error, Hashable, Sendable {
     case forbidden
     case notFound
     case httpError(status: Int)
-    case untrustedCertificate(ServerCertificate)
+    case untrustedCertificate(ServerCertificate, problems: [TrustProblem])
     case certificateMismatch(expected: String, presented: String)
     case transport(String)
     case decoding(String)

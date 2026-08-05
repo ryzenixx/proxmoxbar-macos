@@ -32,8 +32,8 @@ final class ProxmoxSessionDelegate: NSObject, URLSessionDelegate, Sendable {
         switch evaluator.evaluate(trust) {
         case .trusted:
             completionHandler(.useCredential, URLCredential(trust: trust))
-        case .needsApproval(let certificate):
-            store(.untrustedCertificate(certificate))
+        case .needsApproval(let certificate, let problems):
+            store(.untrustedCertificate(certificate, problems: problems))
             completionHandler(.cancelAuthenticationChallenge, nil)
         case .rejected(let error):
             store(error)
