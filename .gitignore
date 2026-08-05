@@ -1,0 +1,26 @@
+# The 2.x app, kept on disk as a reference during the rebuild and deleted at
+# the end of it. Not tracked: it is history, and git already has it.
+ProxmoxBarOld/
+
+# macOS
+.DS_Store
+
+# Xcode — per-user state: open files, breakpoints, window layout.
+# Changes every time Xcode is touched, and belongs to one machine.
+xcuserdata/
+
+# Build output
+DerivedData/
+build/
+*.hmap
+*.dSYM
+*.dSYM.zip
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Release artefacts, produced by the packaging scripts and never committed
+*.dmg
+*.zip
+*.pkg
