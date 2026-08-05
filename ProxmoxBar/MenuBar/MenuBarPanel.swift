@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MenuBarPanel: View {
     private static let width: CGFloat = 360
-    private static let height: CGFloat = 440
+    private static let height: CGFloat = 400
 
     @State private var router = PanelRouter()
 
@@ -16,6 +16,7 @@ struct MenuBarPanel: View {
     private var page: some View {
         switch router.page {
         case .dashboard: DashboardPage()
+        case .addServer: AddServerPage()
         case .settings: SettingsPage()
         }
     }

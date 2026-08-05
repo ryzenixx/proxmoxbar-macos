@@ -1,7 +1,11 @@
 import SwiftUI
 
 struct DashboardPage: View {
+    @Environment(PanelRouter.self) private var router
+
     var body: some View {
-        PagePlaceholder(symbol: "server.rack", message: "No server configured")
+        NoServersView {
+            router.go(to: .addServer)
+        }
     }
 }

@@ -1,14 +1,14 @@
 import SwiftUI
 
-struct SettingsPage: View {
+struct AddServerPage: View {
     @Environment(PanelRouter.self) private var router
 
     var body: some View {
         VStack(spacing: 0) {
-            PageHeader(title: PanelPage.settings.title) {
+            PageHeader(title: PanelPage.addServer.title) {
                 router.goBack()
             }
-            PagePlaceholder(symbol: "gearshape", message: "Nothing to configure yet")
+            PagePlaceholder(symbol: "plus.rectangle.on.folder", message: "The form comes next")
         }
     }
 }
