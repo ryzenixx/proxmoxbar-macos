@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MenuBarPanel: View {
     private static let width: CGFloat = 360
-    private static let height: CGFloat = 280
+    private static let height: CGFloat = 440
 
     @State private var router = PanelRouter()
 
