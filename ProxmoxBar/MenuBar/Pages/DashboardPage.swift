@@ -19,14 +19,35 @@ struct DashboardPage: View {
                     onAddServer: { router.go(to: .addServer) }
                 )
                 Divider()
-                PagePlaceholder(
-                    symbol: "chart.bar.fill",
-                    message: model.selected?.address ?? "Nothing selected"
-                )
+                content
+            }
+            .task(id: model.selectedID) {
+                await model.refresh()
             }
             .onChange(of: store.servers) { _, _ in
                 model.selectionDidChange()
             }
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch model.phase {
+        case .loaded(let state):
+            VStack(spacing: 0) {
+                ClusterSummaryRow(state: state)
+                Divider()
+                PagePlaceholder(
+                    symbol: "square.stack.3d.up",
+                    message: "\(state.guests.count) machines"
+                )
+            }
+        case .failed(let message):
+            PagePlaceholder(symbol: "exclamationmark.triangle", message: message)
+        case .idle, .loading:
+            ProgressView()
+                .controlSize(.small)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
