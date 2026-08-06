@@ -47,7 +47,7 @@ private struct WelcomeWhereToFindIt: View {
                 Text("It lives at the top of your screen")
                     .font(.callout.weight(.medium))
                 Text(
-                    "Click \(Image(systemName: "server.rack")) in the menu bar to open ProxmoxBar. There is no window and no dock icon."
+                    "Click \(Image(.menuBarIcon)) in the menu bar to open ProxmoxBar. There is no window and no dock icon."
                 )
                 .font(.callout)
                 .foregroundStyle(.secondary)
