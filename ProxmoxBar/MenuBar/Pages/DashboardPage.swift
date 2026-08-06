@@ -37,10 +37,7 @@ struct DashboardPage: View {
             VStack(spacing: 0) {
                 ClusterSummaryRow(state: state)
                 Divider()
-                PagePlaceholder(
-                    symbol: "square.stack.3d.up",
-                    message: "\(state.guests.count) machines"
-                )
+                GuestList(guests: state.guests)
             }
         case .failed(let message):
             PagePlaceholder(symbol: "exclamationmark.triangle", message: message)

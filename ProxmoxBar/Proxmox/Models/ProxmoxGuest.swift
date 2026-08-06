@@ -35,6 +35,11 @@ struct ProxmoxGuest: Identifiable, Hashable, Sendable {
         isTemplate == false && isLocked == false
     }
 
+    var memoryUsage: Double? {
+        guard let memory, let maximumMemory, maximumMemory > 0 else { return nil }
+        return min(Double(memory) / Double(maximumMemory), 1)
+    }
+
     var isHighlyAvailable: Bool {
         guard let haState else { return false }
         return haState.isEmpty == false && haState != "ignored"
