@@ -6,7 +6,7 @@ struct ProxmoxGuest: Identifiable, Hashable, Sendable {
     let kind: GuestKind
     let node: String
     let name: String?
-    let status: GuestStatus
+    var status: GuestStatus
     let isTemplate: Bool
     let lock: String?
     let tags: [String]
@@ -35,13 +35,18 @@ struct ProxmoxGuest: Identifiable, Hashable, Sendable {
         isTemplate == false && isLocked == false
     }
 
+    var availableActions: [GuestAction] {
+        guard acceptsPowerActions else { return [] }
+        switch status {
+        case .running: return [.shutdown, .reboot, .stop]
+        case .stopped: return [.start]
+        case .paused, .suspended: return [.resume, .stop]
+        case .unknown: return []
+        }
+    }
+
     var memoryUsage: Double? {
         guard let memory, let maximumMemory, maximumMemory > 0 else { return nil }
         return min(Double(memory) / Double(maximumMemory), 1)
-    }
-
-    var isHighlyAvailable: Bool {
-        guard let haState else { return false }
-        return haState.isEmpty == false && haState != "ignored"
     }
 }

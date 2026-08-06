@@ -5,6 +5,7 @@ actor ProxmoxAPIClient: ProxmoxAPI {
         static let requestTimeout: TimeInterval = 10
         static let taskPollInterval: Duration = .seconds(1)
         static let taskPollAttempts = 30
+        static let settlePollAttempts = 20
     }
 
     private struct Transport {
@@ -22,7 +23,7 @@ actor ProxmoxAPIClient: ProxmoxAPI {
     }
 
     func version(of server: ProxmoxServer) async throws -> ServerVersion {
-        let payload: VersionPayload = try await get("/api2/json/version", from: server)
+        let payload: VersionPayload = try await get(["version"], from: server)
         return ServerVersion(
             version: payload.version,
             release: payload.release,
@@ -32,7 +33,7 @@ actor ProxmoxAPIClient: ProxmoxAPI {
 
     func clusterState(of server: ProxmoxServer) async throws -> ClusterState {
         let resources: [ClusterResource] = try await get(
-            "/api2/json/cluster/resources",
+            ["cluster", "resources"],
             from: server
         )
         return ClusterState(resources: resources)
@@ -43,27 +44,51 @@ actor ProxmoxAPIClient: ProxmoxAPI {
         on guest: ProxmoxGuest,
         of server: ProxmoxServer
     ) async throws {
-        let path =
-            "/api2/json/nodes/\(guest.node)/\(guest.kind.pathComponent)"
-            + "/\(guest.vmid)/status/\(action.pathComponent)"
-        let upid: String = try await post(path, to: server)
+        let upid: String = try await post(
+            [
+                "nodes", guest.node, guest.kind.pathComponent, String(guest.vmid),
+                "status", action.pathComponent,
+            ],
+            to: server
+        )
         try await waitForTask(upid, on: guest.node, of: server)
+        if let settled = action.settledStatus {
+            try await waitUntilGuestSettles(into: settled, guest: guest, of: server)
+        }
+    }
+
+    private func waitUntilGuestSettles(
+        into expected: GuestStatus,
+        guest: ProxmoxGuest,
+        of server: ProxmoxServer
+    ) async throws {
+        let segments = [
+            "nodes", guest.node, guest.kind.pathComponent, String(guest.vmid),
+            "status", "current",
+        ]
+        for _ in 0..<Limits.settlePollAttempts {
+            let current: GuestStatusPayload = try await get(segments, from: server)
+            if GuestStatus(rawValue: current.status) == expected { return }
+            try await Task.sleep(for: Limits.taskPollInterval)
+        }
     }
 
     private func get<Payload: Decodable & Sendable>(
-        _ path: String,
+        _ segments: [String],
         from server: ProxmoxServer
     ) async throws -> Payload {
-        let request = try makeRequest(path: path, method: "GET", server: server)
+        let request = try makeRequest(segments, method: "GET", server: server)
         let data = try await send(request, to: server)
         return try decode(ProxmoxResponse<Payload>.self, from: data).data
     }
 
     private func post<Payload: Decodable & Sendable>(
-        _ path: String,
+        _ segments: [String],
         to server: ProxmoxServer
     ) async throws -> Payload {
-        let request = try makeRequest(path: path, method: "POST", server: server)
+        var request = try makeRequest(segments, method: "POST", server: server)
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.httpBody = Data()
         let data = try await send(request, to: server)
         return try decode(ProxmoxResponse<Payload>.self, from: data).data
     }
@@ -73,12 +98,10 @@ actor ProxmoxAPIClient: ProxmoxAPI {
         on node: String,
         of server: ProxmoxServer
     ) async throws {
-        let encoded =
-            upid.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? upid
-        let path = "/api2/json/nodes/\(node)/tasks/\(encoded)/status"
+        let segments = ["nodes", node, "tasks", upid, "status"]
 
         for _ in 0..<Limits.taskPollAttempts {
-            let status: TaskStatusPayload = try await get(path, from: server)
+            let status: TaskStatusPayload = try await get(segments, from: server)
             if status.isFinished {
                 guard status.succeeded else {
                     throw ProxmoxError.taskFailed(status.exitstatus ?? "The task failed.")
@@ -91,11 +114,11 @@ actor ProxmoxAPIClient: ProxmoxAPI {
     }
 
     private func makeRequest(
-        path: String,
+        _ segments: [String],
         method: String,
         server: ProxmoxServer
     ) throws -> URLRequest {
-        var request = URLRequest(url: server.credentials.baseURL.appending(path: path))
+        var request = URLRequest(url: try url(for: segments, of: server))
         request.httpMethod = method
         request.setValue(
             server.credentials.authorizationHeader,
@@ -103,6 +126,19 @@ actor ProxmoxAPIClient: ProxmoxAPI {
         )
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         return request
+    }
+
+    private func url(for segments: [String], of server: ProxmoxServer) throws -> URL {
+        var components = URLComponents(
+            url: server.credentials.baseURL,
+            resolvingAgainstBaseURL: false
+        )
+        let escaped = segments.map {
+            $0.addingPercentEncoding(withAllowedCharacters: .proxmoxPathSegment) ?? $0
+        }
+        components?.percentEncodedPath = "/api2/json/" + escaped.joined(separator: "/")
+        guard let url = components?.url else { throw ProxmoxError.invalidURL }
+        return url
     }
 
     private func send(_ request: URLRequest, to server: ProxmoxServer) async throws -> Data {
@@ -132,7 +168,13 @@ actor ProxmoxAPIClient: ProxmoxAPI {
         case 401: throw ProxmoxError.unauthorized
         case 403: throw ProxmoxError.forbidden
         case 404: throw ProxmoxError.notFound
-        default: throw ProxmoxError.httpError(status: http.statusCode)
+        default:
+            throw ProxmoxError.httpError(
+                status: http.statusCode,
+                reason: try? JSONDecoder()
+                    .decode(ProxmoxFailurePayload.self, from: data)
+                    .reason
+            )
         }
     }
 

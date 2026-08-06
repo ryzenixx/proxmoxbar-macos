@@ -25,6 +25,38 @@ enum GuestAction: String, Hashable, Sendable, CaseIterable {
         }
     }
 
+    var symbol: String {
+        switch self {
+        case .start, .resume: "play.fill"
+        case .shutdown: "power"
+        case .reboot: "arrow.clockwise"
+        case .stop: "stop.fill"
+        case .reset: "exclamationmark.arrow.circlepath"
+        case .suspend: "pause.fill"
+        }
+    }
+
+    var progressLabel: String {
+        switch self {
+        case .start: "Starting…"
+        case .shutdown: "Shutting down…"
+        case .reboot: "Restarting…"
+        case .stop: "Forcing off…"
+        case .reset: "Resetting…"
+        case .suspend: "Suspending…"
+        case .resume: "Resuming…"
+        }
+    }
+
+    var settledStatus: GuestStatus? {
+        switch self {
+        case .start, .resume: .running
+        case .shutdown, .stop: .stopped
+        case .suspend: .paused
+        case .reboot, .reset: nil
+        }
+    }
+
     var isForceful: Bool {
         switch self {
         case .stop, .reset: true

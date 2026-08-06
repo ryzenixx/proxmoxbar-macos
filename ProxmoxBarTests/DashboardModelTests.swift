@@ -100,6 +100,106 @@ struct DashboardModelTests {
         #expect(model.isStale == false)
     }
 
+    private func resources(status: String) throws -> [ClusterResource] {
+        let json = """
+            [{"id":"qemu/1","type":"qemu","vmid":1,"node":"a","status":"\(status)"}]
+            """
+        let data = try #require(json.data(using: .utf8))
+        return try JSONDecoder().decode([ClusterResource].self, from: data)
+    }
+
+    private func runningResources() throws -> [ClusterResource] {
+        try resources(status: "running")
+    }
+
+    private func stoppedResources() throws -> [ClusterResource] {
+        try resources(status: "stopped")
+    }
+
+    private func runningGuest() throws -> ProxmoxGuest {
+        try #require(ClusterState(resources: try runningResources()).guests.first)
+    }
+
+    @Test("A power action is sent and the cluster is read back right after")
+    func performsActionThenRefreshes() async throws {
+        let api = StubProxmoxAPI()
+        let model = DashboardModel(store: try makeStore(names: ["Alpha"]), api: api)
+        let guest = try runningGuest()
+
+        await model.perform(.shutdown, on: guest)
+
+        #expect(api.performedActions == [.shutdown])
+        #expect(api.callCount == 1)
+        #expect(model.runningActions.isEmpty)
+        #expect(model.actionFailures.isEmpty)
+    }
+
+    @Test("A failing power action is reported against its own machine")
+    func reportsActionFailure() async throws {
+        let api = StubProxmoxAPI()
+        api.failsActions(with: ProxmoxError.forbidden)
+        let model = DashboardModel(store: try makeStore(names: ["Alpha"]), api: api)
+        let guest = try runningGuest()
+
+        await model.perform(.stop, on: guest)
+
+        #expect(model.actionFailures[guest.id] != nil)
+        #expect(model.runningActions.isEmpty)
+
+        model.dismissFailure(for: guest)
+        #expect(model.actionFailures[guest.id] == nil)
+    }
+
+    @Test("A confirmed state is shown while the cached cluster view still lags")
+    func showsConfirmedStateWhileClusterLags() async throws {
+        let api = StubProxmoxAPI()
+        let model = DashboardModel(store: try makeStore(names: ["Alpha"]), api: api)
+        let guest = try runningGuest()
+        api.returns(ClusterState(resources: try runningResources()))
+
+        await model.perform(.shutdown, on: guest)
+
+        let shown = try #require(model.visibleState?.guests.first)
+        #expect(shown.status == .stopped)
+        #expect(model.confirmedStatuses[guest.id] != nil)
+    }
+
+    @Test("The confirmation is dropped once the cluster agrees on its own")
+    func dropsConfirmationOnceClusterAgrees() async throws {
+        let api = StubProxmoxAPI()
+        let model = DashboardModel(store: try makeStore(names: ["Alpha"]), api: api)
+        let guest = try runningGuest()
+        api.returns(ClusterState(resources: try runningResources()))
+        await model.perform(.shutdown, on: guest)
+        #expect(model.confirmedStatuses[guest.id] != nil)
+
+        api.returns(ClusterState(resources: try stoppedResources()))
+        await model.refresh()
+
+        #expect(model.confirmedStatuses.isEmpty)
+        #expect(model.visibleState?.guests.first?.status == .stopped)
+    }
+
+    @Test("Switching servers drops every trace of the previous one")
+    func switchingServersClearsPerGuestState() async throws {
+        let api = StubProxmoxAPI()
+        let store = try makeStore(names: ["Alpha", "Beta"])
+        let model = DashboardModel(store: store, api: api)
+        let guest = try runningGuest()
+        api.returns(ClusterState(resources: try runningResources()))
+
+        api.failsActions(with: ProxmoxError.forbidden)
+        await model.perform(.stop, on: guest)
+        #expect(model.actionFailures.isEmpty == false)
+
+        let beta = try #require(store.servers.first { $0.name == "Beta" })
+        model.select(beta.id)
+
+        #expect(model.actionFailures.isEmpty)
+        #expect(model.confirmedStatuses.isEmpty)
+        #expect(model.runningActions.isEmpty)
+    }
+
     @Test("Monitoring keeps polling on its own until it is stopped")
     func monitoringPollsRepeatedly() async throws {
         let api = StubProxmoxAPI()

@@ -5,10 +5,16 @@ import Synchronization
 
 final class StubProxmoxAPI: ProxmoxAPI, Sendable {
     private let outcome = Mutex<Result<ClusterState, any Error>>(.success(.empty))
+    private let actionOutcome = Mutex<(any Error)?>(nil)
     private let calls = Mutex<Int>(0)
+    private let performed = Mutex<[GuestAction]>([])
 
     var callCount: Int {
         calls.withLock { $0 }
+    }
+
+    var performedActions: [GuestAction] {
+        performed.withLock { $0 }
     }
 
     func returns(_ state: ClusterState) {
@@ -17,6 +23,10 @@ final class StubProxmoxAPI: ProxmoxAPI, Sendable {
 
     func fails(with error: any Error) {
         outcome.withLock { $0 = .failure(error) }
+    }
+
+    func failsActions(with error: (any Error)?) {
+        actionOutcome.withLock { $0 = error }
     }
 
     func version(of server: ProxmoxServer) async throws -> ServerVersion {
@@ -32,5 +42,10 @@ final class StubProxmoxAPI: ProxmoxAPI, Sendable {
         _ action: GuestAction,
         on guest: ProxmoxGuest,
         of server: ProxmoxServer
-    ) async throws {}
+    ) async throws {
+        performed.withLock { $0.append(action) }
+        if let error = actionOutcome.withLock({ $0 }) {
+            throw error
+        }
+    }
 }

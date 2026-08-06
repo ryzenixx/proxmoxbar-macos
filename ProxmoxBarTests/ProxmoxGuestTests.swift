@@ -54,6 +54,46 @@ struct ProxmoxGuestTests {
         #expect(result.displayName == "108")
     }
 
+    @Test("A running guest can be shut down, restarted or forced off")
+    func offersRunningActions() throws {
+        let result = try guest(
+            """
+            [{"id":"qemu/1","type":"qemu","vmid":1,"node":"a","status":"running"}]
+            """
+        )
+        #expect(result.availableActions == [.shutdown, .reboot, .stop])
+    }
+
+    @Test("A stopped guest can only be started")
+    func offersStartOnly() throws {
+        let result = try guest(
+            """
+            [{"id":"lxc/2","type":"lxc","vmid":2,"node":"a","status":"stopped"}]
+            """
+        )
+        #expect(result.availableActions == [.start])
+    }
+
+    @Test("A locked guest offers no action at all")
+    func lockedGuestOffersNothing() throws {
+        let result = try guest(
+            """
+            [{"id":"qemu/3","type":"qemu","vmid":3,"node":"a","status":"running",
+              "lock":"backup"}]
+            """
+        )
+        #expect(result.isLocked)
+        #expect(result.availableActions.isEmpty)
+    }
+
+    @Test("Only forceful actions are marked as such")
+    func marksForcefulActions() {
+        #expect(GuestAction.stop.isForceful)
+        #expect(GuestAction.reset.isForceful)
+        #expect(GuestAction.shutdown.isForceful == false)
+        #expect(GuestAction.reboot.isForceful == false)
+    }
+
     @Test("A template accepts no power action")
     func templateRefusesPowerActions() throws {
         let result = try guest(

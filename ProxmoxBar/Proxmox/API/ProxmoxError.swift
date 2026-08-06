@@ -5,22 +5,13 @@ enum ProxmoxError: Error, Hashable, Sendable {
     case unauthorized
     case forbidden
     case notFound
-    case httpError(status: Int)
+    case httpError(status: Int, reason: String?)
     case untrustedCertificate(ServerCertificate, problems: [TrustProblem])
     case certificateMismatch(expected: String, presented: String)
     case transport(String)
     case decoding(String)
     case taskFailed(String)
     case timedOut
-
-    var isRetryable: Bool {
-        switch self {
-        case .transport, .timedOut: true
-        case .invalidURL, .unauthorized, .forbidden, .notFound, .httpError,
-            .untrustedCertificate, .certificateMismatch, .decoding, .taskFailed:
-            false
-        }
-    }
 }
 
 extension ProxmoxError: LocalizedError {
@@ -34,8 +25,14 @@ extension ProxmoxError: LocalizedError {
             "The API token lacks the permissions this needs."
         case .notFound:
             "The server does not have what was asked for."
-        case .httpError(let status):
-            "The server answered with HTTP \(status)."
+        case .httpError(let status, let reason):
+            if let reason, !reason.isEmpty {
+                reason
+            } else if status >= 500 {
+                "The server could not carry out the request."
+            } else {
+                "The server rejected the request (HTTP \(status))."
+            }
         case .untrustedCertificate:
             "The server presented a certificate that has not been trusted yet."
         case .certificateMismatch:

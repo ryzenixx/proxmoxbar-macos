@@ -7,6 +7,21 @@ struct ClusterState: Hashable, Sendable {
     let discardedCount: Int
 
     static let empty = ClusterState(nodes: [], guests: [], storages: [], discardedCount: 0)
+
+    func applying(_ statuses: [String: GuestStatus]) -> ClusterState {
+        guard !statuses.isEmpty else { return self }
+        return ClusterState(
+            nodes: nodes,
+            guests: guests.map { guest in
+                guard let status = statuses[guest.id] else { return guest }
+                var confirmed = guest
+                confirmed.status = status
+                return confirmed
+            },
+            storages: storages,
+            discardedCount: discardedCount
+        )
+    }
 }
 
 extension ClusterState {

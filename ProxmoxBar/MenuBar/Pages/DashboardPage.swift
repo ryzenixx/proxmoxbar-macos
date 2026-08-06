@@ -32,16 +32,15 @@ struct DashboardPage: View {
 
     @ViewBuilder
     private var content: some View {
-        switch model.phase {
-        case .loaded(let state):
+        if let state = model.visibleState {
             VStack(spacing: 0) {
                 ClusterSummaryRow(state: state, isStale: model.isStale)
                 Divider()
                 GuestList(guests: state.guests)
             }
-        case .failed(let message):
+        } else if case .failed(let message) = model.phase {
             PagePlaceholder(symbol: "exclamationmark.triangle", message: message)
-        case .idle, .loading:
+        } else {
             ProgressView()
                 .controlSize(.small)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
