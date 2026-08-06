@@ -13,12 +13,14 @@ struct ClusterSummaryRow: View {
     }
 
     private var headline: some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(healthTint)
-                .frame(width: 6, height: 6)
+        HStack(spacing: 5) {
+            Image(systemName: "server.rack")
+                .font(.system(size: 10))
+                .foregroundStyle(healthTint)
             Text(nodeSummary)
             Spacer(minLength: 8)
+            Image(systemName: "square.stack.3d.up")
+                .font(.system(size: 10))
             Text(guestSummary)
         }
         .font(.caption)
@@ -58,8 +60,7 @@ struct ClusterSummaryRow: View {
     }
 
     private var healthTint: Color {
-        guard !state.nodes.isEmpty else { return .secondary }
-        return state.onlineNodes == state.nodes.count ? .green : .orange
+        state.onlineNodes < state.nodes.count ? .orange : .secondary
     }
 
     private var nodeSummary: String {
