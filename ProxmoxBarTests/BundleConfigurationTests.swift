@@ -26,3 +26,27 @@ struct BundleConfigurationTests {
         #expect(feed == expected)
     }
 }
+
+@Suite("App information")
+struct AppInfoTests {
+    @Test("The version and build come from the bundle, not from a literal")
+    func readsVersionFromBundle() throws {
+        let short = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")
+        #expect(AppInfo.version == (short as? String ?? "—"))
+        #expect(AppInfo.build == (build as? String ?? "—"))
+    }
+
+    @Test("The summary pairs the version with its build")
+    func summaryPairsBoth() {
+        #expect(AppInfo.versionSummary == "\(AppInfo.version) (\(AppInfo.build))")
+    }
+
+    @Test("Every published link is a valid URL")
+    func linksResolve() {
+        #expect(AppLinks.repository != nil)
+        #expect(AppLinks.issues != nil)
+        #expect(AppLinks.support != nil)
+        #expect(AppLinks.tokenGuide != nil)
+    }
+}

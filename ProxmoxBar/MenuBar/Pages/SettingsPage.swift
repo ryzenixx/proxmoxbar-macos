@@ -55,14 +55,17 @@ struct SettingsPage: View {
     }
 
     private var sections: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                serversSection
-                generalSection
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    serversSection
+                    generalSection
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 4)
+                .padding(.bottom, 16)
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 4)
-            .padding(.bottom, 20)
+            footer
         }
         .task { launchAtLogin.refresh() }
     }
@@ -107,6 +110,32 @@ struct SettingsPage: View {
                     .padding(.top, 4)
             }
         }
+    }
+
+    private var footer: some View {
+        VStack(spacing: 7) {
+            Text("\(AppInfo.name) \(AppInfo.versionSummary)")
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+            HStack(spacing: 16) {
+                if let issues = AppLinks.issues {
+                    HelpLink(
+                        "Report a problem",
+                        symbol: "exclamationmark.bubble",
+                        destination: issues
+                    )
+                }
+                if let support = AppLinks.support {
+                    HelpLink("Support the work", symbol: "heart", destination: support)
+                }
+            }
+            .font(.footnote.weight(.medium))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
     }
 
     private var emptyRow: some View {

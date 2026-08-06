@@ -1,6 +1,6 @@
 import Foundation
 
-enum WelcomeLinks {
+enum AppLinks {
     static let repository = URL(
         string: "https://github.com/ryzenixx/proxmoxbar-macos"
     )

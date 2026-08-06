@@ -62,7 +62,7 @@ struct ServerFormFields: View {
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if let guide = WelcomeLinks.tokenGuide {
+                if let guide = AppLinks.tokenGuide {
                     HelpLink("How to create a token", destination: guide)
                 }
             }

@@ -82,12 +82,12 @@ private struct Capability: View {
 private struct HelpLinks: View {
     var body: some View {
         HStack(spacing: 6) {
-            if let guide = WelcomeLinks.tokenGuide {
+            if let guide = AppLinks.tokenGuide {
                 HelpLink("How to create a token", destination: guide)
             }
             Text("·")
                 .foregroundStyle(.secondary)
-            if let issues = WelcomeLinks.issues {
+            if let issues = AppLinks.issues {
                 HelpLink("Report a problem", destination: issues)
             }
         }

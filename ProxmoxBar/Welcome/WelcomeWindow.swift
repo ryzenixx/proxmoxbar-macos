@@ -64,10 +64,10 @@ private struct WelcomeFooter: View {
 
     var body: some View {
         HStack(spacing: 16) {
-            if let repository = WelcomeLinks.repository {
+            if let repository = AppLinks.repository {
                 Link("GitHub", destination: repository)
             }
-            if let support = WelcomeLinks.support {
+            if let support = AppLinks.support {
                 Link("Support the work", destination: support)
             }
             Spacer()
