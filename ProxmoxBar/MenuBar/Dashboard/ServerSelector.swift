@@ -29,13 +29,10 @@ struct ServerSelector: View {
                 Text(selected?.displayName ?? "No server")
                     .font(.headline)
                     .lineLimit(1)
-                Spacer(minLength: 0)
             }
             .contentShape(.rect)
         }
         .menuStyle(.borderlessButton)
         .fixedSize()
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
     }
 }

@@ -12,11 +12,12 @@ struct DashboardPage: View {
             }
         } else {
             VStack(spacing: 0) {
-                ServerSelector(
+                DashboardHeader(
                     servers: model.servers,
                     selected: model.selected,
                     onSelect: { model.select($0) },
-                    onAddServer: { router.go(to: .addServer) }
+                    onAddServer: { router.go(to: .addServer) },
+                    onOpenSettings: { router.go(to: .settings) }
                 )
                 Divider()
                 content
