@@ -234,3 +234,61 @@ struct DashboardModelTests {
         #expect(model.refreshFailure == nil)
     }
 }
+
+@Suite("Dashboard failures")
+@MainActor
+struct DashboardFailureTests {
+    private func makeStore() throws -> ServerStore {
+        let defaults = try #require(UserDefaults(suiteName: "Failure.\(UUID().uuidString)"))
+        let store = ServerStore(defaults: defaults, secrets: InMemorySecretStore())
+        try store.add(
+            ServerConfiguration(
+                name: "Alpha",
+                address: "https://192.168.1.1:8006",
+                tokenIdentifier: "monitor@pve!bar"
+            ),
+            secret: "s"
+        )
+        return store
+    }
+
+    @Test("A first failure surfaces its message")
+    func firstFailureSurfaces() async throws {
+        let api = StubProxmoxAPI()
+        api.fails(with: ProxmoxError.unauthorized)
+        let model = DashboardModel(store: try makeStore(), api: api)
+
+        await model.refresh()
+
+        #expect(model.failureMessage == "The API token was rejected.")
+        #expect(model.visibleState == nil)
+    }
+
+    @Test("A failure after a good read reports why, and the stale values stay out of sight")
+    func laterFailureHidesStaleValues() async throws {
+        let api = StubProxmoxAPI()
+        let model = DashboardModel(store: try makeStore(), api: api)
+        await model.refresh()
+        #expect(model.failureMessage == nil)
+
+        api.fails(with: ProxmoxError.timedOut)
+        await model.refresh()
+
+        #expect(model.failureMessage == "The server did not answer in time.")
+    }
+
+    @Test("Retrying successfully clears the failure")
+    func retryClearsFailure() async throws {
+        let api = StubProxmoxAPI()
+        api.fails(with: ProxmoxError.timedOut)
+        let model = DashboardModel(store: try makeStore(), api: api)
+        await model.refresh()
+        #expect(model.failureMessage != nil)
+
+        api.returns(.empty)
+        await model.refresh()
+
+        #expect(model.failureMessage == nil)
+        #expect(model.visibleState != nil)
+    }
+}

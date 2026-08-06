@@ -27,6 +27,12 @@ final class DashboardModel {
     private(set) var actionFailures: [String: String] = [:]
     private(set) var confirmedStatuses: [String: ConfirmedStatus] = [:]
 
+    var failureMessage: String? {
+        if let refreshFailure { return refreshFailure }
+        if case .failed(let message) = phase { return message }
+        return nil
+    }
+
     var visibleState: ClusterState? {
         guard case .loaded(let state) = phase else { return nil }
         guard !confirmedStatuses.isEmpty else { return state }

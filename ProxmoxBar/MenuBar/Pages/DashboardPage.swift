@@ -33,18 +33,16 @@ struct DashboardPage: View {
 
     @ViewBuilder
     private var content: some View {
-        if let state = model.visibleState {
+        if let message = model.failureMessage {
+            DashboardFailure(message: message) {
+                await model.refresh()
+            }
+        } else if let state = model.visibleState {
             VStack(spacing: 0) {
                 ClusterSummaryRow(state: state)
                 Divider()
-                if let failure = model.refreshFailure {
-                    ErrorPlaceholder(message: failure)
-                } else {
-                    GuestList(guests: state.guests)
-                }
+                GuestList(guests: state.guests)
             }
-        } else if case .failed(let message) = model.phase {
-            ErrorPlaceholder(message: message)
         } else {
             ProgressView()
                 .controlSize(.small)
