@@ -6,6 +6,7 @@ struct SettingsPage: View {
 
     @State private var editor: ServerFormModel?
     @State private var removalError: String?
+    @State private var launchAtLogin = LaunchAtLogin()
 
     private var title: String {
         guard let editor else { return PanelPage.settings.title }
@@ -57,10 +58,21 @@ struct SettingsPage: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 serversSection
+                generalSection
             }
             .padding(.horizontal, 20)
             .padding(.top, 4)
             .padding(.bottom, 20)
+        }
+        .task { launchAtLogin.refresh() }
+    }
+
+    private var generalSection: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            SectionLabel("General")
+            FieldGroup {
+                LaunchAtLoginRow(launch: launchAtLogin)
+            }
         }
     }
 
