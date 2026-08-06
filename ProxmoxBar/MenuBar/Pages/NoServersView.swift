@@ -52,7 +52,7 @@ struct NoServersView: View {
             Divider().padding(.leading, 30)
             Capability(symbol: "power", text: "Start, stop and restart without a browser")
             Divider().padding(.leading, 30)
-            Capability(symbol: "lock.fill", text: "Your token stays on this Mac, in the keychain")
+            Capability(symbol: "lock.fill", text: "Your token never leaves the keychain")
         }
         .background(.quaternary.opacity(0.35), in: .rect(cornerRadius: 10))
     }
@@ -63,14 +63,15 @@ private struct Capability: View {
     let text: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .center, spacing: 12) {
             Image(systemName: symbol)
                 .font(.footnote)
                 .foregroundStyle(.tint)
                 .frame(width: 18)
             Text(text)
                 .font(.callout)
-                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(1)
+                .minimumScaleFactor(0.9)
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 12)
@@ -82,15 +83,32 @@ private struct HelpLinks: View {
     var body: some View {
         HStack(spacing: 6) {
             if let guide = WelcomeLinks.tokenGuide {
-                Link("How to create a token", destination: guide)
+                HelpLink("How to create a token", destination: guide)
             }
             Text("·")
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
             if let issues = WelcomeLinks.issues {
-                Link("Report a problem", destination: issues)
+                HelpLink("Report a problem", destination: issues)
             }
         }
-        .font(.caption)
-        .tint(.secondary)
+        .font(.footnote.weight(.medium))
+    }
+}
+
+private struct HelpLink: View {
+    let title: String
+    let destination: URL
+
+    init(_ title: String, destination: URL) {
+        self.title = title
+        self.destination = destination
+    }
+
+    var body: some View {
+        Link(destination: destination) {
+            Text(title)
+                .underline()
+                .foregroundStyle(.primary)
+        }
     }
 }
