@@ -43,7 +43,7 @@ final class DashboardModel {
     @ObservationIgnored private let api: any ProxmoxAPI
     @ObservationIgnored private let refreshInterval: Duration
     @ObservationIgnored private var monitor: Task<Void, Never>?
-    @ObservationIgnored private var wakeObserver: (any NSObjectProtocol)?
+    @ObservationIgnored private var wakeWatcher: Task<Void, Never>?
     @ObservationIgnored private var refreshGeneration = 0
 
     init(
@@ -59,6 +59,7 @@ final class DashboardModel {
 
     deinit {
         monitor?.cancel()
+        wakeWatcher?.cancel()
     }
 
     var servers: [ServerConfiguration] {
@@ -79,22 +80,21 @@ final class DashboardModel {
                 try? await Task.sleep(for: interval)
             }
         }
-        wakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
-            forName: NSWorkspace.didWakeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in await self?.refresh() }
+        wakeWatcher = Task { [weak self] in
+            let wakes = NSWorkspace.shared.notificationCenter.notifications(
+                named: NSWorkspace.didWakeNotification
+            )
+            for await _ in wakes {
+                await self?.refresh()
+            }
         }
     }
 
     func stopMonitoring() {
         monitor?.cancel()
         monitor = nil
-        if let wakeObserver {
-            NSWorkspace.shared.notificationCenter.removeObserver(wakeObserver)
-        }
-        wakeObserver = nil
+        wakeWatcher?.cancel()
+        wakeWatcher = nil
     }
 
     func select(_ identifier: UUID) {
@@ -131,6 +131,7 @@ final class DashboardModel {
                 return
             }
             try await api.perform(action, on: guest, of: server)
+            guard target == selectedID else { return }
             if let settled = action.settledStatus {
                 confirmedStatuses[guest.id] = ConfirmedStatus(
                     status: settled,
@@ -140,6 +141,7 @@ final class DashboardModel {
         } catch is CancellationError {
             return
         } catch {
+            guard target == selectedID else { return }
             actionFailures[guest.id] =
                 (error as? ProxmoxError)?.errorDescription ?? error.localizedDescription
         }
