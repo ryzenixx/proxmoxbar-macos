@@ -88,12 +88,24 @@ struct LaunchAtLoginTests {
         #expect(launch.isNoteAProblem)
     }
 
-    @Test("An app outside Applications cannot register and says so")
-    func unavailableOutsideApplications() {
-        let launch = LaunchAtLogin(controller: StubLoginItem(status: .unavailable))
-        #expect(launch.isAvailable == false)
+    @Test("An unknown state says nothing and still lets the switch be tried")
+    func unknownStateStaysSilent() {
+        let launch = LaunchAtLogin(controller: StubLoginItem(status: .unknown))
+        #expect(launch.isOn == false)
+        #expect(launch.note == nil)
+        #expect(launch.isNoteAProblem == false)
+    }
+
+    @Test("A registration refused from an unknown state reports what the system said")
+    func unknownStateStillReportsRealErrors() {
+        let item = StubLoginItem(status: .unknown)
+        item.registerError = Denied()
+        let launch = LaunchAtLogin(controller: item)
+
+        launch.setEnabled(true)
+
+        #expect(launch.note == "Operation not permitted.")
         #expect(launch.isNoteAProblem)
-        #expect(launch.note?.contains("Applications") == true)
     }
 
     @Test("A new attempt clears the previous failure")

@@ -8,7 +8,7 @@ final class LaunchAtLogin {
         case enabled
         case disabled
         case requiresApproval
-        case unavailable
+        case unknown
     }
 
     private(set) var status: Status = .disabled
@@ -25,24 +25,14 @@ final class LaunchAtLogin {
         status == .enabled || status == .requiresApproval
     }
 
-    var isAvailable: Bool {
-        status != .unavailable
-    }
-
     var note: String? {
         if let failure { return failure }
-        switch status {
-        case .requiresApproval:
-            return "macOS is waiting for your approval in Login Items."
-        case .unavailable:
-            return "Move ProxmoxBar to your Applications folder to use this."
-        case .enabled, .disabled:
-            return nil
-        }
+        guard status == .requiresApproval else { return nil }
+        return "macOS is waiting for your approval in Login Items."
     }
 
     var isNoteAProblem: Bool {
-        failure != nil || status == .unavailable
+        failure != nil
     }
 
     func refresh() {

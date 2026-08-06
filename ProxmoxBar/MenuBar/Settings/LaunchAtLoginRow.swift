@@ -19,7 +19,6 @@ struct LaunchAtLoginRow: View {
                 .labelsHidden()
                 .toggleStyle(.switch)
                 .controlSize(.small)
-                .disabled(launch.isAvailable == false)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)

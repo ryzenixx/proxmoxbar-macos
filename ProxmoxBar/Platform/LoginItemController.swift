@@ -16,8 +16,8 @@ struct SystemLoginItem: LoginItemController {
         case .enabled: .enabled
         case .requiresApproval: .requiresApproval
         case .notRegistered: .disabled
-        case .notFound: .unavailable
-        @unknown default: .unavailable
+        case .notFound: .unknown
+        @unknown default: .unknown
         }
     }
 
