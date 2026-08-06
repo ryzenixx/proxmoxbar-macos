@@ -32,7 +32,7 @@ private struct AddServerForm: View {
         VStack(alignment: .leading, spacing: 0) {
             SectionLabel("Server")
             FieldGroup {
-                FormRow(label: "Name", hint: "Homelab", text: $model.name)
+                FormRow(label: "Name", hint: "my server", text: $model.name)
                 Divider()
                 FormRow(
                     label: "Address",
@@ -49,7 +49,7 @@ private struct AddServerForm: View {
                 Divider()
                 FormRow(
                     label: "Secret",
-                    hint: "Shown once, when the token is created",
+                    hint: "",
                     text: $model.secret,
                     isSecret: true
                 )
@@ -88,28 +88,24 @@ private struct AddServerForm: View {
     }
 
     private var reassurance: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Label {
-                Text("The secret goes straight to your keychain. It never leaves this Mac.")
-                    .fixedSize(horizontal: false, vertical: true)
-            } icon: {
-                Image(systemName: "lock.fill")
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
+        HStack(alignment: .top, spacing: 7) {
+            Image(systemName: "lock.fill")
+                .frame(width: 13)
+                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 5) {
+                Text(
+                    "Proxmox shows the secret once, when the token is created. "
+                        + "It goes straight to your keychain."
+                )
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
-            if let guide = WelcomeLinks.tokenGuide {
-                Link(destination: guide) {
-                    HStack(spacing: 3) {
-                        Text("How to create a token")
-                        Image(systemName: "arrow.up.forward")
-                            .imageScale(.small)
-                    }
-                    .font(.caption)
+                if let guide = WelcomeLinks.tokenGuide {
+                    HelpLink("How to create a token", destination: guide)
                 }
-                .padding(.leading, 20)
             }
         }
+        .font(.caption)
     }
 
     private var connectButton: some View {
