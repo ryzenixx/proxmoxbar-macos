@@ -6,20 +6,49 @@ struct AddServerPage: View {
 
     @State private var model: AddServerModel?
 
+    private var title: String {
+        if case .awaitingTrust = model?.phase {
+            return "Check the Certificate"
+        }
+        return PanelPage.addServer.title
+    }
+
+    private func back() {
+        if case .awaitingTrust = model?.phase {
+            model?.cancelTrust()
+            return
+        }
+        router.goBack()
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            PageHeader(title: PanelPage.addServer.title) {
-                router.goBack()
+            PageHeader(title: title) {
+                back()
             }
             if let model {
-                AddServerForm(model: model) {
-                    router.reset()
-                }
+                step(for: model)
             }
         }
         .task {
             guard model == nil else { return }
             model = AddServerModel(api: ProxmoxAPIClient(), store: store)
+        }
+    }
+
+    @ViewBuilder
+    private func step(for model: AddServerModel) -> some View {
+        if case .awaitingTrust(let certificate, let problems) = model.phase {
+            CertificateApprovalView(
+                certificate: certificate,
+                problems: problems,
+                onTrust: { Task { await model.trustPresentedCertificate() } },
+                onCancel: { model.cancelTrust() }
+            )
+        } else {
+            AddServerForm(model: model) {
+                router.reset()
+            }
         }
     }
 }
@@ -75,16 +104,6 @@ private struct AddServerForm: View {
             guard phase == .added else { return }
             onAdded()
         }
-        .sheet(isPresented: .constant(isAwaitingTrust)) {
-            if case .awaitingTrust(let certificate, let problems) = model.phase {
-                CertificateApprovalView(
-                    certificate: certificate,
-                    problems: problems,
-                    onTrust: { Task { await model.trustPresentedCertificate() } },
-                    onCancel: { model.cancelTrust() }
-                )
-            }
-        }
     }
 
     private var reassurance: some View {
@@ -125,11 +144,6 @@ private struct AddServerForm: View {
         .controlSize(.large)
         .disabled(model.canSubmit == false)
         .keyboardShortcut(.defaultAction)
-    }
-
-    private var isAwaitingTrust: Bool {
-        if case .awaitingTrust = model.phase { return true }
-        return false
     }
 }
 

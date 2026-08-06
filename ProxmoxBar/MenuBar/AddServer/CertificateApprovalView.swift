@@ -8,77 +8,89 @@ struct CertificateApprovalView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Check this certificate")
-                .font(.headline)
-
             Text("Proxmox signs its own certificates, so your Mac cannot vouch for this one.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, 4)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Field(label: "Issued to", value: certificate.subject)
-                if let issuer = certificate.issuer {
-                    Field(label: "Issued by", value: issuer)
-                }
-                if let expiry = certificate.expiry {
-                    Field(
-                        label: "Expires",
-                        value: expiry.formatted(date: .abbreviated, time: .omitted)
-                    )
-                }
-                Field(label: "SHA-256", value: certificate.fingerprint, isMonospaced: true)
-            }
-            .padding(.top, 14)
+            details
+                .padding(.top, 14)
 
             if problems.isEmpty == false {
-                VStack(alignment: .leading, spacing: 5) {
+                VStack(alignment: .leading, spacing: 4) {
                     ForEach(problems, id: \.self) { problem in
                         Label(problem.summary, systemImage: "exclamationmark.triangle.fill")
-                            .font(.caption)
                             .foregroundStyle(problem.isExpected ? Color.secondary : Color.orange)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
+                .font(.caption)
                 .padding(.top, 12)
             }
 
-            Text(
-                "Compare the fingerprint with Datacenter → Certificates in the Proxmox web interface."
-            )
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(.top, 12)
+            Text("Compare it with Datacenter → Certificates in the Proxmox web interface.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 12)
 
-            HStack {
-                Button("Cancel", role: .cancel, action: onCancel)
-                Spacer()
-                Button("Trust This Server", action: onTrust)
+            Spacer(minLength: 12)
+
+            HStack(spacing: 10) {
+                Button("Cancel", action: onCancel)
+                    .controlSize(.large)
+                Button("Trust", action: onTrust)
                     .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
                     .keyboardShortcut(.defaultAction)
             }
-            .padding(.top, 18)
+            .frame(maxWidth: .infinity)
         }
-        .padding(20)
-        .frame(width: 340)
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 18)
+        .frame(maxHeight: .infinity, alignment: .top)
+    }
+
+    private var details: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            DetailRow(label: "Issued to", value: certificate.subject)
+            if let issuer = certificate.issuer {
+                Divider()
+                DetailRow(label: "Issued by", value: issuer)
+            }
+            if let expiry = certificate.expiry {
+                Divider()
+                DetailRow(
+                    label: "Expires",
+                    value: expiry.formatted(date: .abbreviated, time: .omitted)
+                )
+            }
+            Divider()
+            DetailRow(label: "SHA-256", value: certificate.fingerprint, isMonospaced: true)
+        }
+        .background(.quaternary.opacity(0.35), in: .rect(cornerRadius: 10))
     }
 }
 
-private struct Field: View {
+private struct DetailRow: View {
     let label: String
     let value: String
     var isMonospaced = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
+        HStack(alignment: .top, spacing: 10) {
             Text(label)
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(width: 64, alignment: .leading)
             Text(value)
-                .font(isMonospaced ? .caption.monospaced() : .callout)
+                .font(isMonospaced ? .caption2.monospaced() : .caption)
                 .textSelection(.enabled)
                 .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 9)
     }
 }
