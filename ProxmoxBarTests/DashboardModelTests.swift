@@ -27,13 +27,6 @@ struct DashboardModelTests {
         let store = try makeStore(names: ["Alpha", "Beta"])
         let model = DashboardModel(store: store)
         #expect(model.selected?.name == "Alpha")
-        #expect(model.hasSeveralServers)
-    }
-
-    @Test("A single server is not offered as a choice")
-    func singleServerIsNotAChoice() throws {
-        let model = DashboardModel(store: try makeStore(names: ["Alpha"]))
-        #expect(model.hasSeveralServers == false)
     }
 
     @Test("Selecting another server switches to it")

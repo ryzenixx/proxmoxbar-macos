@@ -129,6 +129,18 @@ struct ClusterSummaryTests {
         #expect(capacity.total == 200)
     }
 
+    @Test("A storage that reports no status is still counted")
+    func countsStorageWithoutStatus() throws {
+        let result = try state(
+            """
+            [{"id":"storage/a/local","type":"storage","storage":"local","node":"a",
+              "disk":50,"maxdisk":200}]
+            """
+        )
+        let capacity = try #require(result.storage)
+        #expect(capacity.total == 200)
+    }
+
     @Test("A cluster with no storage has nothing to report")
     func noStorageMeansNoCapacity() throws {
         let result = try state(

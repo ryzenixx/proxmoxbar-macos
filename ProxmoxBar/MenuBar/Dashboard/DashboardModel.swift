@@ -32,10 +32,6 @@ final class DashboardModel {
         return store.servers.first { $0.id == selectedID }
     }
 
-    var hasSeveralServers: Bool {
-        store.servers.count > 1
-    }
-
     func select(_ identifier: UUID) {
         guard identifier != selectedID,
             store.servers.contains(where: { $0.id == identifier })
@@ -45,11 +41,9 @@ final class DashboardModel {
     }
 
     func selectionDidChange() {
-        guard let selectedID, store.servers.contains(where: { $0.id == selectedID }) else {
-            self.selectedID = store.servers.first?.id
-            phase = .idle
-            return
-        }
+        guard !store.servers.contains(where: { $0.id == selectedID }) else { return }
+        selectedID = store.servers.first?.id
+        phase = .idle
     }
 
     func refresh() async {

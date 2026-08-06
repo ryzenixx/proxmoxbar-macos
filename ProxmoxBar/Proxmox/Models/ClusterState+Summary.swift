@@ -33,7 +33,7 @@ extension ClusterState {
         var used = 0
         var total = 0
 
-        for storage in storages where storage.status?.lowercased() != "unavailable" {
+        for storage in storages where !storage.isUnavailable {
             guard let capacity = storage.total, capacity > 0 else { continue }
             if storage.isShared, !countedShared.insert(storage.name).inserted { continue }
             used += storage.used ?? 0

@@ -16,7 +16,7 @@ struct ProxmoxStorage: Identifiable, Hashable, Sendable {
         return Double(used) / Double(total)
     }
 
-    var isAvailable: Bool {
-        status?.lowercased() == "available"
+    var isUnavailable: Bool {
+        status?.lowercased() == "unavailable"
     }
 }
