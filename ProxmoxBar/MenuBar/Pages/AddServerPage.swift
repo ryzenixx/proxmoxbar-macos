@@ -7,10 +7,11 @@ struct AddServerPage: View {
     @State private var model: AddServerModel?
 
     private var title: String {
-        if case .awaitingTrust = model?.phase {
-            return "Check the Certificate"
+        switch model?.phase {
+        case .awaitingTrust: "Check the Certificate"
+        case .added: "Server Added"
+        default: PanelPage.addServer.title
         }
-        return PanelPage.addServer.title
     }
 
     private func back() {
@@ -45,17 +46,21 @@ struct AddServerPage: View {
                 onTrust: { Task { await model.trustPresentedCertificate() } },
                 onCancel: { model.cancelTrust() }
             )
+        } else if model.phase == .added {
+            ServerConnectedView(
+                name: model.addedName,
+                version: model.version,
+                summary: model.summary,
+                onDone: { router.reset() }
+            )
         } else {
-            AddServerForm(model: model) {
-                router.reset()
-            }
+            AddServerForm(model: model)
         }
     }
 }
 
 private struct AddServerForm: View {
     @Bindable var model: AddServerModel
-    let onAdded: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -100,10 +105,6 @@ private struct AddServerForm: View {
         .padding(.top, 10)
         .padding(.bottom, 18)
         .frame(maxHeight: .infinity, alignment: .top)
-        .onChange(of: model.phase) { _, phase in
-            guard phase == .added else { return }
-            onAdded()
-        }
     }
 
     private var reassurance: some View {

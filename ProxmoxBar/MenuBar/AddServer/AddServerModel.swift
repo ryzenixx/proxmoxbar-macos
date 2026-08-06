@@ -18,6 +18,9 @@ final class AddServerModel {
     var secret = ""
 
     private(set) var phase: Phase = .editing
+    private(set) var version: ServerVersion?
+    private(set) var summary: ClusterState?
+    private(set) var addedName = ""
 
     @ObservationIgnored private let api: any ProxmoxAPI
     @ObservationIgnored private let store: ServerStore
@@ -60,8 +63,12 @@ final class AddServerModel {
             pinnedFingerprint: pendingFingerprint
         )
         do {
-            _ = try await api.version(of: server)
+            let version = try await api.version(of: server)
+            let summary = try? await api.clusterState(of: server)
             try save(credentials: credentials)
+            self.version = version
+            self.summary = summary
+            self.addedName = displayName(for: credentials)
             phase = .added
         } catch let error as ProxmoxError {
             handle(error)
