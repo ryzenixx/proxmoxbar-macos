@@ -35,8 +35,11 @@ final class ServerStore {
         persist()
     }
 
-    func update(_ configuration: ServerConfiguration) {
+    func update(_ configuration: ServerConfiguration, secret: String? = nil) throws {
         guard let index = servers.firstIndex(where: { $0.id == configuration.id }) else { return }
+        if let secret {
+            try secrets.store(secret, for: configuration.id)
+        }
         servers[index] = configuration
         persist()
     }

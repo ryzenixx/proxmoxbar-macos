@@ -29,9 +29,9 @@ private let certificate = ServerCertificate(
     expiry: nil
 )
 
-@Suite("Adding a server")
+@Suite("Server form")
 @MainActor
-struct AddServerModelTests {
+struct ServerFormModelTests {
     private func makeStore() throws -> ServerStore {
         let defaults = try #require(UserDefaults(suiteName: "AddServer.\(UUID().uuidString)"))
         return ServerStore(defaults: defaults, secrets: InMemorySecretStore())
@@ -40,8 +40,8 @@ struct AddServerModelTests {
     private func makeModel(
         store: ServerStore,
         onVersion: @escaping @Sendable (ProxmoxServer) async throws -> ServerVersion
-    ) -> AddServerModel {
-        let model = AddServerModel(api: StubAPI(onVersion: onVersion), store: store)
+    ) -> ServerFormModel {
+        let model = ServerFormModel(api: StubAPI(onVersion: onVersion), store: store)
         model.address = "https://192.168.1.1:8006"
         model.tokenIdentifier = "monitor@pve!bar"
         model.secret = "a-secret"
@@ -50,7 +50,7 @@ struct AddServerModelTests {
 
     @Test("An empty form cannot be submitted")
     func emptyFormIsNotSubmittable() throws {
-        let model = AddServerModel(
+        let model = ServerFormModel(
             api: StubAPI { _ in ServerVersion(version: "9", release: "9", repositoryID: "x") },
             store: try makeStore()
         )
@@ -75,7 +75,7 @@ struct AddServerModelTests {
         }
         await model.connect()
 
-        #expect(model.phase == .added)
+        #expect(model.phase == .saved)
         #expect(store.servers.count == 1)
         #expect(store.servers.first?.name == "192.168.1.1")
         let stored = try #require(store.servers.first)
@@ -120,7 +120,7 @@ struct AddServerModelTests {
     func acceptingPinsAndSaves() async throws {
         let store = try makeStore()
         let attempts = Attempts()
-        let model = AddServerModel(
+        let model = ServerFormModel(
             api: StubAPI { server in
                 if await attempts.next() == 1 {
                     throw ProxmoxError.untrustedCertificate(
@@ -140,7 +140,7 @@ struct AddServerModelTests {
         await model.connect()
         await model.trustPresentedCertificate()
 
-        #expect(model.phase == .added)
+        #expect(model.phase == .saved)
         #expect(store.servers.first?.pinnedFingerprint == "65:D3:EB")
     }
 
@@ -164,5 +164,110 @@ private actor Attempts {
     func next() -> Int {
         count += 1
         return count
+    }
+}
+
+@Suite("Editing a server")
+@MainActor
+struct EditServerFormTests {
+    private func makeStore() throws -> (ServerStore, ServerConfiguration) {
+        let defaults = try #require(UserDefaults(suiteName: "EditServer.\(UUID().uuidString)"))
+        let store = ServerStore(defaults: defaults, secrets: InMemorySecretStore())
+        let configuration = ServerConfiguration(
+            name: "Homelab",
+            address: "https://192.168.1.1:8006",
+            tokenIdentifier: "monitor@pve!bar",
+            pinnedFingerprint: "65:D3:EB"
+        )
+        try store.add(configuration, secret: "original-secret")
+        return (store, configuration)
+    }
+
+    private func makeModel(
+        store: ServerStore,
+        configuration: ServerConfiguration
+    ) -> ServerFormModel {
+        ServerFormModel(
+            mode: .editing(configuration),
+            api: StubAPI { _ in ServerVersion(version: "9", release: "9", repositoryID: "x") },
+            store: store
+        )
+    }
+
+    @Test("The form opens already filled with what was stored")
+    func fillsFromExistingServer() throws {
+        let (store, configuration) = try makeStore()
+        let model = makeModel(store: store, configuration: configuration)
+
+        #expect(model.name == "Homelab")
+        #expect(model.address == "https://192.168.1.1:8006")
+        #expect(model.tokenIdentifier == "monitor@pve!bar")
+        #expect(model.secret.isEmpty)
+        #expect(model.isEditing)
+    }
+
+    @Test("A blank secret keeps the one already in the keychain")
+    func blankSecretKeepsTheStoredOne() async throws {
+        let (store, configuration) = try makeStore()
+        let model = makeModel(store: store, configuration: configuration)
+        model.name = "Renamed"
+
+        #expect(model.keepsExistingSecret)
+        #expect(model.canSubmit)
+        await model.connect()
+
+        #expect(model.phase == .saved)
+        #expect(store.servers.count == 1)
+        #expect(store.servers.first?.name == "Renamed")
+        #expect(store.servers.first?.id == configuration.id)
+        #expect(try store.secret(for: configuration.id) == "original-secret")
+    }
+
+    @Test("A typed secret replaces the stored one")
+    func typedSecretReplacesTheStoredOne() async throws {
+        let (store, configuration) = try makeStore()
+        let model = makeModel(store: store, configuration: configuration)
+        model.secret = "rotated-secret"
+
+        await model.connect()
+
+        #expect(model.phase == .saved)
+        #expect(try store.secret(for: configuration.id) == "rotated-secret")
+    }
+
+    @Test("Moving a server to another address drops the certificate pinned to the old one")
+    func changingAddressDropsThePin() async throws {
+        let (store, configuration) = try makeStore()
+        let model = makeModel(store: store, configuration: configuration)
+        model.address = "https://192.168.1.2:8006"
+
+        await model.connect()
+
+        #expect(model.phase == .saved)
+        #expect(store.servers.first?.address == "https://192.168.1.2:8006")
+        #expect(store.servers.first?.pinnedFingerprint == nil)
+    }
+
+    @Test("Keeping the same address keeps the certificate that was already trusted")
+    func sameAddressKeepsThePin() async throws {
+        let (store, configuration) = try makeStore()
+        let model = makeModel(store: store, configuration: configuration)
+        model.name = "Still Homelab"
+
+        await model.connect()
+
+        #expect(store.servers.first?.pinnedFingerprint == "65:D3:EB")
+    }
+
+    @Test("Editing never creates a second server")
+    func editingDoesNotDuplicate() async throws {
+        let (store, configuration) = try makeStore()
+        let model = makeModel(store: store, configuration: configuration)
+        model.tokenIdentifier = "other@pve!token"
+
+        await model.connect()
+
+        #expect(store.servers.count == 1)
+        #expect(store.servers.first?.tokenIdentifier == "other@pve!token")
     }
 }
