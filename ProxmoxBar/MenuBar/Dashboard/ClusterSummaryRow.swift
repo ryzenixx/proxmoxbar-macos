@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ClusterSummaryRow: View {
     let state: ClusterState
-    let isStale: Bool
 
     var body: some View {
         VStack(spacing: 8) {
@@ -18,13 +17,12 @@ struct ClusterSummaryRow: View {
             Circle()
                 .fill(healthTint)
                 .frame(width: 6, height: 6)
-            Text(isStale ? "Not responding" : nodeSummary)
+            Text(nodeSummary)
             Spacer(minLength: 8)
             Text(guestSummary)
         }
         .font(.caption)
         .foregroundStyle(.secondary)
-        .help(isStale ? "Showing the last values received." : "")
         .accessibilityElement(children: .combine)
     }
 
@@ -60,7 +58,6 @@ struct ClusterSummaryRow: View {
     }
 
     private var healthTint: Color {
-        guard !isStale else { return .red }
         guard !state.nodes.isEmpty else { return .secondary }
         return state.onlineNodes == state.nodes.count ? .green : .orange
     }

@@ -23,7 +23,7 @@ final class DashboardModel {
     private(set) var selectedID: UUID?
     private(set) var phase: Phase = .idle
     private(set) var lastRefresh: Date?
-    private(set) var isStale = false
+    private(set) var refreshFailure: String?
     private(set) var runningActions: [String: GuestAction] = [:]
     private(set) var actionFailures: [String: String] = [:]
     private(set) var confirmedStatuses: [String: ConfirmedStatus] = [:]
@@ -107,7 +107,7 @@ final class DashboardModel {
     private func startOver(on identifier: UUID?) {
         selectedID = identifier
         phase = .idle
-        isStale = false
+        refreshFailure = nil
         lastRefresh = nil
         runningActions.removeAll()
         actionFailures.removeAll()
@@ -180,7 +180,7 @@ final class DashboardModel {
             reconcileConfirmedStatuses(against: state)
             phase = .loaded(state)
             lastRefresh = Date()
-            isStale = false
+            refreshFailure = nil
         } catch is CancellationError {
             return
         } catch {
@@ -188,7 +188,7 @@ final class DashboardModel {
             let message =
                 (error as? ProxmoxError)?.errorDescription ?? error.localizedDescription
             if case .loaded = phase {
-                isStale = true
+                refreshFailure = message
             } else {
                 phase = .failed(message)
             }

@@ -67,7 +67,7 @@ struct DashboardModelTests {
         #expect(model.selected == nil)
     }
 
-    @Test("A failing refresh keeps the last values and flags them as stale")
+    @Test("A failing refresh keeps the last values and records why it failed")
     func keepsLastValuesWhenRefreshFails() async throws {
         let api = StubProxmoxAPI()
         let model = DashboardModel(store: try makeStore(names: ["Alpha"]), api: api)
@@ -78,12 +78,12 @@ struct DashboardModelTests {
         api.returns(loaded)
         await model.refresh()
         #expect(model.phase == .loaded(loaded))
-        #expect(model.isStale == false)
+        #expect(model.refreshFailure == nil)
 
         api.fails(with: ProxmoxError.timedOut)
         await model.refresh()
         #expect(model.phase == .loaded(loaded))
-        #expect(model.isStale)
+        #expect(model.refreshFailure != nil)
     }
 
     @Test("A first refresh that fails has nothing to keep and reports the error")
@@ -97,7 +97,7 @@ struct DashboardModelTests {
             Issue.record("Expected a failed phase, got \(model.phase)")
             return
         }
-        #expect(model.isStale == false)
+        #expect(model.refreshFailure == nil)
     }
 
     private func resources(status: String) throws -> [ClusterResource] {
@@ -219,19 +219,19 @@ struct DashboardModelTests {
         #expect(api.callCount == polled)
     }
 
-    @Test("Recovering clears the stale flag and stamps the refresh")
-    func recoveryClearsStaleness() async throws {
+    @Test("Recovering clears the failure and stamps the refresh")
+    func recoveryClearsTheFailure() async throws {
         let api = StubProxmoxAPI()
         let model = DashboardModel(store: try makeStore(names: ["Alpha"]), api: api)
 
         await model.refresh()
         api.fails(with: ProxmoxError.timedOut)
         await model.refresh()
-        #expect(model.isStale)
+        #expect(model.refreshFailure != nil)
 
         api.returns(.empty)
         await model.refresh()
-        #expect(model.isStale == false)
+        #expect(model.refreshFailure == nil)
         #expect(model.lastRefresh != nil)
     }
 }
