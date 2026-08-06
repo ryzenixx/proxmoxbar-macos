@@ -9,8 +9,9 @@ struct ProxmoxBarApp: App {
             MenuBarPanel()
                 .environment(appDelegate.store)
                 .environment(appDelegate.dashboard)
+                .environment(appDelegate.menuBar)
         } label: {
-            MenuBarLabel()
+            MenuBarLabel(dashboard: appDelegate.dashboard, preference: appDelegate.menuBar)
         }
         .menuBarExtraStyle(.window)
     }

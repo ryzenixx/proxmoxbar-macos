@@ -16,6 +16,30 @@ struct BundleConfigurationTests {
         #expect(value as? Bool == true)
     }
 
+    @Test("The build number is a plain counter, never a version string")
+    func buildNumberIsACounter() throws {
+        let value = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")
+        let build = try #require(value as? String)
+        #expect(Int(build) != nil)
+    }
+
+    @Test("The build number outranks every build already installed from 2.x")
+    func buildNumberOutranksTheInstalledBase() throws {
+        let value = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion")
+        let build = try #require(value as? String)
+        let counter = try #require(Int(build))
+        #expect(counter > 2)
+    }
+
+    @Test("The public version is three numbers separated by dots")
+    func publicVersionIsSemantic() throws {
+        let value = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString")
+        let version = try #require(value as? String)
+        let parts = version.split(separator: ".")
+        #expect(parts.count == 3)
+        #expect(parts.allSatisfy { Int($0) != nil })
+    }
+
     @Test("The update feed still points at the published appcast")
     func updateFeedURL() throws {
         let expected = """

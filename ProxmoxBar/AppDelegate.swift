@@ -3,6 +3,7 @@ import AppKit
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let store = ServerStore()
+    let menuBar = MenuBarPreference()
     private(set) lazy var dashboard = DashboardModel(store: store)
 
     private let welcome = WelcomePresenter()

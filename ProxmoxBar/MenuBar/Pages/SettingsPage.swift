@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsPage: View {
     @Environment(PanelRouter.self) private var router
     @Environment(ServerStore.self) private var store
+    @Environment(MenuBarPreference.self) private var menuBar
 
     @State private var editor: ServerFormModel?
     @State private var removalError: String?
@@ -74,6 +75,8 @@ struct SettingsPage: View {
         VStack(alignment: .leading, spacing: 5) {
             SectionLabel("General")
             FieldGroup {
+                MenuBarContentRow(preference: menuBar)
+                Divider()
                 LaunchAtLoginRow(launch: launchAtLogin)
             }
         }
