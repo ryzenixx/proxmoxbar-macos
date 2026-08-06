@@ -21,8 +21,8 @@ struct DashboardPage: View {
                 Divider()
                 content
             }
-            .task(id: model.selectedID) {
-                await model.refresh()
+            .task {
+                model.startMonitoring()
             }
             .onChange(of: store.servers) { _, _ in
                 model.selectionDidChange()
@@ -35,7 +35,7 @@ struct DashboardPage: View {
         switch model.phase {
         case .loaded(let state):
             VStack(spacing: 0) {
-                ClusterSummaryRow(state: state)
+                ClusterSummaryRow(state: state, isStale: model.isStale)
                 Divider()
                 GuestList(guests: state.guests)
             }

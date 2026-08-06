@@ -7,6 +7,8 @@ struct ProxmoxBarApp: App {
     var body: some Scene {
         MenuBarExtra {
             MenuBarPanel()
+                .environment(appDelegate.store)
+                .environment(appDelegate.dashboard)
         } label: {
             MenuBarLabel()
         }

@@ -66,4 +66,72 @@ struct DashboardModelTests {
         model.selectionDidChange()
         #expect(model.selected == nil)
     }
+
+    @Test("A failing refresh keeps the last values and flags them as stale")
+    func keepsLastValuesWhenRefreshFails() async throws {
+        let api = StubProxmoxAPI()
+        let model = DashboardModel(store: try makeStore(names: ["Alpha"]), api: api)
+
+        let loaded = ClusterState(
+            nodes: [], guests: [], storages: [], discardedCount: 0
+        )
+        api.returns(loaded)
+        await model.refresh()
+        #expect(model.phase == .loaded(loaded))
+        #expect(model.isStale == false)
+
+        api.fails(with: ProxmoxError.timedOut)
+        await model.refresh()
+        #expect(model.phase == .loaded(loaded))
+        #expect(model.isStale)
+    }
+
+    @Test("A first refresh that fails has nothing to keep and reports the error")
+    func reportsFailureWithNothingLoaded() async throws {
+        let api = StubProxmoxAPI()
+        api.fails(with: ProxmoxError.unauthorized)
+        let model = DashboardModel(store: try makeStore(names: ["Alpha"]), api: api)
+
+        await model.refresh()
+        guard case .failed = model.phase else {
+            Issue.record("Expected a failed phase, got \(model.phase)")
+            return
+        }
+        #expect(model.isStale == false)
+    }
+
+    @Test("Monitoring keeps polling on its own until it is stopped")
+    func monitoringPollsRepeatedly() async throws {
+        let api = StubProxmoxAPI()
+        let model = DashboardModel(
+            store: try makeStore(names: ["Alpha"]),
+            api: api,
+            refreshInterval: .milliseconds(20)
+        )
+
+        model.startMonitoring()
+        try await Task.sleep(for: .milliseconds(300))
+        model.stopMonitoring()
+        let polled = api.callCount
+        #expect(polled >= 3)
+
+        try await Task.sleep(for: .milliseconds(150))
+        #expect(api.callCount == polled)
+    }
+
+    @Test("Recovering clears the stale flag and stamps the refresh")
+    func recoveryClearsStaleness() async throws {
+        let api = StubProxmoxAPI()
+        let model = DashboardModel(store: try makeStore(names: ["Alpha"]), api: api)
+
+        await model.refresh()
+        api.fails(with: ProxmoxError.timedOut)
+        await model.refresh()
+        #expect(model.isStale)
+
+        api.returns(.empty)
+        await model.refresh()
+        #expect(model.isStale == false)
+        #expect(model.lastRefresh != nil)
+    }
 }
