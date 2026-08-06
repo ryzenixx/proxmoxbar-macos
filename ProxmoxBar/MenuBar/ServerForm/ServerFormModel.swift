@@ -129,11 +129,6 @@ final class ServerFormModel {
         phase = .editing
     }
 
-    func resetError() {
-        guard case .failed = phase else { return }
-        phase = .editing
-    }
-
     private func handle(_ error: ProxmoxError) {
         if case .untrustedCertificate(let certificate, let problems) = error {
             phase = .awaitingTrust(certificate, problems)

@@ -22,7 +22,6 @@ final class DashboardModel {
 
     private(set) var selectedID: UUID?
     private(set) var phase: Phase = .idle
-    private(set) var lastRefresh: Date?
     private(set) var refreshFailure: String?
     private(set) var runningActions: [String: GuestAction] = [:]
     private(set) var actionFailures: [String: String] = [:]
@@ -108,7 +107,6 @@ final class DashboardModel {
         selectedID = identifier
         phase = .idle
         refreshFailure = nil
-        lastRefresh = nil
         runningActions.removeAll()
         actionFailures.removeAll()
         confirmedStatuses.removeAll()
@@ -179,7 +177,6 @@ final class DashboardModel {
             guard generation == refreshGeneration, target == selectedID else { return }
             reconcileConfirmedStatuses(against: state)
             phase = .loaded(state)
-            lastRefresh = Date()
             refreshFailure = nil
         } catch is CancellationError {
             return

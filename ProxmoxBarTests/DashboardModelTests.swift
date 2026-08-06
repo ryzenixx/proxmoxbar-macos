@@ -232,6 +232,5 @@ struct DashboardModelTests {
         api.returns(.empty)
         await model.refresh()
         #expect(model.refreshFailure == nil)
-        #expect(model.lastRefresh != nil)
     }
 }
