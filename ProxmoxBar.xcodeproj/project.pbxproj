@@ -6,6 +6,10 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F67C18883025DC3A00F46744 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = F67C18873025DC3A00F46744 /* Sparkle */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		F6600A4E30232DE0003199BC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -51,6 +55,7 @@
 		F6600A3D30232DDE003199BC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				F67C18883025DC3A00F46744 /* Sparkle in Frameworks */,
 			);
 		};
 		F6600A4A30232DE0003199BC /* Frameworks */ = {
@@ -66,6 +71,7 @@
 			children = (
 				F6600A4230232DDE003199BC /* ProxmoxBar */,
 				F6600A5030232DE0003199BC /* ProxmoxBarTests */,
+				F67C18863025DC3A00F46744 /* Frameworks */,
 				F6600A4130232DDE003199BC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -77,6 +83,13 @@
 				F6600A4D30232DE0003199BC /* ProxmoxBarTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F67C18863025DC3A00F46744 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -96,6 +109,9 @@
 				F6600A4230232DDE003199BC /* ProxmoxBar */,
 			);
 			name = ProxmoxBar;
+			packageProductDependencies = (
+				F67C18873025DC3A00F46744 /* Sparkle */,
+			);
 			productName = ProxmoxBar;
 			productReference = F6600A4030232DDE003199BC /* ProxmoxBar.app */;
 			productType = "com.apple.product-type.application";
@@ -149,6 +165,9 @@
 			);
 			mainGroup = F6600A3730232DDE003199BC;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F67C17C23025DB2300F46744 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F6600A4130232DDE003199BC /* Products */;
 			projectDirPath = "";
@@ -319,8 +338,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = ProxmoxBar/ProxmoxBar.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 3;
@@ -355,8 +375,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = ProxmoxBar/ProxmoxBar.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 3;
@@ -457,6 +478,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F67C17C23025DB2300F46744 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.9.5;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F67C18873025DC3A00F46744 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F67C17C23025DB2300F46744 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F6600A3830232DDE003199BC /* Project object */;
 	validationLevel = 1;

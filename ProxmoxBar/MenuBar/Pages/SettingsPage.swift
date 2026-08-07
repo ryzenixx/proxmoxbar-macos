@@ -4,6 +4,7 @@ struct SettingsPage: View {
     @Environment(PanelRouter.self) private var router
     @Environment(ServerStore.self) private var store
     @Environment(MenuBarPreference.self) private var menuBar
+    @Environment(AppUpdates.self) private var updates
 
     @State private var editor: ServerFormModel?
     @State private var removalError: String?
@@ -61,6 +62,7 @@ struct SettingsPage: View {
                 VStack(alignment: .leading, spacing: 18) {
                     serversSection
                     generalSection
+                    updatesSection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 4)
@@ -68,7 +70,10 @@ struct SettingsPage: View {
             }
             footer
         }
-        .task { launchAtLogin.refresh() }
+        .task {
+            launchAtLogin.refresh()
+            updates.refresh()
+        }
     }
 
     private var generalSection: some View {
@@ -78,6 +83,18 @@ struct SettingsPage: View {
                 MenuBarContentRow(preference: menuBar)
                 Divider()
                 LaunchAtLoginRow(launch: launchAtLogin)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var updatesSection: some View {
+        if updates.isSupported {
+            VStack(alignment: .leading, spacing: 5) {
+                SectionLabel("Updates")
+                FieldGroup {
+                    UpdatesRows(updates: updates)
+                }
             }
         }
     }

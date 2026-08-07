@@ -10,6 +10,7 @@ struct ProxmoxBarApp: App {
                 .environment(appDelegate.store)
                 .environment(appDelegate.dashboard)
                 .environment(appDelegate.menuBar)
+                .environment(appDelegate.updates)
         } label: {
             MenuBarLabel(dashboard: appDelegate.dashboard, preference: appDelegate.menuBar)
         }
