@@ -1,0 +1,15 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>ProxmoxBar</title>
+        <item>
+            <title>2.0.6</title>
+            <pubDate>Sun, 15 Mar 2026 00:33:52 +0000</pubDate>
+            <sparkle:version>2.0.6</sparkle:version>
+            <sparkle:shortVersionString>2.0.6</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://raw.githubusercontent.com/ryzenixx/proxmoxbar-macos/main/RELEASE_NOTES.md</sparkle:releaseNotesLink>
+            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v2.0.6/ProxmoxBar.dmg" length="1737479" type="application/octet-stream" sparkle:edSignature="ku2G1TN4hrp/Rg4ee/D0zw7Rq0r2p2BWvNZWawXpYRItHE4wHxgTDrux2W5kGgOwNA6qHaG7LioKLWyxAKtcAA=="/>
+        </item>
+    </channel>
+</rss>
