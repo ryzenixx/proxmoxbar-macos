@@ -74,3 +74,13 @@ struct AppInfoTests {
         #expect(AppLinks.tokenGuide != nil)
     }
 }
+
+@Suite("Local network access")
+struct LocalNetworkTests {
+    @Test("The app explains why it needs the local network, as macOS 15 requires")
+    func declaresLocalNetworkUsage() throws {
+        let value = Bundle.main.object(forInfoDictionaryKey: "NSLocalNetworkUsageDescription")
+        let reason = try #require(value as? String)
+        #expect(reason.isEmpty == false)
+    }
+}
