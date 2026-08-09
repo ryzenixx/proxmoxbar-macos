@@ -9,7 +9,7 @@ struct DashboardToolbar: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 12))
+                .font(.system(size: 13))
                 .foregroundStyle(.secondary)
             TextField("Search", text: $search)
                 .textFieldStyle(.plain)
@@ -19,7 +19,7 @@ struct DashboardToolbar: View {
                     search = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 12))
+                        .font(.system(size: 13))
                         .foregroundStyle(.tertiary)
                 }
                 .buttonStyle(.plain)
@@ -27,35 +27,38 @@ struct DashboardToolbar: View {
             }
             if showsSort {
                 Divider()
-                    .frame(height: 14)
+                    .frame(height: 16)
                 sortMenu
             }
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 7)
-        .background(.quaternary.opacity(0.35), in: .rect(cornerRadius: 8))
+        .padding(.horizontal, 12)
+        .padding(.vertical, 9)
+        .background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 9))
     }
 
     private var sortMenu: some View {
         Menu {
-            ForEach(GuestSort.allCases, id: \.self) { option in
-                Button {
-                    onSelectSort(option)
-                } label: {
-                    Label(
-                        option.rawValue,
-                        systemImage: option == sort ? "checkmark" : option.symbol
-                    )
+            Picker("Sort", selection: sortBinding) {
+                ForEach(GuestSort.allCases, id: \.self) { option in
+                    Label(option.rawValue, systemImage: option.symbol).tag(option)
                 }
             }
         } label: {
-            Image(systemName: "arrow.up.arrow.down")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(.secondary)
+            HStack(spacing: 4) {
+                Image(systemName: "arrow.up.arrow.down")
+                    .font(.system(size: 12, weight: .medium))
+                Text(sort.rawValue)
+                    .font(.caption.weight(.medium))
+            }
+            .foregroundStyle(.secondary)
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
-        .help("Sort")
+        .help("Sort order")
+    }
+
+    private var sortBinding: Binding<GuestSort> {
+        Binding(get: { sort }, set: { onSelectSort($0) })
     }
 }

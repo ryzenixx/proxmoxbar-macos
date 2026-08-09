@@ -105,7 +105,6 @@ struct DashboardPage: View {
         }
         .pickerStyle(.segmented)
         .labelsHidden()
-        .controlSize(.small)
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
     }
