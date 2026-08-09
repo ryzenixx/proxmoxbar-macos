@@ -1,15 +1,15 @@
 # Welcome to ProxmoxBar 3.0 
 
-Rebuilt from scratch, top to bottom, with support for macOS 27 Golden Gate.
+ProxmoxBar has been rebuilt from the ground up, with support for macOS 27 Golden Gate.
 
-First, an apology: you will have to add your server again. I rewrote everything, including the way ProxmoxBar stores what you configure. Keeping the old format would have meant keeping its quirks, so 3.0 starts clean. It costs you a minute. Your address, an API token, and you are back where you were.
+**You will need to add your server again.** The way ProxmoxBar stores your configuration was rewritten along with the rest of the app. Carrying the old format forward would have meant carrying its quirks, so 3.0 starts clean. Your address and an API token, and you are back where you were in under a minute. Sorry for the small detour.
 
-One thing before you go. ProxmoxBar 3.0 needs macOS 15 or later. If you are still on Sonoma, this update will not reach you and 2.0.6 keeps working.
+**Requires macOS 15 or later.** If you are still on Sonoma, this update will not reach you and 2.0.6 keeps working exactly as before.
 
-Everything you know is still here, only steadier. It is also honest about what it does not know. When the cluster goes quiet, it says so instead of leaving old numbers on screen.
+**A reading in the menu bar.** The icon can now show your running machine count or your cluster CPU, so you can check on things without opening anything. It is the one part of this release you have not seen before.
 
-The one thing you have never seen sits in the menu bar. The icon can show your running machine count or your cluster CPU, so you can read your cluster without opening anything.
+**Steadier, and honest about it.** Everything you relied on is still here. When the cluster goes quiet, ProxmoxBar now says so instead of leaving stale numbers on screen.
 
-The real point of this release is the foundation underneath. Notifications and widgets are being built on it right now. Neither was possible before.
+**Built for what comes next.** The real work in this release is the foundation underneath. Notifications and widgets are being built on it now. Neither was possible before.
 
-Enjoy, and tell me what breaks.
+Thank you for using ProxmoxBar, and please report anything that breaks.
