@@ -1,0 +1,73 @@
+name: 👀 Bug report
+description: Something in ProxmoxBar does not behave as it should
+title: "[Bug]: "
+labels:
+  - bug
+
+body:
+  - type: textarea
+    attributes:
+      label: Bug description
+      description: A clear and concise description of what the bug is.
+      placeholder: My Proxmox connection isn't working; I get an infinite loading screen when I try to connect.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Open the app
+        2. Add a server
+        3. See error...
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: The connection to my Proxmox server should work and there should be no infinite loading.
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Device
+      description: On which device did you encounter this bug?
+      placeholder: MacBook Pro M2
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: macOS version
+      description: The version shown in  > About This Mac.
+      placeholder: macOS 26
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: ProxmoxBar version
+      description: Which version are you using? (displayed at the bottom of Settings)
+      placeholder: "3.0.0"
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Proxmox VE version
+      description: Which version does your server run? (displayed under Datacenter, Summary)
+      placeholder: "9.2"
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Screenshots / Link to video
+      description: If applicable, add screenshots or a link to a video to help explain your problem.
+      placeholder: Click on the 📎 icon to import a photo/video
+    validations:
+      required: false

@@ -1,0 +1,39 @@
+name: ❓ Question / Support
+description: Ask a question or get help with ProxmoxBar
+title: "[Question]: "
+labels:
+  - question
+
+body:
+  - type: textarea
+    attributes:
+      label: Question
+      description: What would you like to know?
+      placeholder: How do I configure the API token for my Proxmox server?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Context
+      description: What are you trying to achieve? What have you tried so far?
+      placeholder: |
+        I created a user in Proxmox but I'm not sure which permissions are required for the token.
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: ProxmoxBar version
+      description: Which version are you using? (displayed at the bottom of Settings)
+      placeholder: "3.0.0"
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Screenshots
+      description: If helpful, add screenshots.
+      placeholder: Click on the 📎 icon to import a photo
+    validations:
+      required: false
