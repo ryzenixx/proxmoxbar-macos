@@ -3,12 +3,6 @@ import Testing
 
 @testable import ProxmoxBar
 
-@MainActor
-private final class RecordingNotifier: StatusChangeNotifier {
-    private(set) var posted: [StatusEvent] = []
-    func post(_ event: StatusEvent) { posted.append(event) }
-}
-
 @Suite("Dashboard selection")
 @MainActor
 struct DashboardModelTests {
@@ -240,40 +234,26 @@ struct DashboardModelTests {
         #expect(model.refreshFailure == nil)
     }
 
-    @Test("A status change seen on refresh fires a notification")
-    func notifiesOnStatusChange() async throws {
+    @Test("A user action is recorded so the watcher can stay quiet about it")
+    func recordsUserActionsForTheWatcher() async throws {
         let api = StubProxmoxAPI()
-        let notifier = RecordingNotifier()
-        let model = DashboardModel(
-            store: try makeStore(names: ["Alpha"]), api: api, notifier: notifier
-        )
-
-        api.returns(ClusterState(resources: try runningResources()))
-        await model.refresh()
-        #expect(notifier.posted.isEmpty)
-
-        api.returns(ClusterState(resources: try stoppedResources()))
-        await model.refresh()
-        #expect(notifier.posted.count == 1)
-        #expect(notifier.posted.first?.body.contains("stopped") == true)
-    }
-
-    @Test("A change the user just triggered is not announced back to them")
-    func doesNotNotifyForOwnActions() async throws {
-        let api = StubProxmoxAPI()
-        let notifier = RecordingNotifier()
-        let model = DashboardModel(
-            store: try makeStore(names: ["Alpha"]), api: api, notifier: notifier
-        )
+        let recorder = RecordingActionRecorder()
+        let store = try makeStore(names: ["Alpha"])
+        let model = DashboardModel(store: store, api: api, recorder: recorder)
         let guest = try runningGuest()
 
-        api.returns(ClusterState(resources: try runningResources()))
-        await model.refresh()
-
-        api.returns(ClusterState(resources: try stoppedResources()))
         await model.perform(.shutdown, on: guest)
 
-        #expect(notifier.posted.isEmpty)
+        let server = try #require(store.servers.first)
+        #expect(recorder.recorded.contains { $0 == (server.id, guest.id) })
+    }
+}
+
+@MainActor
+private final class RecordingActionRecorder: UserActionRecorder {
+    private(set) var recorded: [(UUID, String)] = []
+    func recordUserAction(server: UUID, guestID: String) {
+        recorded.append((server, guestID))
     }
 }
 

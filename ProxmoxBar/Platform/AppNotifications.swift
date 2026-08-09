@@ -4,7 +4,7 @@ import UserNotifications
 
 @MainActor
 @Observable
-final class AppNotifications: StatusChangeNotifier {
+final class AppNotifications: StatusChangeNotifier, NotificationSwitch {
     static let enabledKey = "ProxmoxBar.notifyOnStatusChange"
 
     private(set) var isEnabled: Bool
