@@ -42,6 +42,7 @@ jobs:
             -scheme ProxmoxBar \
             -destination 'platform=macOS' \
             -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
             build test
 
       - name: Upload test results

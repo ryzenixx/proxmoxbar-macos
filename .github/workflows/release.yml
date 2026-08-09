@@ -54,7 +54,7 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild -project "${APP_NAME}.xcodeproj" -scheme "$APP_NAME" \
-            -destination 'platform=macOS' build test
+            -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build test
 
   package:
     name: Sign, notarize and package
