@@ -11,8 +11,11 @@ Native macOS menu bar app for monitoring and controlling Proxmox VE.
 
 - Several servers, switched from the panel
 - Nodes online, aggregated CPU, memory and storage at a glance
-- Every VM and container with its live status, refreshed every five seconds
+- Every VM and container with its live status, refreshed every five seconds, searchable and sortable
+- A storage tab beside the machines, with per-datastore usage
 - Start, shutdown, reboot, stop and resume, with the real task followed to completion
+- Notifications when a machine or a node changes state, across every server
+- Desktop and Notification Center widgets for any server, small or medium
 - Menu bar title showing the icon alone, running machines, or cluster CPU
 - Signed and notarized updates delivered by Sparkle
 
