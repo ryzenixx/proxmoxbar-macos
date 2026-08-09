@@ -60,6 +60,7 @@ struct KeychainSecretStore: SecretStore {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: identifier.uuidString,
+            kSecUseDataProtectionKeychain as String: true,
         ]
     }
 }
