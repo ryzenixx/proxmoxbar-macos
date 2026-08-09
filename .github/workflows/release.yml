@@ -48,7 +48,7 @@ jobs:
           }
 
       - name: Check formatting
-        run: xcrun swift-format lint --strict --recursive ProxmoxBar ProxmoxBarTests
+        run: xcrun swift-format lint --strict --recursive ProxmoxBar ProxmoxBarWidget ProxmoxBarTests
 
       - name: Build and test
         run: |
@@ -131,11 +131,13 @@ jobs:
           set -euo pipefail
           app="${RUNNER_TEMP}/export/${APP_NAME}.app"
           codesign --verify --deep --strict "$app"
+          appex=$(find "$app/Contents/PlugIns" -type d -name "*.appex" 2>/dev/null | head -n1)
+          [ -n "$appex" ] || { echo "::error::widget extension missing from the bundle"; exit 1; }
           while IFS= read -r part; do
             team=$(codesign -dv "$part" 2>&1 | sed -n 's/^TeamIdentifier=//p')
             [ "$team" = "$TEAM_ID" ] || { echo "::error::$part signed by ${team:-nothing}"; exit 1; }
-          done < <(find "$app/Contents/Frameworks" -type d \
-            \( -name "*.framework" -o -name "*.xpc" -o -name "*.app" \) 2>/dev/null)
+          done < <(find "$app/Contents/Frameworks" "$app/Contents/PlugIns" -type d \
+            \( -name "*.framework" -o -name "*.xpc" -o -name "*.app" -o -name "*.appex" \) 2>/dev/null)
           echo "every embedded component is signed by $TEAM_ID"
 
       - name: Notarize and staple the app

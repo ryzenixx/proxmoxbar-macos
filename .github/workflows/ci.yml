@@ -32,7 +32,7 @@ jobs:
 
       - name: Check formatting
         run: |
-          xcrun swift-format lint --strict --recursive ProxmoxBar ProxmoxBarTests
+          xcrun swift-format lint --strict --recursive ProxmoxBar ProxmoxBarWidget ProxmoxBarTests
 
       - name: Build and test
         run: |

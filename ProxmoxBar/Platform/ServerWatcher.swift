@@ -1,6 +1,7 @@
 import AppKit
 import Foundation
 import Observation
+import WidgetKit
 
 @MainActor
 protocol UserActionRecorder {
@@ -32,6 +33,7 @@ final class ServerWatcher: UserActionRecorder {
     private var previousGuests: [UUID: [String: GuestStatus]] = [:]
     private var previousNodes: [UUID: [String: Bool]] = [:]
     private var recentActions: [String: Date] = [:]
+    private var lastWidgetSignature: String?
 
     init(
         store: ServerStore,
@@ -83,12 +85,6 @@ final class ServerWatcher: UserActionRecorder {
     }
 
     func pollOnce() async {
-        guard gate?.isEnabled ?? true else {
-            previousGuests.removeAll()
-            previousNodes.removeAll()
-            return
-        }
-
         pruneRecentActions()
 
         let servers = store.servers
@@ -101,6 +97,7 @@ final class ServerWatcher: UserActionRecorder {
         }
 
         let api = self.api
+        var states: [UUID: ClusterState] = [:]
         await withTaskGroup(of: (UUID, ClusterState?).self) { group in
             for (id, server) in targets {
                 group.addTask {
@@ -108,9 +105,55 @@ final class ServerWatcher: UserActionRecorder {
                 }
             }
             for await (id, state) in group {
-                if let state { handle(server: id, state: state) }
+                if let state { states[id] = state }
             }
         }
+
+        publishWidgets(servers: servers, states: states)
+
+        let shouldNotify = gate?.isEnabled ?? true
+        for (id, state) in states {
+            handle(server: id, state: state, notify: shouldNotify)
+        }
+    }
+
+    private func publishWidgets(servers: [ServerConfiguration], states: [UUID: ClusterState]) {
+        let snapshots = servers.map { snapshot(for: $0, state: states[$0.id]) }
+        WidgetSharedStore.write(snapshots)
+        let signature = snapshots.map(\.signature).joined(separator: "|")
+        if signature != lastWidgetSignature {
+            lastWidgetSignature = signature
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    private func snapshot(for config: ServerConfiguration, state: ClusterState?) -> WidgetSnapshot {
+        guard let state else {
+            return WidgetSnapshot(
+                id: config.id.uuidString,
+                name: config.name,
+                reachable: false,
+                nodesOnline: 0,
+                nodesTotal: 0,
+                running: 0,
+                guestsTotal: 0,
+                cpu: nil,
+                memory: nil,
+                storage: nil
+            )
+        }
+        return WidgetSnapshot(
+            id: config.id.uuidString,
+            name: config.name,
+            reachable: true,
+            nodesOnline: state.onlineNodes,
+            nodesTotal: state.nodes.count,
+            running: state.runningGuests,
+            guestsTotal: state.guests.count,
+            cpu: state.cpuUsage,
+            memory: state.memory?.ratio,
+            storage: state.storage?.ratio
+        )
     }
 
     private func pruneRecentActions() {
@@ -120,20 +163,22 @@ final class ServerWatcher: UserActionRecorder {
         }
     }
 
-    private func handle(server id: UUID, state: ClusterState) {
-        let skip = Set(state.guests.map(\.id).filter { recentlyActed(id, $0) })
-        for change in GuestStatusChange.detect(
-            previous: previousGuests[id] ?? [:],
-            current: state.guests,
-            skipping: skip
-        ) {
-            notifier.post(change.event)
-        }
-        for change in NodeStatusChange.detect(
-            previous: previousNodes[id] ?? [:],
-            current: state.nodes
-        ) {
-            notifier.post(change.event)
+    private func handle(server id: UUID, state: ClusterState, notify: Bool) {
+        if notify {
+            let skip = Set(state.guests.map(\.id).filter { recentlyActed(id, $0) })
+            for change in GuestStatusChange.detect(
+                previous: previousGuests[id] ?? [:],
+                current: state.guests,
+                skipping: skip
+            ) {
+                notifier.post(change.event)
+            }
+            for change in NodeStatusChange.detect(
+                previous: previousNodes[id] ?? [:],
+                current: state.nodes
+            ) {
+                notifier.post(change.event)
+            }
         }
         previousGuests[id] = Dictionary(
             uniqueKeysWithValues: state.guests.map { ($0.id, $0.status) }

@@ -7,10 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F63436E730291684008D367B /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F63436E630291684008D367B /* WidgetKit.framework */; };
+		F63436E930291684008D367B /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F63436E830291684008D367B /* SwiftUI.framework */; };
+		F63436F630291685008D367B /* ProxmoxBarWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F63436E530291684008D367B /* ProxmoxBarWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F67C18883025DC3A00F46744 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = F67C18873025DC3A00F46744 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		F63436F430291685008D367B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F6600A3830232DDE003199BC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F63436E430291684008D367B;
+			remoteInfo = ProxmoxBarWidgetExtension;
+		};
 		F6600A4E30232DE0003199BC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F6600A3830232DDE003199BC /* Project object */;
@@ -20,12 +30,41 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		F63436FB30291685008D367B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				F63436F630291685008D367B /* ProxmoxBarWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		F63436E530291684008D367B /* ProxmoxBarWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ProxmoxBarWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F63436E630291684008D367B /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		F63436E830291684008D367B /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		F6600A4030232DDE003199BC /* ProxmoxBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProxmoxBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F6600A4D30232DE0003199BC /* ProxmoxBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProxmoxBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F63436FA30291685008D367B /* Exceptions for "ProxmoxBarWidget" folder in "ProxmoxBarWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F63436E430291684008D367B /* ProxmoxBarWidgetExtension */;
+		};
+		F63437E330291A50008D367B /* Exceptions for "ProxmoxBar" folder in "ProxmoxBarWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Widgets/WidgetSnapshot.swift,
+			);
+			target = F63436E430291684008D367B /* ProxmoxBarWidgetExtension */;
+		};
 		F6600AA030232DDE003199BC /* Exceptions for "ProxmoxBar" folder in "ProxmoxBar" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -36,10 +75,19 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		F63436EA30291684008D367B /* ProxmoxBarWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F63436FA30291685008D367B /* Exceptions for "ProxmoxBarWidget" folder in "ProxmoxBarWidgetExtension" target */,
+			);
+			path = ProxmoxBarWidget;
+			sourceTree = "<group>";
+		};
 		F6600A4230232DDE003199BC /* ProxmoxBar */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				F6600AA030232DDE003199BC /* Exceptions for "ProxmoxBar" folder in "ProxmoxBar" target */,
+				F63437E330291A50008D367B /* Exceptions for "ProxmoxBar" folder in "ProxmoxBarWidgetExtension" target */,
 			);
 			path = ProxmoxBar;
 			sourceTree = "<group>";
@@ -52,6 +100,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		F63436E230291684008D367B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				F63436E930291684008D367B /* SwiftUI.framework in Frameworks */,
+				F63436E730291684008D367B /* WidgetKit.framework in Frameworks */,
+			);
+		};
 		F6600A3D30232DDE003199BC /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -71,6 +126,7 @@
 			children = (
 				F6600A4230232DDE003199BC /* ProxmoxBar */,
 				F6600A5030232DE0003199BC /* ProxmoxBarTests */,
+				F63436EA30291684008D367B /* ProxmoxBarWidget */,
 				F67C18863025DC3A00F46744 /* Frameworks */,
 				F6600A4130232DDE003199BC /* Products */,
 			);
@@ -81,6 +137,7 @@
 			children = (
 				F6600A4030232DDE003199BC /* ProxmoxBar.app */,
 				F6600A4D30232DE0003199BC /* ProxmoxBarTests.xctest */,
+				F63436E530291684008D367B /* ProxmoxBarWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -88,6 +145,8 @@
 		F67C18863025DC3A00F46744 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F63436E630291684008D367B /* WidgetKit.framework */,
+				F63436E830291684008D367B /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -95,6 +154,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		F63436E430291684008D367B /* ProxmoxBarWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F63436F730291685008D367B /* Build configuration list for PBXNativeTarget "ProxmoxBarWidgetExtension" */;
+			buildPhases = (
+				F63436E130291684008D367B /* Sources */,
+				F63436E230291684008D367B /* Frameworks */,
+				F63436E330291684008D367B /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				F63436EA30291684008D367B /* ProxmoxBarWidget */,
+			);
+			name = ProxmoxBarWidgetExtension;
+			productName = ProxmoxBarWidgetExtension;
+			productReference = F63436E530291684008D367B /* ProxmoxBarWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		F6600A3F30232DDE003199BC /* ProxmoxBar */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F6600A5F30232DE0003199BC /* Build configuration list for PBXNativeTarget "ProxmoxBar" */;
@@ -102,8 +179,12 @@
 				F6600A3C30232DDE003199BC /* Sources */,
 				F6600A3D30232DDE003199BC /* Frameworks */,
 				F6600A3E30232DDE003199BC /* Resources */,
+				F63436FB30291685008D367B /* Embed Foundation Extensions */,
 			);
 			buildRules = (
+			);
+			dependencies = (
+				F63436F530291685008D367B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				F6600A4230232DDE003199BC /* ProxmoxBar */,
@@ -147,6 +228,9 @@
 				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
+					F63436E430291684008D367B = {
+						CreatedOnToolsVersion = 27.0;
+					};
 					F6600A3F30232DDE003199BC = {
 						CreatedOnToolsVersion = 27.0;
 					};
@@ -175,11 +259,17 @@
 			targets = (
 				F6600A3F30232DDE003199BC /* ProxmoxBar */,
 				F6600A4C30232DE0003199BC /* ProxmoxBarTests */,
+				F63436E430291684008D367B /* ProxmoxBarWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		F63436E330291684008D367B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 		F6600A3E30232DDE003199BC /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
@@ -193,6 +283,11 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		F63436E130291684008D367B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		F6600A3C30232DDE003199BC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -206,6 +301,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		F63436F530291685008D367B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F63436E430291684008D367B /* ProxmoxBarWidgetExtension */;
+			targetProxy = F63436F430291685008D367B /* PBXContainerItemProxy */;
+		};
 		F6600A4F30232DE0003199BC /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F6600A3F30232DDE003199BC /* ProxmoxBar */;
@@ -214,6 +314,74 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		F63436F830291685008D367B /* Debug configuration for PBXNativeTarget "ProxmoxBarWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = ProxmoxBarWidget/ProxmoxBarWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DL58RM98AN;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ProxmoxBarWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ProxmoxBarWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.proxmoxbar.app.ProxmoxBarWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		F63436F930291685008D367B /* Release configuration for PBXNativeTarget "ProxmoxBarWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = ProxmoxBarWidget/ProxmoxBarWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DL58RM98AN;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ProxmoxBarWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ProxmoxBarWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.proxmoxbar.app.ProxmoxBarWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
 		F6600A5D30232DE0003199BC /* Debug configuration for PBXProject "ProxmoxBar" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -457,6 +625,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F63436F730291685008D367B /* Build configuration list for PBXNativeTarget "ProxmoxBarWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F63436F830291685008D367B /* Debug configuration for PBXNativeTarget "ProxmoxBarWidgetExtension" */,
+				F63436F930291685008D367B /* Release configuration for PBXNativeTarget "ProxmoxBarWidgetExtension" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		F6600A3B30232DDE003199BC /* Build configuration list for PBXProject "ProxmoxBar" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
