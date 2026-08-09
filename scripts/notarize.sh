@@ -19,10 +19,13 @@ case "$target" in
 esac
 
 echo "submitting $(basename "$payload") to the notary service"
-if ! xcrun notarytool submit "$payload" "${creds[@]}" --wait --timeout "$timeout"; then
-  echo "notarization failed, fetching the log"
-  id=$(xcrun notarytool history "${creds[@]}" --output-format json \
-    | python3 -c 'import json,sys; print(json.load(sys.stdin)["history"][0]["id"])')
+result=$(xcrun notarytool submit "$payload" "${creds[@]}" --wait --timeout "$timeout" \
+  --output-format json)
+echo "$result"
+id=$(printf '%s' "$result" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')
+status=$(printf '%s' "$result" | python3 -c 'import json,sys; print(json.load(sys.stdin)["status"])')
+if [ "$status" != "Accepted" ]; then
+  echo "notarization returned $status, fetching the log for $id"
   xcrun notarytool log "$id" "${creds[@]}" || true
   exit 1
 fi

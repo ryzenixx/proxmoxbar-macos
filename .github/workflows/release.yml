@@ -130,6 +130,18 @@ jobs:
             -exportOptionsPlist "$plist" \
             -exportPath "${RUNNER_TEMP}/export"
 
+      - name: Enable the hardened runtime
+        run: |
+          set -euo pipefail
+          app="${RUNNER_TEMP}/export/${APP_NAME}.app"
+          appex=$(find "$app/Contents/PlugIns" -name "*.appex" | head -n1)
+          for part in "$appex" "$app"; do
+            codesign --force --options runtime --timestamp \
+              --preserve-metadata=entitlements \
+              --sign "Developer ID Application" "$part"
+          done
+          codesign --verify --deep --strict "$app"
+
       - name: Verify the whole bundle is signed by our team
         env:
           TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
