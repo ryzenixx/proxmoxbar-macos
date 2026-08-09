@@ -74,55 +74,61 @@ jobs:
           p12-file-base64: ${{ secrets.MACOS_CERTIFICATE }}
           p12-password: ${{ secrets.MACOS_CERTIFICATE_PWD }}
 
-      - name: Restore the App Store Connect key
+      - name: Install provisioning profiles
         env:
-          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          PP_APP: ${{ secrets.MACOS_PROVISION_APP }}
+          PP_WIDGET: ${{ secrets.MACOS_PROVISION_WIDGET }}
         run: |
           set -euo pipefail
-          umask 077
-          printf '%s' "$ASC_KEY_P8" | base64 --decode > "${RUNNER_TEMP}/asc.p8"
-          test -s "${RUNNER_TEMP}/asc.p8"
+          dir="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$dir"
+          install_profile() {
+            local tmp uuid name
+            tmp="$(mktemp)"
+            printf '%s' "$1" | base64 --decode > "$tmp"
+            uuid=$(security cms -D -i "$tmp" | plutil -extract UUID raw -)
+            name=$(security cms -D -i "$tmp" | plutil -extract Name raw -)
+            cp "$tmp" "$dir/$uuid.provisionprofile"
+            echo "$2=$name" >> "$GITHUB_ENV"
+            echo "installed '$name' ($uuid)"
+          }
+          install_profile "$PP_APP" APP_PROFILE
+          install_profile "$PP_WIDGET" WIDGET_PROFILE
 
       - name: Archive
         env:
-          TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
           SPARKLE_PUBLIC_KEY: ${{ secrets.MACOS_SPARKLE_PUBLIC_KEY }}
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           set -euo pipefail
           xcodebuild -project "${APP_NAME}.xcodeproj" -scheme "$APP_NAME" \
             -configuration Release -destination 'generic/platform=macOS' \
             -archivePath "${RUNNER_TEMP}/${APP_NAME}.xcarchive" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "${RUNNER_TEMP}/asc.p8" \
-            -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-            DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGNING_ALLOWED=NO \
             SPARKLE_PUBLIC_ED_KEY="$SPARKLE_PUBLIC_KEY" \
             archive
 
       - name: Export Developer ID build
         env:
           TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
-          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           set -euo pipefail
           plist="${RUNNER_TEMP}/ExportOptions.plist"
-          /usr/bin/plutil -create xml1 "$plist"
-          /usr/bin/plutil -insert method -string developer-id "$plist"
-          /usr/bin/plutil -insert signingStyle -string automatic "$plist"
-          /usr/bin/plutil -insert teamID -string "$TEAM_ID" "$plist"
+          printf '%s\n' \
+            '<?xml version="1.0" encoding="UTF-8"?>' \
+            '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' \
+            '<plist version="1.0"><dict/></plist>' > "$plist"
+          pb() { /usr/libexec/PlistBuddy -c "$1" "$plist"; }
+          pb "Add :method string developer-id"
+          pb "Add :signingStyle string manual"
+          pb "Add :teamID string ${TEAM_ID}"
+          pb "Add :signingCertificate string Developer ID Application"
+          pb "Add :provisioningProfiles dict"
+          pb "Add :provisioningProfiles:com.proxmoxbar.app string ${APP_PROFILE}"
+          pb "Add :provisioningProfiles:com.proxmoxbar.app.ProxmoxBarWidget string ${WIDGET_PROFILE}"
           xcodebuild -exportArchive \
             -archivePath "${RUNNER_TEMP}/${APP_NAME}.xcarchive" \
             -exportOptionsPlist "$plist" \
-            -exportPath "${RUNNER_TEMP}/export" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "${RUNNER_TEMP}/asc.p8" \
-            -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+            -exportPath "${RUNNER_TEMP}/export"
 
       - name: Verify the whole bundle is signed by our team
         env:
