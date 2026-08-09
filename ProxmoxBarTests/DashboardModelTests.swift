@@ -5,8 +5,8 @@ import Testing
 
 @MainActor
 private final class RecordingNotifier: StatusChangeNotifier {
-    private(set) var posted: [GuestStatusChange] = []
-    func post(_ change: GuestStatusChange) { posted.append(change) }
+    private(set) var posted: [StatusEvent] = []
+    func post(_ event: StatusEvent) { posted.append(event) }
 }
 
 @Suite("Dashboard selection")
@@ -254,7 +254,8 @@ struct DashboardModelTests {
 
         api.returns(ClusterState(resources: try stoppedResources()))
         await model.refresh()
-        #expect(notifier.posted.map(\.status) == [.stopped])
+        #expect(notifier.posted.count == 1)
+        #expect(notifier.posted.first?.body.contains("stopped") == true)
     }
 
     @Test("A change the user just triggered is not announced back to them")

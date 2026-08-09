@@ -67,11 +67,11 @@ final class AppNotifications: StatusChangeNotifier {
         setEnabled(false)
     }
 
-    func post(_ change: GuestStatusChange) {
+    func post(_ event: StatusEvent) {
         guard canPost else { return }
         let content = UNMutableNotificationContent()
-        content.title = change.title
-        content.body = change.body
+        content.title = event.title
+        content.body = event.body
         content.sound = .default
         let request = UNNotificationRequest(
             identifier: UUID().uuidString,

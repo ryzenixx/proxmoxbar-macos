@@ -47,6 +47,7 @@ final class DashboardModel {
     @ObservationIgnored private var wakeWatcher: Task<Void, Never>?
     @ObservationIgnored private var refreshGeneration = 0
     @ObservationIgnored private var previousStatuses: [String: GuestStatus] = [:]
+    @ObservationIgnored private var previousNodeStatuses: [String: Bool] = [:]
 
     init(
         store: ServerStore,
@@ -129,6 +130,7 @@ final class DashboardModel {
         actionFailures.removeAll()
         confirmedStatuses.removeAll()
         previousStatuses.removeAll()
+        previousNodeStatuses.removeAll()
         Task { await refresh() }
     }
 
@@ -168,10 +170,19 @@ final class DashboardModel {
             current: state.guests,
             skipping: selfInitiated
         ) {
-            notifier.post(change)
+            notifier.post(change.event)
+        }
+        for change in NodeStatusChange.detect(
+            previous: previousNodeStatuses,
+            current: state.nodes
+        ) {
+            notifier.post(change.event)
         }
         previousStatuses = Dictionary(
             uniqueKeysWithValues: state.guests.map { ($0.id, $0.status) }
+        )
+        previousNodeStatuses = Dictionary(
+            uniqueKeysWithValues: state.nodes.map { ($0.name, $0.isOnline) }
         )
     }
 
