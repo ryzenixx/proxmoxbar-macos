@@ -99,7 +99,7 @@ struct SettingsPage: View {
     }
 
     private var serversSection: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 4) {
                 SectionLabel("Servers")
                 Spacer(minLength: 8)
