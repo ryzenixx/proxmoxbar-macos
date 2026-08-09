@@ -152,13 +152,15 @@ jobs:
           CODESIGN_IDENTITY: ${{ secrets.MACOS_CODESIGN_IDENTITY }}
         run: |
           set -euo pipefail
+          python3 -m pip install --quiet dmgbuild \
+            || python3 -m pip install --quiet --break-system-packages dmgbuild
           dmg="${RUNNER_TEMP}/${APP_NAME}.dmg"
-          staging="${RUNNER_TEMP}/dmg-staging"
-          rm -rf "$staging"; mkdir -p "$staging"
-          cp -R "${RUNNER_TEMP}/export/${APP_NAME}.app" "$staging/"
-          ln -s /Applications "$staging/Applications"
-          hdiutil create -volname "$APP_NAME" -srcfolder "$staging" \
-            -ov -format UDZO "$dmg"
+          rm -f "$dmg"
+          python3 -m dmgbuild \
+            -s installer/dmg_settings.py \
+            -D app="${RUNNER_TEMP}/export/${APP_NAME}.app" \
+            "$APP_NAME" "$dmg"
+          test -f "$dmg"
           codesign --force --timestamp --sign "$CODESIGN_IDENTITY" "$dmg"
           codesign --verify --strict "$dmg"
 
