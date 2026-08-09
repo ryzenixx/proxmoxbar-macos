@@ -88,15 +88,13 @@ struct SettingsPage: View {
         }
     }
 
-    @ViewBuilder
     private var updatesSection: some View {
-        if updates.isSupported {
-            VStack(alignment: .leading, spacing: 5) {
-                SectionLabel("Updates")
-                FieldGroup {
-                    UpdatesRows(updates: updates)
-                }
+        VStack(alignment: .leading, spacing: 5) {
+            SectionLabel("Updates")
+            FieldGroup {
+                UpdatesRows(updates: updates)
             }
+            .disabled(!updates.isSupported)
         }
     }
 

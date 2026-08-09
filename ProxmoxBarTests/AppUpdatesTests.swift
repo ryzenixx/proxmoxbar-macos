@@ -22,12 +22,12 @@ private final class StubUpdater: SoftwareUpdater {
 @Suite("App updates")
 @MainActor
 struct AppUpdatesTests {
-    @Test("Without an updater the section has nothing to offer")
+    @Test("Without an updater the section is shown but cannot act")
     func unsupportedWithoutUpdater() {
         let updates = AppUpdates(updater: nil)
         #expect(updates.isSupported == false)
         #expect(updates.canCheck == false)
-        #expect(updates.checksAutomatically == false)
+        #expect(updates.checksAutomatically)
     }
 
     @Test("Asking for a check reaches the updater")
