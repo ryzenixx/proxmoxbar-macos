@@ -22,6 +22,7 @@ struct GuestList: View {
                 }
                 .padding(.vertical, 4)
             }
+            .scrollIndicators(.never)
             .animation(.snappy(duration: 0.18), value: expandedID)
             .onChange(of: model.actionFailures) { previous, current in
                 guard let appeared = current.keys.first(where: { previous[$0] == nil }) else {

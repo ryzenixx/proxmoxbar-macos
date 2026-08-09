@@ -68,6 +68,7 @@ struct SettingsPage: View {
                 .padding(.top, 4)
                 .padding(.bottom, 16)
             }
+            .scrollIndicators(.never)
             footer
         }
         .task {
