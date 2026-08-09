@@ -9,6 +9,6 @@ enum AppLinks {
     )
     static let support = URL(string: "https://ko-fi.com/ryzenixx")
     static let tokenGuide = URL(
-        string: "https://pve.proxmox.com/wiki/User_Management#pveum_tokens"
+        string: "https://github.com/ryzenixx/proxmoxbar-macos#create-a-restricted-api-token"
     )
 }
