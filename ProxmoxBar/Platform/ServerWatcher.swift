@@ -89,17 +89,22 @@ final class ServerWatcher: UserActionRecorder {
             return
         }
 
+        pruneRecentActions()
+
         let servers = store.servers
         let living = Set(servers.map(\.id))
         previousGuests = previousGuests.filter { living.contains($0.key) }
         previousNodes = previousNodes.filter { living.contains($0.key) }
 
+        let targets = servers.compactMap { config in
+            (try? store.server(for: config.id)).map { (config.id, $0) }
+        }
+
+        let api = self.api
         await withTaskGroup(of: (UUID, ClusterState?).self) { group in
-            for server in servers {
-                let id = server.id
-                group.addTask { [weak self] in
-                    guard let self else { return (id, nil) }
-                    return (id, await self.fetch(id))
+            for (id, server) in targets {
+                group.addTask {
+                    (id, try? await api.clusterState(of: server))
                 }
             }
             for await (id, state) in group {
@@ -108,9 +113,11 @@ final class ServerWatcher: UserActionRecorder {
         }
     }
 
-    private func fetch(_ id: UUID) async -> ClusterState? {
-        guard let server = try? store.server(for: id) else { return nil }
-        return try? await api.clusterState(of: server)
+    private func pruneRecentActions() {
+        let now = Date()
+        recentActions = recentActions.filter {
+            now.timeIntervalSince($0.value) <= Self.actionWindow
+        }
     }
 
     private func handle(server id: UUID, state: ClusterState) {
