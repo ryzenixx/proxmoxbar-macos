@@ -4,6 +4,7 @@ struct SettingsPage: View {
     @Environment(PanelRouter.self) private var router
     @Environment(ServerStore.self) private var store
     @Environment(MenuBarPreference.self) private var menuBar
+    @Environment(AppNotifications.self) private var notifications
     @Environment(AppUpdates.self) private var updates
 
     @State private var editor: ServerFormModel?
@@ -74,6 +75,7 @@ struct SettingsPage: View {
         .task {
             launchAtLogin.refresh()
             updates.refresh()
+            await notifications.refreshAuthorization()
         }
     }
 
@@ -82,6 +84,8 @@ struct SettingsPage: View {
             SectionLabel("General")
             FieldGroup {
                 MenuBarContentRow(preference: menuBar)
+                Divider()
+                NotificationsRow(notifications: notifications)
                 Divider()
                 LaunchAtLoginRow(launch: launchAtLogin)
             }

@@ -3,6 +3,12 @@ import Testing
 
 @testable import ProxmoxBar
 
+@MainActor
+private final class RecordingNotifier: StatusChangeNotifier {
+    private(set) var posted: [GuestStatusChange] = []
+    func post(_ change: GuestStatusChange) { posted.append(change) }
+}
+
 @Suite("Dashboard selection")
 @MainActor
 struct DashboardModelTests {
@@ -232,6 +238,41 @@ struct DashboardModelTests {
         api.returns(.empty)
         await model.refresh()
         #expect(model.refreshFailure == nil)
+    }
+
+    @Test("A status change seen on refresh fires a notification")
+    func notifiesOnStatusChange() async throws {
+        let api = StubProxmoxAPI()
+        let notifier = RecordingNotifier()
+        let model = DashboardModel(
+            store: try makeStore(names: ["Alpha"]), api: api, notifier: notifier
+        )
+
+        api.returns(ClusterState(resources: try runningResources()))
+        await model.refresh()
+        #expect(notifier.posted.isEmpty)
+
+        api.returns(ClusterState(resources: try stoppedResources()))
+        await model.refresh()
+        #expect(notifier.posted.map(\.status) == [.stopped])
+    }
+
+    @Test("A change the user just triggered is not announced back to them")
+    func doesNotNotifyForOwnActions() async throws {
+        let api = StubProxmoxAPI()
+        let notifier = RecordingNotifier()
+        let model = DashboardModel(
+            store: try makeStore(names: ["Alpha"]), api: api, notifier: notifier
+        )
+        let guest = try runningGuest()
+
+        api.returns(ClusterState(resources: try runningResources()))
+        await model.refresh()
+
+        api.returns(ClusterState(resources: try stoppedResources()))
+        await model.perform(.shutdown, on: guest)
+
+        #expect(notifier.posted.isEmpty)
     }
 }
 
