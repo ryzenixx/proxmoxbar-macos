@@ -9,8 +9,10 @@ struct DashboardPage: View {
     @Environment(PanelRouter.self) private var router
     @Environment(ServerStore.self) private var store
     @Environment(DashboardModel.self) private var model
+    @Environment(GuestListPreferences.self) private var preferences
 
     @State private var section: DashboardSection = .machines
+    @State private var search = ""
 
     var body: some View {
         if store.servers.isEmpty {
@@ -50,17 +52,48 @@ struct DashboardPage: View {
                 ClusterSummaryRow(state: state)
                 Divider()
                 sectionPicker
-                switch section {
-                case .machines:
-                    GuestList(guests: state.guests)
-                case .storage:
-                    StorageList(storages: state.distinctStorages)
-                }
+                DashboardToolbar(
+                    search: $search,
+                    showsSort: section == .machines,
+                    sort: preferences.sort,
+                    onSelectSort: { preferences.sort = $0 }
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+                list(for: state)
             }
         } else {
             ProgressView()
                 .controlSize(.small)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    @ViewBuilder
+    private func list(for state: ClusterState) -> some View {
+        switch section {
+        case .machines:
+            let guests = preferences.sort.arrange(state.guests, matching: search)
+            if guests.isEmpty, !search.isEmpty {
+                PagePlaceholder(symbol: "magnifyingglass", message: "No matches")
+            } else {
+                GuestList(guests: guests)
+            }
+        case .storage:
+            let storages = filteredStorages(of: state)
+            if storages.isEmpty, !search.isEmpty {
+                PagePlaceholder(symbol: "magnifyingglass", message: "No matches")
+            } else {
+                StorageList(storages: storages)
+            }
+        }
+    }
+
+    private func filteredStorages(of state: ClusterState) -> [ProxmoxStorage] {
+        let query = search.trimmingCharacters(in: .whitespaces)
+        guard !query.isEmpty else { return state.distinctStorages }
+        return state.distinctStorages.filter {
+            $0.name.localizedCaseInsensitiveContains(query)
         }
     }
 

@@ -4,6 +4,7 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let store = ServerStore()
     let menuBar = MenuBarPreference()
+    let guestList = GuestListPreferences()
     let updates = AppUpdates()
     private(set) lazy var dashboard = DashboardModel(store: store)
 
