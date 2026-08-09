@@ -27,7 +27,7 @@ struct AppUpdatesTests {
         let updates = AppUpdates(updater: nil)
         #expect(updates.isSupported == false)
         #expect(updates.canCheck == false)
-        #expect(updates.checksAutomatically)
+        #expect(updates.checksAutomatically == false)
     }
 
     @Test("Asking for a check reaches the updater")

@@ -18,7 +18,7 @@ final class AppUpdates {
     init(updater: (any SoftwareUpdater)? = AppUpdates.bundledUpdater()) {
         self.updater = updater
         canCheck = updater?.canCheckForUpdates ?? false
-        checksAutomatically = updater?.checksAutomatically ?? true
+        checksAutomatically = updater?.checksAutomatically ?? false
     }
 
     var isSupported: Bool {
