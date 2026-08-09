@@ -43,4 +43,19 @@ extension ClusterState {
         guard total > 0 else { return nil }
         return ClusterCapacity(used: used, total: total)
     }
+
+    var distinctStorages: [ProxmoxStorage] {
+        var seenShared: Set<String> = []
+        var result: [ProxmoxStorage] = []
+
+        for storage in storages {
+            if storage.isShared, !seenShared.insert(storage.name).inserted { continue }
+            result.append(storage)
+        }
+
+        return result.sorted { lhs, rhs in
+            if lhs.isUnavailable != rhs.isUnavailable { return rhs.isUnavailable }
+            return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+        }
+    }
 }

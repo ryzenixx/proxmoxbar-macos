@@ -151,6 +151,52 @@ struct ClusterSummaryTests {
         #expect(result.storage == nil)
     }
 
+    @Test("The storage list shows a shared datastore once")
+    func distinctStoragesDeduplicatesShared() throws {
+        let result = try state(
+            """
+            [
+              {"id":"storage/a/ceph","type":"storage","storage":"ceph","node":"a",
+               "shared":1,"disk":100,"maxdisk":400,"status":"available"},
+              {"id":"storage/b/ceph","type":"storage","storage":"ceph","node":"b",
+               "shared":1,"disk":100,"maxdisk":400,"status":"available"}
+            ]
+            """
+        )
+        let names = result.distinctStorages.map(\.name)
+        #expect(names == ["ceph"])
+    }
+
+    @Test("The storage list keeps a local datastore from each node")
+    func distinctStoragesKeepsLocalPerNode() throws {
+        let result = try state(
+            """
+            [
+              {"id":"storage/a/local","type":"storage","storage":"local","node":"a",
+               "shared":0,"disk":50,"maxdisk":200,"status":"available"},
+              {"id":"storage/b/local","type":"storage","storage":"local","node":"b",
+               "shared":0,"disk":50,"maxdisk":200,"status":"available"}
+            ]
+            """
+        )
+        #expect(result.distinctStorages.count == 2)
+    }
+
+    @Test("The storage list sorts unavailable datastores last")
+    func distinctStoragesSortsUnavailableLast() throws {
+        let result = try state(
+            """
+            [
+              {"id":"storage/a/nfs","type":"storage","storage":"nfs","node":"a",
+               "disk":0,"maxdisk":900,"status":"unavailable"},
+              {"id":"storage/a/local","type":"storage","storage":"local","node":"a",
+               "disk":50,"maxdisk":200,"status":"available"}
+            ]
+            """
+        )
+        #expect(result.distinctStorages.map(\.name) == ["local", "nfs"])
+    }
+
     @Test("Usage never exceeds a full meter")
     func usageIsClamped() throws {
         let result = try state(
