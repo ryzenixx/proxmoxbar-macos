@@ -24,6 +24,7 @@ struct DashboardPage: View {
             }
             .task {
                 model.startMonitoring()
+                await model.refresh()
             }
             .onChange(of: store.servers) { _, _ in
                 model.selectionDidChange()

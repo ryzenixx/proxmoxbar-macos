@@ -292,3 +292,65 @@ struct DashboardFailureTests {
         #expect(model.visibleState != nil)
     }
 }
+
+@Suite("Server selection")
+@MainActor
+struct DashboardSelectionTests {
+    private func emptyStore() throws -> ServerStore {
+        let defaults = try #require(UserDefaults(suiteName: "Selection.\(UUID().uuidString)"))
+        return ServerStore(defaults: defaults, secrets: InMemorySecretStore())
+    }
+
+    private func add(_ name: String, to store: ServerStore) throws -> ServerConfiguration {
+        let configuration = ServerConfiguration(
+            name: name,
+            address: "https://192.168.1.1:8006",
+            tokenIdentifier: "monitor@pve!bar"
+        )
+        try store.add(configuration, secret: "s")
+        return configuration
+    }
+
+    @Test("The first server added after launch is selected without being picked")
+    func adoptsTheFirstServerAddedLater() throws {
+        let store = try emptyStore()
+        let model = DashboardModel(store: store)
+        #expect(model.selected == nil)
+
+        let added = try add("Alpha", to: store)
+
+        #expect(model.selected?.id == added.id)
+    }
+
+    @Test("An explicit choice wins over the first server")
+    func explicitChoiceWins() throws {
+        let store = try emptyStore()
+        _ = try add("Alpha", to: store)
+        let beta = try add("Beta", to: store)
+        let model = DashboardModel(store: store)
+
+        model.select(beta.id)
+
+        #expect(model.selected?.name == "Beta")
+    }
+
+    @Test("Removing the chosen server falls back without leaving nothing selected")
+    func fallsBackWhenChosenServerGoes() throws {
+        let store = try emptyStore()
+        let alpha = try add("Alpha", to: store)
+        let beta = try add("Beta", to: store)
+        let model = DashboardModel(store: store)
+        model.select(beta.id)
+
+        try store.remove(beta.id)
+
+        #expect(model.selected?.id == alpha.id)
+    }
+
+    @Test("An empty store selects nothing")
+    func emptyStoreSelectsNothing() throws {
+        let model = DashboardModel(store: try emptyStore())
+        #expect(model.selected == nil)
+        #expect(model.activeID == nil)
+    }
+}

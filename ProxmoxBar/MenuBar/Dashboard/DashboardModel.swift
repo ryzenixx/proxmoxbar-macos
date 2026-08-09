@@ -54,7 +54,6 @@ final class DashboardModel {
         self.store = store
         self.api = api
         self.refreshInterval = refreshInterval
-        selectedID = store.servers.first?.id
     }
 
     deinit {
@@ -66,9 +65,16 @@ final class DashboardModel {
         store.servers
     }
 
+    var activeID: UUID? {
+        if let selectedID, store.servers.contains(where: { $0.id == selectedID }) {
+            return selectedID
+        }
+        return store.servers.first?.id
+    }
+
     var selected: ServerConfiguration? {
-        guard let selectedID else { return nil }
-        return store.servers.first { $0.id == selectedID }
+        guard let activeID else { return nil }
+        return store.servers.first { $0.id == activeID }
     }
 
     func startMonitoring() {
@@ -98,15 +104,17 @@ final class DashboardModel {
     }
 
     func select(_ identifier: UUID) {
-        guard identifier != selectedID,
+        guard identifier != activeID,
             store.servers.contains(where: { $0.id == identifier })
         else { return }
         startOver(on: identifier)
     }
 
     func selectionDidChange() {
-        guard !store.servers.contains(where: { $0.id == selectedID }) else { return }
-        startOver(on: store.servers.first?.id)
+        guard let selectedID, !store.servers.contains(where: { $0.id == selectedID }) else {
+            return
+        }
+        startOver(on: nil)
     }
 
     private func startOver(on identifier: UUID?) {
@@ -120,7 +128,7 @@ final class DashboardModel {
     }
 
     func perform(_ action: GuestAction, on guest: ProxmoxGuest) async {
-        guard let target = selectedID, runningActions[guest.id] == nil else { return }
+        guard let target = activeID, runningActions[guest.id] == nil else { return }
         runningActions[guest.id] = action
         actionFailures[guest.id] = nil
         defer { runningActions[guest.id] = nil }
@@ -131,7 +139,7 @@ final class DashboardModel {
                 return
             }
             try await api.perform(action, on: guest, of: server)
-            guard target == selectedID else { return }
+            guard target == activeID else { return }
             if let settled = action.settledStatus {
                 confirmedStatuses[guest.id] = ConfirmedStatus(
                     status: settled,
@@ -141,7 +149,7 @@ final class DashboardModel {
         } catch is CancellationError {
             return
         } catch {
-            guard target == selectedID else { return }
+            guard target == activeID else { return }
             actionFailures[guest.id] =
                 (error as? ProxmoxError)?.errorDescription ?? error.localizedDescription
         }
@@ -167,7 +175,7 @@ final class DashboardModel {
     }
 
     func refresh() async {
-        guard let target = selectedID else {
+        guard let target = activeID else {
             phase = .idle
             return
         }
@@ -182,14 +190,14 @@ final class DashboardModel {
                 return
             }
             let state = try await api.clusterState(of: server)
-            guard generation == refreshGeneration, target == selectedID else { return }
+            guard generation == refreshGeneration, target == activeID else { return }
             reconcileConfirmedStatuses(against: state)
             phase = .loaded(state)
             refreshFailure = nil
         } catch is CancellationError {
             return
         } catch {
-            guard generation == refreshGeneration, target == selectedID else { return }
+            guard generation == refreshGeneration, target == activeID else { return }
             let message =
                 (error as? ProxmoxError)?.errorDescription ?? error.localizedDescription
             if case .loaded = phase {
