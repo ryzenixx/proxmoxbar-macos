@@ -74,38 +74,55 @@ jobs:
           p12-file-base64: ${{ secrets.MACOS_CERTIFICATE }}
           p12-password: ${{ secrets.MACOS_CERTIFICATE_PWD }}
 
+      - name: Restore the App Store Connect key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          set -euo pipefail
+          umask 077
+          printf '%s' "$ASC_KEY_P8" | base64 --decode > "${RUNNER_TEMP}/asc.p8"
+          test -s "${RUNNER_TEMP}/asc.p8"
+
       - name: Archive
         env:
-          CODESIGN_IDENTITY: ${{ secrets.MACOS_CODESIGN_IDENTITY }}
           TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
           SPARKLE_PUBLIC_KEY: ${{ secrets.MACOS_SPARKLE_PUBLIC_KEY }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           set -euo pipefail
           xcodebuild -project "${APP_NAME}.xcodeproj" -scheme "$APP_NAME" \
             -configuration Release -destination 'generic/platform=macOS' \
             -archivePath "${RUNNER_TEMP}/${APP_NAME}.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "${RUNNER_TEMP}/asc.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
             DEVELOPMENT_TEAM="$TEAM_ID" \
-            CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="$CODESIGN_IDENTITY" \
+            CODE_SIGN_STYLE=Automatic \
             SPARKLE_PUBLIC_ED_KEY="$SPARKLE_PUBLIC_KEY" \
             archive
 
       - name: Export Developer ID build
         env:
-          CODESIGN_IDENTITY: ${{ secrets.MACOS_CODESIGN_IDENTITY }}
           TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           set -euo pipefail
           plist="${RUNNER_TEMP}/ExportOptions.plist"
           /usr/bin/plutil -create xml1 "$plist"
           /usr/bin/plutil -insert method -string developer-id "$plist"
-          /usr/bin/plutil -insert signingStyle -string manual "$plist"
-          /usr/bin/plutil -insert signingCertificate -string "$CODESIGN_IDENTITY" "$plist"
+          /usr/bin/plutil -insert signingStyle -string automatic "$plist"
           /usr/bin/plutil -insert teamID -string "$TEAM_ID" "$plist"
           xcodebuild -exportArchive \
             -archivePath "${RUNNER_TEMP}/${APP_NAME}.xcarchive" \
             -exportOptionsPlist "$plist" \
-            -exportPath "${RUNNER_TEMP}/export"
+            -exportPath "${RUNNER_TEMP}/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "${RUNNER_TEMP}/asc.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
 
       - name: Verify the whole bundle is signed by our team
         env:
