@@ -3,14 +3,14 @@
     <channel>
         <title>ProxmoxBar</title>
         <item>
-            <title>3.0.0</title>
-            <pubDate>Sun, 09 Aug 2026 22:27:42 +0000</pubDate>
+            <title>3.0.1</title>
+            <pubDate>Mon, 10 Aug 2026 09:41:47 +0000</pubDate>
             <link>https://github.com/ryzenixx/proxmoxbar-macos</link>
-            <sparkle:version>3</sparkle:version>
-            <sparkle:shortVersionString>3.0.0</sparkle:shortVersionString>
+            <sparkle:version>4</sparkle:version>
+            <sparkle:shortVersionString>3.0.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
             <sparkle:releaseNotesLink>https://raw.githubusercontent.com/ryzenixx/proxmoxbar-macos/main/RELEASE_NOTES.md</sparkle:releaseNotesLink>
-            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v3.0.0/ProxmoxBar.dmg" length="3346708" type="application/octet-stream" sparkle:edSignature="OFKd3mxcqEE1fDF/VAPloInuZZXfsMcU3bBvg8rBnCesg7NzrhYXq10QvoMy5bNXrmXdXPfL8U47IAGF9X6jBg=="/>
+            <enclosure url="https://github.com/ryzenixx/proxmoxbar-macos/releases/download/v3.0.1/ProxmoxBar.dmg" length="3346921" type="application/octet-stream" sparkle:edSignature="nQsubKqG7cgNi+Lwyo/jD0IH3MCuMTtgFpbWjTfOUzlby6G/vz8IH3MGupkbNWdsK+PEFw6XBaPeGH4x1c+cDw=="/>
         </item>
     </channel>
 </rss>
