@@ -130,16 +130,30 @@ jobs:
             -exportOptionsPlist "$plist" \
             -exportPath "${RUNNER_TEMP}/export"
 
-      - name: Enable the hardened runtime
+      - name: Re-sign with the hardened runtime and full entitlements
+        env:
+          TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
         run: |
           set -euo pipefail
           app="${RUNNER_TEMP}/export/${APP_NAME}.app"
           appex=$(find "$app/Contents/PlugIns" -name "*.appex" | head -n1)
-          for part in "$appex" "$app"; do
-            codesign --force --options runtime --timestamp \
-              --preserve-metadata=entitlements \
-              --sign "Developer ID Application" "$part"
-          done
+          resolved="${RUNNER_TEMP}/app.entitlements"
+          python3 - "$TEAM_ID" "ProxmoxBar/ProxmoxBar.entitlements" "$resolved" <<'PY'
+          import sys
+          team, src, dst = sys.argv[1], sys.argv[2], sys.argv[3]
+          bundle = "com.proxmoxbar.app"
+          text = open(src).read()
+          text = text.replace("$(PRODUCT_BUNDLE_IDENTIFIER)", bundle)
+          text = text.replace("$(AppIdentifierPrefix)", team + ".")
+          text = text.replace("$(CFBundleIdentifier)", bundle)
+          open(dst, "w").write(text)
+          PY
+          codesign --force --options runtime --timestamp \
+            --entitlements ProxmoxBarWidget/ProxmoxBarWidget.entitlements \
+            --sign "Developer ID Application" "$appex"
+          codesign --force --options runtime --timestamp \
+            --entitlements "$resolved" \
+            --sign "Developer ID Application" "$app"
           codesign --verify --deep --strict "$app"
 
       - name: Verify the whole bundle is signed by our team
