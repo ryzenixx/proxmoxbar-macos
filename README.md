@@ -2,13 +2,16 @@
 
 Native macOS menu bar app for monitoring and controlling Proxmox VE.
 
-<img width="1972" height="588" alt="Frame 1" src="https://github.com/user-attachments/assets/88f9ab14-2749-4421-adc9-97fb1c3da048" />
-
-
 [![macOS](https://img.shields.io/badge/platform-macOS%2015%2B-000000?style=for-the-badge&logo=apple&logoColor=white)](https://www.apple.com/macos)
 [![Swift](https://img.shields.io/badge/Swift-6-orange?style=for-the-badge&logo=swift&logoColor=white)](https://www.swift.org/)
 [![Sparkle](https://img.shields.io/badge/Sparkle-2.9.5-blue?style=for-the-badge)](https://sparkle-project.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+
+<p align="center">
+  <img src=".github/assets/machines.png" alt="Machines panel" width="300">
+  &nbsp;
+  <img src=".github/assets/storage.png" alt="Storage panel" width="300">
+</p>
 
 ## Features
 
