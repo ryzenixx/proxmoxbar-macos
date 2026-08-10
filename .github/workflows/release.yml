@@ -229,11 +229,7 @@ jobs:
             --ed-key-file - \
             "$assets"
 
-          version="${TAG_NAME#v}"
-          awk -v h="## $version" '$0==h {f=1; next} f && /^## / {exit} f {print}' RELEASE_NOTES.md \
-            | sed -e '/./,$!d' > "$assets/release-notes.md"
-
-          notes="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/release-notes.md"
+          notes="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/RELEASE_NOTES.md"
           python3 - "$assets/appcast.xml" "$notes" <<'PY'
           import re, sys
           path, url = sys.argv[1], sys.argv[2]
@@ -277,17 +273,24 @@ jobs:
           name: release-assets
           path: assets
 
+      - name: Extract this version's notes
+        run: |
+          set -euo pipefail
+          version="${TAG_NAME#v}"
+          awk -v h="## $version" '$0==h {f=1; next} f && /^## / {exit} f {print}' RELEASE_NOTES.md \
+            | sed -e '/./,$!d' > "${RUNNER_TEMP}/body.md"
+          cat "${RUNNER_TEMP}/body.md"
+
       - name: Publish the GitHub release
         uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
         with:
           tag_name: ${{ env.TAG_NAME }}
           name: ${{ env.TAG_NAME }}
-          body_path: assets/release-notes.md
+          body_path: ${{ runner.temp }}/body.md
           generate_release_notes: true
           files: |
             assets/${{ env.APP_NAME }}.dmg
             assets/${{ env.APP_NAME }}.dmg.sha256
-            assets/release-notes.md
           fail_on_unmatched_files: true
 
       - name: Update the appcast on main
