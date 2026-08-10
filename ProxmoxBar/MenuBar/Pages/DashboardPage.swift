@@ -28,7 +28,6 @@ struct DashboardPage: View {
                     onAddServer: { router.go(to: .addServer) },
                     onOpenSettings: { router.go(to: .settings) }
                 )
-                Divider()
                 content
             }
             .task {
@@ -51,15 +50,7 @@ struct DashboardPage: View {
             VStack(spacing: 0) {
                 ClusterSummaryRow(state: state)
                 Divider()
-                sectionPicker
-                DashboardToolbar(
-                    search: $search,
-                    showsSort: section == .machines,
-                    sort: preferences.sort,
-                    onSelectSort: { preferences.sort = $0 }
-                )
-                .padding(.horizontal, 16)
-                .padding(.bottom, 8)
+                controlsRow
                 list(for: state)
             }
         } else {
@@ -97,14 +88,24 @@ struct DashboardPage: View {
         }
     }
 
-    private var sectionPicker: some View {
-        Picker("", selection: $section) {
-            ForEach(DashboardSection.allCases, id: \.self) { section in
-                Text(section.rawValue).tag(section)
+    private var controlsRow: some View {
+        HStack(spacing: 10) {
+            Picker("", selection: $section) {
+                ForEach(DashboardSection.allCases, id: \.self) { section in
+                    Text(section.rawValue).tag(section)
+                }
             }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .controlSize(.large)
+            .fixedSize()
+            DashboardToolbar(
+                search: $search,
+                showsSort: section == .machines,
+                sort: preferences.sort,
+                onSelectSort: { preferences.sort = $0 }
+            )
         }
-        .pickerStyle(.segmented)
-        .labelsHidden()
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
     }

@@ -32,8 +32,8 @@ struct DashboardToolbar: View {
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 9)
-        .background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 9))
+        .padding(.vertical, 7)
+        .background(.quaternary.opacity(0.5), in: .rect(cornerRadius: 8))
     }
 
     private var sortMenu: some View {

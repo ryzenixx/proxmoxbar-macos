@@ -1,4 +1,14 @@
-# Welcome to ProxmoxBar 3.0 
+## 3.0.2
+
+**A tighter dashboard.** The header was pushing the machine list halfway down the panel. Nodes, load, and the Machines/Storage controls now sit closer together with fewer separators, so your machines start near the top.
+
+## 3.0.1
+
+**The widget now shows up.** In 3.0.0 the widget extension shipped without its full entitlements, so macOS refused to register it and it never appeared in the widget gallery. That is fixed. Add it from the desktop's Edit Widgets, then pick a server.
+
+## 3.0.0
+
+Welcome to ProxmoxBar 3.0 
 
 ProxmoxBar has been rebuilt from the ground up, with support for macOS 27 Golden Gate.
 

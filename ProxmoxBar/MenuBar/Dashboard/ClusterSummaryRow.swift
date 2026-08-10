@@ -4,12 +4,13 @@ struct ClusterSummaryRow: View {
     let state: ClusterState
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             headline
             gauges
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.top, 6)
+        .padding(.bottom, 10)
     }
 
     private var headline: some View {
@@ -29,7 +30,7 @@ struct ClusterSummaryRow: View {
     }
 
     private var gauges: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 14) {
             UsageGauge(
                 symbol: "cpu",
                 label: "CPU",
@@ -49,8 +50,6 @@ struct ClusterSummaryRow: View {
                 detail: state.storage?.summary
             )
         }
-        .padding(10)
-        .background(.quinary, in: RoundedRectangle(cornerRadius: 8))
     }
 
     private var coreSummary: String? {

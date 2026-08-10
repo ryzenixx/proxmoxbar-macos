@@ -24,6 +24,7 @@ struct DashboardHeader: View {
         }
         .padding(.leading, 16)
         .padding(.trailing, 12)
-        .padding(.vertical, 10)
+        .padding(.top, 10)
+        .padding(.bottom, 4)
     }
 }
