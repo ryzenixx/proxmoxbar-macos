@@ -229,7 +229,11 @@ jobs:
             --ed-key-file - \
             "$assets"
 
-          notes="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/RELEASE_NOTES.md"
+          version="${TAG_NAME#v}"
+          awk -v h="## $version" '$0==h {f=1; next} f && /^## / {exit} f {print}' RELEASE_NOTES.md \
+            | sed -e '/./,$!d' > "$assets/release-notes.md"
+
+          notes="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/release-notes.md"
           python3 - "$assets/appcast.xml" "$notes" <<'PY'
           import re, sys
           path, url = sys.argv[1], sys.argv[2]
@@ -278,10 +282,12 @@ jobs:
         with:
           tag_name: ${{ env.TAG_NAME }}
           name: ${{ env.TAG_NAME }}
-          body_path: RELEASE_NOTES.md
+          body_path: assets/release-notes.md
+          generate_release_notes: true
           files: |
             assets/${{ env.APP_NAME }}.dmg
             assets/${{ env.APP_NAME }}.dmg.sha256
+            assets/release-notes.md
           fail_on_unmatched_files: true
 
       - name: Update the appcast on main
