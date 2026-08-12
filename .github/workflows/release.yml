@@ -306,3 +306,38 @@ jobs:
           git add appcast.xml
           git commit -m "chore(release): update appcast for ${TAG_NAME}"
           git push origin HEAD:main
+
+  update-tap:
+    name: Update the Homebrew tap
+    runs-on: ubuntu-latest
+    needs: publish
+    timeout-minutes: 10
+    steps:
+      - name: Checkout the tap
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ryzenixx/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          ref: main
+
+      - name: Bump the cask
+        run: |
+          set -euo pipefail
+          version="${TAG_NAME#v}"
+          sha=$(curl -fsSL "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/${APP_NAME}.dmg.sha256" | awk '{print $1}')
+          [ -n "$sha" ] || { echo "::error::empty sha256 for ${TAG_NAME}"; exit 1; }
+          file="Casks/proxmoxbar.rb"
+          sed -i -E "s|^  version \".*\"|  version \"${version}\"|" "$file"
+          sed -i -E "s|^  sha256 \".*\"|  sha256 \"${sha}\"|" "$file"
+          grep -qF "  version \"${version}\"" "$file" || { echo "::error::version not updated in $file"; exit 1; }
+          grep -qF "  sha256 \"${sha}\"" "$file" || { echo "::error::sha256 not updated in $file"; exit 1; }
+          echo "updated cask:"
+          grep -E "^  (version|sha256) " "$file"
+          if git diff --quiet; then
+            echo "cask already at ${version}"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Update ProxmoxBar to ${version}"
+          git push
