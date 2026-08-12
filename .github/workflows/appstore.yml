@@ -45,8 +45,6 @@ jobs:
         run: |
           set -euo pipefail
           key="$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
-          build="$(git rev-list --count HEAD)"
-          echo "build number: $build"
           xcodebuild archive \
             -project ProxmoxBar.xcodeproj \
             -scheme "ProxmoxBar MAS" \
@@ -55,8 +53,7 @@ jobs:
             -allowProvisioningUpdates \
             -authenticationKeyPath "$key" \
             -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-            CURRENT_PROJECT_VERSION="$build"
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
 
       - name: Export the App Store package
         env:
