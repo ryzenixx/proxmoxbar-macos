@@ -1,0 +1,99 @@
+name: App Store
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    name: Build and upload to App Store Connect
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Install the App Store Connect API key
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          python3 - "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8" <<'PY'
+          import base64, os, sys
+          open(sys.argv[1], "wb").write(base64.b64decode(os.environ["ASC_KEY_P8"]))
+          PY
+
+      - name: Archive
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          key="$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          build="$(git rev-list --count HEAD)"
+          echo "build number: $build"
+          xcodebuild archive \
+            -project ProxmoxBar.xcodeproj \
+            -scheme "ProxmoxBar MAS" \
+            -destination 'generic/platform=macOS' \
+            -archivePath "$RUNNER_TEMP/ProxmoxBar.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$key" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            CURRENT_PROJECT_VERSION="$build"
+
+      - name: Export the App Store package
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          key="$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          plist="$RUNNER_TEMP/ExportOptions.plist"
+          cat > "$plist" <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+          <key>method</key>
+          <string>app-store-connect</string>
+          <key>teamID</key>
+          <string>DL58RM98AN</string>
+          <key>signingStyle</key>
+          <string>automatic</string>
+          <key>destination</key>
+          <string>export</string>
+          </dict>
+          </plist>
+          PLIST
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/ProxmoxBar.xcarchive" \
+            -exportOptionsPlist "$plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$key" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          ls -la "$RUNNER_TEMP/export"
+
+      - name: Upload to App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          pkg="$(ls "$RUNNER_TEMP/export"/*.pkg | head -n1)"
+          echo "uploading $pkg"
+          xcrun altool --upload-app --type macos --file "$pkg" \
+            --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
