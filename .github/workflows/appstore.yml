@@ -18,8 +18,13 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Show Xcode version
-        run: xcodebuild -version
+      - name: Select the latest Xcode 26 (macOS 26 SDK)
+        run: |
+          set -euo pipefail
+          app="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)"
+          [ -n "$app" ] || { echo "::error::no Xcode 26 found on the runner"; exit 1; }
+          sudo xcode-select -s "$app"
+          xcodebuild -version
 
       - name: Install the App Store Connect API key
         env:
