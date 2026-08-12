@@ -26,6 +26,7 @@ final class DashboardModel {
     private(set) var runningActions: [String: GuestAction] = [:]
     private(set) var actionFailures: [String: String] = [:]
     private(set) var confirmedStatuses: [String: ConfirmedStatus] = [:]
+    private(set) var isDemo = false
 
     var failureMessage: String? {
         if let refreshFailure { return refreshFailure }
@@ -130,7 +131,37 @@ final class DashboardModel {
         Task { await refresh() }
     }
 
+    func enterDemo() {
+        stopMonitoring()
+        isDemo = true
+        selectedID = nil
+        refreshFailure = nil
+        runningActions.removeAll()
+        actionFailures.removeAll()
+        confirmedStatuses.removeAll()
+        phase = .loaded(DemoCluster.state())
+    }
+
+    func exitDemo() {
+        isDemo = false
+        runningActions.removeAll()
+        phase = .idle
+    }
+
+    private func performDemo(_ action: GuestAction, on guest: ProxmoxGuest) async {
+        guard runningActions[guest.id] == nil else { return }
+        runningActions[guest.id] = action
+        defer { runningActions[guest.id] = nil }
+        try? await Task.sleep(for: .seconds(0.8))
+        guard isDemo, case .loaded(let current) = phase, let settled = action.settledStatus else { return }
+        phase = .loaded(current.applying([guest.id: settled]))
+    }
+
     func perform(_ action: GuestAction, on guest: ProxmoxGuest) async {
+        if isDemo {
+            await performDemo(action, on: guest)
+            return
+        }
         guard let target = activeID, runningActions[guest.id] == nil else { return }
         runningActions[guest.id] = action
         actionFailures[guest.id] = nil
@@ -179,6 +210,7 @@ final class DashboardModel {
     }
 
     func refresh() async {
+        if isDemo { return }
         guard let target = activeID else {
             phase = .idle
             return

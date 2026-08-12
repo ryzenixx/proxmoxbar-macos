@@ -5,6 +5,7 @@ struct ServerSelector: View {
     let selected: ServerConfiguration?
     let onSelect: (UUID) -> Void
     let onAddServer: () -> Void
+    var titleOverride: String?
 
     var body: some View {
         Menu {
@@ -26,7 +27,7 @@ struct ServerSelector: View {
                 Image(.menuBarIcon)
                     .renderingMode(.template)
                     .foregroundStyle(.tint)
-                Text(selected?.displayName ?? "No server")
+                Text(titleOverride ?? selected?.displayName ?? "No server")
                     .font(.headline)
                     .lineLimit(1)
             }

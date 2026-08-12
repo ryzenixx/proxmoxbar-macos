@@ -15,22 +15,21 @@ struct DashboardPage: View {
     @State private var search = ""
 
     var body: some View {
-        if store.servers.isEmpty {
-            NoServersView {
-                router.go(to: .addServer)
-            }
+        if store.servers.isEmpty && !model.isDemo {
+            NoServersView(
+                onAddServer: { router.go(to: .addServer) },
+                onTryDemo: { model.enterDemo() }
+            )
         } else {
             VStack(spacing: 0) {
-                DashboardHeader(
-                    servers: model.servers,
-                    selected: model.selected,
-                    onSelect: { model.select($0) },
-                    onAddServer: { router.go(to: .addServer) },
-                    onOpenSettings: { router.go(to: .settings) }
-                )
+                header
                 content
             }
             .task {
+                if model.isDemo {
+                    if store.servers.isEmpty { return }
+                    model.exitDemo()
+                }
                 model.startMonitoring()
                 await model.refresh()
             }
@@ -38,6 +37,21 @@ struct DashboardPage: View {
                 model.selectionDidChange()
             }
         }
+    }
+
+    private var header: some View {
+        DashboardHeader(
+            servers: model.servers,
+            selected: model.selected,
+            onSelect: { model.select($0) },
+            onAddServer: {
+                if model.isDemo { model.exitDemo() }
+                router.go(to: .addServer)
+            },
+            onOpenSettings: { router.go(to: .settings) },
+            titleOverride: model.isDemo ? "Demo" : nil,
+            onExitDemo: model.isDemo ? { model.exitDemo() } : nil
+        )
     }
 
     @ViewBuilder

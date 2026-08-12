@@ -7,6 +7,8 @@ struct DashboardHeader: View {
     let onSelect: (UUID) -> Void
     let onAddServer: () -> Void
     let onOpenSettings: () -> Void
+    var titleOverride: String?
+    var onExitDemo: (() -> Void)?
 
     var body: some View {
         HStack(spacing: 2) {
@@ -14,9 +16,18 @@ struct DashboardHeader: View {
                 servers: servers,
                 selected: selected,
                 onSelect: onSelect,
-                onAddServer: onAddServer
+                onAddServer: onAddServer,
+                titleOverride: titleOverride
             )
             Spacer(minLength: 8)
+            if let onExitDemo {
+                Button(action: onExitDemo) {
+                    Label("Exit demo", systemImage: "xmark")
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                .tint(.red)
+            }
             PanelIconButton(symbol: "gearshape", title: "Settings", action: onOpenSettings)
             PanelIconButton(symbol: "power", title: "Quit ProxmoxBar") {
                 NSApplication.shared.terminate(nil)

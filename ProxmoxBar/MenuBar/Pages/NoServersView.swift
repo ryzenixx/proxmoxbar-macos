@@ -2,6 +2,7 @@ import SwiftUI
 
 struct NoServersView: View {
     let onAddServer: () -> Void
+    let onTryDemo: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -37,6 +38,12 @@ struct NoServersView: View {
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
+
+            Button("Explore the demo", action: onTryDemo)
+                .buttonStyle(.plain)
+                .font(.callout.weight(.medium))
+                .foregroundStyle(.tint)
+                .padding(.top, 12)
 
             HelpLinks()
                 .padding(.top, 12)
