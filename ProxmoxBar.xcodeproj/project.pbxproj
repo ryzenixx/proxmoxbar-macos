@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F601CD83302C82AA00A8BEDD /* ProxmoxBarWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F63436E530291684008D367B /* ProxmoxBarWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F63436E730291684008D367B /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F63436E630291684008D367B /* WidgetKit.framework */; };
 		F63436E930291684008D367B /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F63436E830291684008D367B /* SwiftUI.framework */; };
 		F63436F630291685008D367B /* ProxmoxBarWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F63436E530291684008D367B /* ProxmoxBarWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -14,6 +15,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		F601CD7B302C82AA00A8BEDD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F6600A3830232DDE003199BC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F63436E430291684008D367B;
+			remoteInfo = ProxmoxBarWidgetExtension;
+		};
 		F63436F430291685008D367B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F6600A3830232DDE003199BC /* Project object */;
@@ -31,6 +39,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		F601CD82302C82AA00A8BEDD /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				F601CD83302C82AA00A8BEDD /* ProxmoxBarWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
 		F63436FB30291685008D367B /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			dstPath = "";
@@ -43,6 +60,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F601CD87302C82AA00A8BEDD /* ProxmoxBar MAS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ProxmoxBar MAS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F601CD88302C82AA00A8BEDD /* MAS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MAS-Info.plist"; sourceTree = SOURCE_ROOT; };
 		F63436E530291684008D367B /* ProxmoxBarWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ProxmoxBarWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		F63436E630291684008D367B /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		F63436E830291684008D367B /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -51,6 +70,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F601CD89302C82AB00A8BEDD /* Exceptions for "ProxmoxBar" folder in "ProxmoxBar MAS" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F601CD79302C82AA00A8BEDD /* ProxmoxBar MAS */;
+		};
 		F63436FA30291685008D367B /* Exceptions for "ProxmoxBarWidget" folder in "ProxmoxBarWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -88,6 +114,7 @@
 			exceptions = (
 				F6600AA030232DDE003199BC /* Exceptions for "ProxmoxBar" folder in "ProxmoxBar" target */,
 				F63437E330291A50008D367B /* Exceptions for "ProxmoxBar" folder in "ProxmoxBarWidgetExtension" target */,
+				F601CD89302C82AB00A8BEDD /* Exceptions for "ProxmoxBar" folder in "ProxmoxBar MAS" target */,
 			);
 			path = ProxmoxBar;
 			sourceTree = "<group>";
@@ -100,6 +127,11 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		F601CD7F302C82AA00A8BEDD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 		F63436E230291684008D367B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -128,6 +160,7 @@
 				F6600A5030232DE0003199BC /* ProxmoxBarTests */,
 				F63436EA30291684008D367B /* ProxmoxBarWidget */,
 				F67C18863025DC3A00F46744 /* Frameworks */,
+				F601CD88302C82AA00A8BEDD /* MAS-Info.plist */,
 				F6600A4130232DDE003199BC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -138,6 +171,7 @@
 				F6600A4030232DDE003199BC /* ProxmoxBar.app */,
 				F6600A4D30232DE0003199BC /* ProxmoxBarTests.xctest */,
 				F63436E530291684008D367B /* ProxmoxBarWidgetExtension.appex */,
+				F601CD87302C82AA00A8BEDD /* ProxmoxBar MAS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -154,6 +188,30 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		F601CD79302C82AA00A8BEDD /* ProxmoxBar MAS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F601CD84302C82AA00A8BEDD /* Build configuration list for PBXNativeTarget "ProxmoxBar MAS" */;
+			buildPhases = (
+				F601CD7E302C82AA00A8BEDD /* Sources */,
+				F601CD7F302C82AA00A8BEDD /* Frameworks */,
+				F601CD81302C82AA00A8BEDD /* Resources */,
+				F601CD82302C82AA00A8BEDD /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F601CD7A302C82AA00A8BEDD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				F6600A4230232DDE003199BC /* ProxmoxBar */,
+			);
+			name = "ProxmoxBar MAS";
+			packageProductDependencies = (
+			);
+			productName = ProxmoxBar;
+			productReference = F601CD87302C82AA00A8BEDD /* ProxmoxBar MAS.app */;
+			productType = "com.apple.product-type.application";
+		};
 		F63436E430291684008D367B /* ProxmoxBarWidgetExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F63436F730291685008D367B /* Build configuration list for PBXNativeTarget "ProxmoxBarWidgetExtension" */;
@@ -260,11 +318,17 @@
 				F6600A3F30232DDE003199BC /* ProxmoxBar */,
 				F6600A4C30232DE0003199BC /* ProxmoxBarTests */,
 				F63436E430291684008D367B /* ProxmoxBarWidgetExtension */,
+				F601CD79302C82AA00A8BEDD /* ProxmoxBar MAS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		F601CD81302C82AA00A8BEDD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 		F63436E330291684008D367B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
@@ -283,6 +347,11 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		F601CD7E302C82AA00A8BEDD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		F63436E130291684008D367B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -301,6 +370,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		F601CD7A302C82AA00A8BEDD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F63436E430291684008D367B /* ProxmoxBarWidgetExtension */;
+			targetProxy = F601CD7B302C82AA00A8BEDD /* PBXContainerItemProxy */;
+		};
 		F63436F530291685008D367B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F63436E430291684008D367B /* ProxmoxBarWidgetExtension */;
@@ -314,6 +388,86 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		F601CD85302C82AA00A8BEDD /* Debug configuration for PBXNativeTarget "ProxmoxBar MAS" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = ProxmoxBar/ProxmoxBarMAS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = DL58RM98AN;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "MAS-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = ProxmoxBar;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 3.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.proxmoxbar.app;
+				PRODUCT_NAME = ProxmoxBar;
+				REGISTER_APP_GROUPS = YES;
+				SPARKLE_PUBLIC_ED_KEY = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "MAC_APP_STORE DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		F601CD86302C82AA00A8BEDD /* Release configuration for PBXNativeTarget "ProxmoxBar MAS" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = ProxmoxBar/ProxmoxBarMAS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 5;
+				DEVELOPMENT_TEAM = DL58RM98AN;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "MAS-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = ProxmoxBar;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 3.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.proxmoxbar.app;
+				PRODUCT_NAME = ProxmoxBar;
+				REGISTER_APP_GROUPS = YES;
+				SPARKLE_PUBLIC_ED_KEY = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "MAC_APP_STORE $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
 		F63436F830291685008D367B /* Debug configuration for PBXNativeTarget "ProxmoxBarWidgetExtension" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -625,6 +779,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F601CD84302C82AA00A8BEDD /* Build configuration list for PBXNativeTarget "ProxmoxBar MAS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F601CD85302C82AA00A8BEDD /* Debug configuration for PBXNativeTarget "ProxmoxBar MAS" */,
+				F601CD86302C82AA00A8BEDD /* Release configuration for PBXNativeTarget "ProxmoxBar MAS" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		F63436F730291685008D367B /* Build configuration list for PBXNativeTarget "ProxmoxBarWidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

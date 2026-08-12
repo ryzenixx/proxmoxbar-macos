@@ -63,7 +63,9 @@ struct SettingsPage: View {
                 VStack(alignment: .leading, spacing: 18) {
                     serversSection
                     generalSection
-                    updatesSection
+                    #if !MAC_APP_STORE
+                        updatesSection
+                    #endif
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 4)
@@ -92,15 +94,17 @@ struct SettingsPage: View {
         }
     }
 
-    private var updatesSection: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            SectionLabel("Updates")
-            FieldGroup {
-                UpdatesRows(updates: updates)
+    #if !MAC_APP_STORE
+        private var updatesSection: some View {
+            VStack(alignment: .leading, spacing: 5) {
+                SectionLabel("Updates")
+                FieldGroup {
+                    UpdatesRows(updates: updates)
+                }
+                .disabled(!updates.isSupported)
             }
-            .disabled(!updates.isSupported)
         }
-    }
+    #endif
 
     private var serversSection: some View {
         VStack(alignment: .leading, spacing: 0) {
