@@ -153,7 +153,9 @@ final class DashboardModel {
         runningActions[guest.id] = action
         defer { runningActions[guest.id] = nil }
         try? await Task.sleep(for: .seconds(0.8))
-        guard isDemo, case .loaded(let current) = phase, let settled = action.settledStatus else { return }
+        guard isDemo, case .loaded(let current) = phase, let settled = action.settledStatus else {
+            return
+        }
         phase = .loaded(current.applying([guest.id: settled]))
     }
 
