@@ -36,13 +36,21 @@ revisited in System Settings, Privacy & Security, Local Network.
 
 ## Install
 
+### Homebrew
+
+```
+brew install --cask ryzenixx/tap/proxmoxbar
+```
+
+### Direct download
+
 1. Open the [latest release](https://github.com/ryzenixx/proxmoxbar-macos/releases/latest).
 2. Download `ProxmoxBar.dmg`.
 3. Drag `ProxmoxBar.app` to `/Applications`.
 4. Launch ProxmoxBar and add your server.
 
-Later versions install themselves: the app checks for updates and applies them
-after your confirmation.
+Either way, later versions install themselves: the app checks for updates and
+applies them after your confirmation.
 
 ## Create a restricted API token
 
