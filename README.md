@@ -2,6 +2,7 @@
 
 Native macOS menu bar app for monitoring and controlling Proxmox VE.
 
+[![Mac App Store](https://img.shields.io/badge/Mac%20App%20Store-Download-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/proxmoxbar/id6800746122)
 [![macOS](https://img.shields.io/badge/platform-macOS%2015%2B-000000?style=for-the-badge&logo=apple&logoColor=white)](https://www.apple.com/macos)
 [![Swift](https://img.shields.io/badge/Swift-6-orange?style=for-the-badge&logo=swift&logoColor=white)](https://www.swift.org/)
 [![Sparkle](https://img.shields.io/badge/Sparkle-2.9.5-blue?style=for-the-badge)](https://sparkle-project.org/)
@@ -36,6 +37,10 @@ revisited in System Settings, Privacy & Security, Local Network.
 
 ## Install
 
+### Mac App Store
+
+[Download on the Mac App Store](https://apps.apple.com/app/proxmoxbar/id6800746122).
+
 ### Homebrew
 
 ```
@@ -48,9 +53,6 @@ brew install --cask ryzenixx/tap/proxmoxbar
 2. Download `ProxmoxBar.dmg`.
 3. Drag `ProxmoxBar.app` to `/Applications`.
 4. Launch ProxmoxBar and add your server.
-
-Either way, later versions install themselves: the app checks for updates and
-applies them after your confirmation.
 
 ## Create a restricted API token
 
