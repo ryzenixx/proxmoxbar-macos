@@ -5,8 +5,6 @@ Native macOS menu bar app for monitoring and controlling Proxmox VE.
 [![Mac App Store](https://img.shields.io/badge/Mac%20App%20Store-Download-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/proxmoxbar/id6800746122)
 [![macOS](https://img.shields.io/badge/platform-macOS%2015%2B-000000?style=for-the-badge&logo=apple&logoColor=white)](https://www.apple.com/macos)
 [![Swift](https://img.shields.io/badge/Swift-6-orange?style=for-the-badge&logo=swift&logoColor=white)](https://www.swift.org/)
-[![Sparkle](https://img.shields.io/badge/Sparkle-2.9.5-blue?style=for-the-badge)](https://sparkle-project.org/)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 <p align="center">
   <img src=".github/assets/machines.png" alt="Machines panel" width="300">
