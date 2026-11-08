@@ -17,7 +17,12 @@ struct DashboardPage: View {
     var body: some View {
         VStack(spacing: 0) {
             header
-            if store.servers.isEmpty && !model.isDemo {
+            if let error = store.writeError {
+                PagePlaceholder(
+                    symbol: "exclamationmark.triangle", message: error.localizedDescription
+                )
+                .padding(.horizontal, 20)
+            } else if store.servers.isEmpty && !model.isDemo {
                 NoServersView(
                     onAddServer: { router.go(to: .addServer) },
                     onTryDemo: { model.enterDemo() }

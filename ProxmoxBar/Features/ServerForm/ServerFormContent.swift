@@ -7,12 +7,12 @@ struct ServerFormContent<Success: View>: View {
 
     var body: some View {
         switch model.phase {
-        case .awaitingTrust(let certificate, let problems):
+        case .awaitingTrust(let approvalID, let certificate, let problems):
             CertificateApprovalView(
                 certificate: certificate,
                 problems: problems,
-                onTrust: { Task { await model.trustPresentedCertificate() } },
-                onCancel: { model.cancelTrust() }
+                onTrust: { model.trustPresentedCertificate(approvalID) },
+                onCancel: { model.cancelSubmission() }
             )
         case .saved:
             success()

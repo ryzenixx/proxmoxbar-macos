@@ -9,6 +9,7 @@ protocol SecretStore: Sendable {
 enum SecretStoreError: Error, Hashable, Sendable {
     case unwritable(OSStatus)
     case unreadable(OSStatus)
+    case undeletable(OSStatus)
     case corrupted
 }
 
@@ -19,6 +20,8 @@ extension SecretStoreError: LocalizedError {
             "The token could not be saved to the keychain (\(status))."
         case .unreadable(let status):
             "The token could not be read from the keychain (\(status))."
+        case .undeletable(let status):
+            "The token could not be removed from the keychain (\(status))."
         case .corrupted:
             "The stored token is not readable text."
         }

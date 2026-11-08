@@ -33,6 +33,7 @@ struct SettingsPage: View {
                 sections
             }
         }
+        .onDisappear { editor?.cancelSubmission() }
     }
 
     private func back() {
@@ -40,10 +41,9 @@ struct SettingsPage: View {
             router.goBack()
             return
         }
-        if case .awaitingTrust = editor.phase {
-            editor.cancelTrust()
-            return
-        }
+        let phase = editor.phase
+        editor.cancelSubmission()
+        if case .awaitingTrust = phase { return }
         self.editor = nil
     }
 
@@ -104,9 +104,14 @@ struct SettingsPage: View {
                 PanelIconButton(symbol: "plus", title: "Add a server") {
                     router.go(to: .addServer)
                 }
+                .disabled(store.writeError != nil)
             }
             FieldGroup {
-                if store.servers.isEmpty {
+                if let error = store.writeError {
+                    ErrorNote(message: error.localizedDescription)
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else if store.servers.isEmpty {
                     emptyRow
                 } else {
                     ForEach(store.servers) { configuration in
@@ -174,7 +179,7 @@ struct SettingsPage: View {
             removalError = nil
             try store.remove(configuration.id)
         } catch {
-            removalError = "The server was removed but its secret stayed in the keychain."
+            removalError = error.localizedDescription
         }
     }
 }

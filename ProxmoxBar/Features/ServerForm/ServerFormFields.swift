@@ -18,6 +18,7 @@ struct ServerFormFields: View {
                     isValid: model.hasUsableAddress
                 )
             }
+            .disabled(model.isChecking)
 
             SectionLabel("Access")
                 .padding(.top, 18)
@@ -32,11 +33,12 @@ struct ServerFormFields: View {
                     isSecret: true
                 )
             }
+            .disabled(model.isChecking)
 
             reassurance
                 .padding(.top, 10)
 
-            if case .failed(let message) = model.phase {
+            if let message = model.failureMessage {
                 ErrorNote(message: message)
                     .padding(.top, 12)
             }
@@ -79,7 +81,7 @@ struct ServerFormFields: View {
 
     private var submitButton: some View {
         Button {
-            Task { await model.connect() }
+            model.connect()
         } label: {
             Group {
                 if model.isChecking {

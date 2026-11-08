@@ -51,7 +51,7 @@ struct KeychainSecretStore: SecretStore {
     func removeSecret(for identifier: UUID) throws {
         let status = SecItemDelete(baseQuery(for: identifier) as CFDictionary)
         guard status == errSecSuccess || status == errSecItemNotFound else {
-            throw SecretStoreError.unwritable(status)
+            throw SecretStoreError.undeletable(status)
         }
     }
 

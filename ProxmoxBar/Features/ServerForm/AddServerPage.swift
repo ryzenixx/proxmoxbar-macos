@@ -16,10 +16,9 @@ struct AddServerPage: View {
     }
 
     private func back() {
-        if case .awaitingTrust = model?.phase {
-            model?.cancelTrust()
-            return
-        }
+        let phase = model?.phase
+        model?.cancelSubmission()
+        if case .awaitingTrust = phase { return }
         router.goBack()
     }
 
@@ -43,5 +42,6 @@ struct AddServerPage: View {
             guard model == nil else { return }
             model = makeServerForm(.adding)
         }
+        .onDisappear { model?.cancelSubmission() }
     }
 }
