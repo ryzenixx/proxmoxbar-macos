@@ -21,7 +21,7 @@ struct MenuBarLabel: View {
     }
 
     private var reading: String? {
-        guard dashboard.failureMessage == nil, let state = dashboard.visibleState else {
+        guard dashboard.failureMessage == nil, let state = dashboard.visibleSnapshot?.state else {
             return nil
         }
         switch preference.content {

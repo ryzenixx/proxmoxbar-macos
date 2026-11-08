@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GuestRow: View {
     let guest: ProxmoxGuest
+    let source: DashboardModel.Source
     let isExpanded: Bool
     let onToggle: () -> Void
 
@@ -105,7 +106,7 @@ struct GuestRow: View {
                         .font(.caption)
                         .foregroundStyle(.red)
                         .fixedSize(horizontal: false, vertical: true)
-                    Button("Dismiss") { model.dismissFailure(for: guest) }
+                    Button("Dismiss") { model.dismissFailure(for: guest, from: source) }
                         .buttonStyle(.link)
                         .font(.caption)
                 }
@@ -128,7 +129,7 @@ struct GuestRow: View {
                 pendingForce = action
             } else {
                 pendingForce = nil
-                Task { await model.perform(action, on: guest) }
+                Task { await model.perform(action, on: guest, from: source) }
             }
         } label: {
             Label {
@@ -146,7 +147,7 @@ struct GuestRow: View {
     }
 
     private var runningAction: GuestAction? {
-        model.runningActions[guest.id]
+        model.runningAction(for: guest, from: source)
     }
 
     private var failure: String? {

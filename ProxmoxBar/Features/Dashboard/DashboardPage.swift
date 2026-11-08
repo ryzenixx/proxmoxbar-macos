@@ -60,12 +60,12 @@ struct DashboardPage: View {
             DashboardFailure(message: message) {
                 await model.refresh()
             }
-        } else if let state = model.visibleState {
+        } else if let snapshot = model.visibleSnapshot {
             VStack(spacing: 0) {
-                ClusterSummaryRow(state: state)
+                ClusterSummaryRow(state: snapshot.state)
                 Divider()
                 controlsRow
-                list(for: state)
+                list(for: snapshot)
             }
         } else {
             ProgressView()
@@ -75,14 +75,16 @@ struct DashboardPage: View {
     }
 
     @ViewBuilder
-    private func list(for state: ClusterState) -> some View {
+    private func list(for snapshot: DashboardModel.Snapshot) -> some View {
+        let state = snapshot.state
         switch section {
         case .machines:
             let guests = preferences.sort.arrange(state.guests, matching: search)
             if guests.isEmpty, !search.isEmpty {
                 PagePlaceholder(symbol: "magnifyingglass", message: "No matches")
             } else {
-                GuestList(guests: guests)
+                GuestList(guests: guests, source: snapshot.source)
+                    .id(snapshot.source)
             }
         case .storage:
             let storages = filteredStorages(of: state)

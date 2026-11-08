@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GuestList: View {
     let guests: [ProxmoxGuest]
+    let source: DashboardModel.Source
 
     @Environment(DashboardModel.self) private var model
     @State private var expandedID: String?
@@ -15,6 +16,7 @@ struct GuestList: View {
                     ForEach(guests) { guest in
                         GuestRow(
                             guest: guest,
+                            source: source,
                             isExpanded: expandedID == guest.id,
                             onToggle: { toggle(guest) }
                         )
