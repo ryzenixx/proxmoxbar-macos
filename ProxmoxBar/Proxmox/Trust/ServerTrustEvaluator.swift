@@ -14,22 +14,23 @@ struct ServerTrustEvaluator: Sendable {
         }
         let certificate = ServerCertificate(certificate: leaf)
 
-        if SecTrustEvaluateWithError(trust, nil) {
-            return .trusted
-        }
-
-        let problems = Self.diagnose(trust, leaf: leaf, certificate: certificate)
-
-        guard let pinnedFingerprint else {
-            return .needsApproval(certificate, problems: problems)
-        }
-        guard certificate.fingerprint == pinnedFingerprint else {
+        if let pinnedFingerprint, certificate.fingerprint != pinnedFingerprint {
             return .rejected(
                 .certificateMismatch(
                     expected: pinnedFingerprint,
                     presented: certificate.fingerprint
                 )
             )
+        }
+
+        if SecTrustEvaluateWithError(trust, nil) {
+            return .trusted
+        }
+
+        let problems = Self.diagnose(trust, leaf: leaf, certificate: certificate)
+
+        guard pinnedFingerprint != nil else {
+            return .needsApproval(certificate, problems: problems)
         }
         let unexpected = problems.filter { $0.isExpected == false }
         guard unexpected.isEmpty else {
