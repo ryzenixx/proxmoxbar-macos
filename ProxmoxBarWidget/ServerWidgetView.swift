@@ -91,14 +91,14 @@ private struct GaugeColumn: View {
             Text(percentage)
                 .font(.title3.weight(.semibold))
                 .monospacedDigit()
-            MeterBar(value: value ?? 0)
+            UsageMeter(value: value ?? 0, height: 5)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var percentage: String {
         guard let value else { return "—" }
-        return "\(Int((value * 100).rounded()))%"
+        return value.formatted(.usagePercent)
     }
 }
 
@@ -111,37 +111,11 @@ private struct InlineMeter: View {
             Text(label)
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(.secondary)
-            MeterBar(value: value)
-            Text("\(Int((value * 100).rounded()))%")
+            UsageMeter(value: value, height: 5)
+            Text(value, format: .usagePercent)
                 .font(.caption2)
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
-        }
-    }
-}
-
-private struct MeterBar: View {
-    let value: Double
-
-    var body: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .leading) {
-                Capsule().fill(.quaternary)
-                if value > 0 {
-                    Capsule()
-                        .fill(tint)
-                        .frame(width: max(proxy.size.width * min(value, 1), 4))
-                }
-            }
-        }
-        .frame(height: 5)
-    }
-
-    private var tint: Color {
-        switch value {
-        case 0.9...: .red
-        case 0.75...: .orange
-        default: .secondary
         }
     }
 }

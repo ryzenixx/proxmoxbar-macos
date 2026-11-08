@@ -1,0 +1,7 @@
+CODE_SIGN_ENTITLEMENTS = ProxmoxBarWidget/ProxmoxBarWidget.entitlements
+INFOPLIST_FILE = Configuration/Widget-Info.plist
+INFOPLIST_KEY_CFBundleDisplayName = ProxmoxBarWidget
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks
+PRODUCT_BUNDLE_IDENTIFIER = $(PROXMOXBAR_APP_BUNDLE_IDENTIFIER).ProxmoxBarWidget
+PRODUCT_NAME = $(TARGET_NAME)
+SKIP_INSTALL = YES

@@ -1,0 +1,6 @@
+#include "Application.xcconfig"
+
+CODE_SIGN_ENTITLEMENTS = ProxmoxBar/ProxmoxBarMAS.entitlements
+CONFIGURATION_BUILD_DIR = $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/AppStore
+INFOPLIST_FILE = Configuration/AppStore-Info.plist
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) MAC_APP_STORE

@@ -10,16 +10,21 @@ struct ServerCredentials: Hashable, Sendable {
     }
 
     init?(address: String, tokenIdentifier: String, secret: String) {
+        guard let url = Self.baseURL(for: address) else { return nil }
+
+        self.baseURL = url
+        self.tokenIdentifier = tokenIdentifier.trimmingCharacters(in: .whitespaces)
+        self.secret = secret.trimmingCharacters(in: .whitespaces)
+    }
+
+    static func baseURL(for address: String) -> URL? {
         guard let url = URL(string: address.trimmingCharacters(in: .whitespaces)),
             let scheme = url.scheme?.lowercased(),
             scheme == "https" || scheme == "http",
             let host = url.host(),
             host.isEmpty == false
         else { return nil }
-
-        self.baseURL = url
-        self.tokenIdentifier = tokenIdentifier.trimmingCharacters(in: .whitespaces)
-        self.secret = secret.trimmingCharacters(in: .whitespaces)
+        return url
     }
 }
 

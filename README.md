@@ -1,139 +1,57 @@
 # ProxmoxBar
 
-Native macOS menu bar app for monitoring and controlling Proxmox VE.
+Monitor your Proxmox VE servers and control VMs and containers from the macOS menu bar.
 
-[![Mac App Store](https://img.shields.io/badge/Mac%20App%20Store-Download-0D96F6?style=for-the-badge&logo=apple&logoColor=white)](https://apps.apple.com/app/proxmoxbar/id6800746122)
-[![macOS](https://img.shields.io/badge/platform-macOS%2015%2B-000000?style=for-the-badge&logo=apple&logoColor=white)](https://www.apple.com/macos)
-[![Swift](https://img.shields.io/badge/Swift-6-orange?style=for-the-badge&logo=swift&logoColor=white)](https://www.swift.org/)
+[Mac App Store](https://apps.apple.com/app/proxmoxbar/id6800746122) · [Download DMG](https://github.com/ryzenixx/proxmoxbar-macos/releases/latest) · [Source](#build-from-source)
 
 <p align="center">
-  <img src=".github/assets/machines.png" alt="Machines panel" width="300">
-  &nbsp;
-  <img src=".github/assets/storage.png" alt="Storage panel" width="300">
+  <img src=".github/assets/machines.png" alt="ProxmoxBar dashboard showing virtual machines and containers" width="320">
+  <img src=".github/assets/storage.png" alt="ProxmoxBar storage view showing datastore usage" width="320">
 </p>
 
-## Features
+## What it does
 
-- Several servers, switched from the panel
-- Nodes online, aggregated CPU, memory and storage at a glance
-- Every VM and container with its live status, refreshed every five seconds, searchable and sortable
-- A storage tab beside the machines, with per-datastore usage
-- Start, shutdown, reboot, stop and resume, with the real task followed to completion
-- Notifications when a machine or a node changes state, across every server
-- Desktop and Notification Center widgets for any server, small or medium
-- Menu bar title showing the icon alone, running machines, or cluster CPU
-- Signed and notarized updates delivered by Sparkle
-
-## Requirements
-
-- macOS 15 or later
-- A Proxmox VE server and an API token
-
-On first connection macOS asks for permission to reach devices on your local
-network. ProxmoxBar cannot see your server until you allow it. The prompt can be
-revisited in System Settings, Privacy & Security, Local Network.
+- Switch between servers and check node health, CPU, memory and storage.
+- Search and sort VMs and containers. Start, shut down, restart, force stop or resume them from the panel.
+- Get notifications for guest and node status changes across your servers.
+- Add a desktop widget for a server, or show cluster CPU or the running guest count in the menu bar.
 
 ## Install
 
-### Mac App Store
+ProxmoxBar runs on **macOS 15 or later**. The App Store edition updates through the store. The direct download is signed and notarized and uses Sparkle for updates.
 
-[Download on the Mac App Store](https://apps.apple.com/app/proxmoxbar/id6800746122).
+To install the direct edition with Homebrew:
 
-### Homebrew
-
-```
+```sh
 brew install --cask ryzenixx/tap/proxmoxbar
 ```
 
-### Direct download
+## Connect a server
 
-1. Open the [latest release](https://github.com/ryzenixx/proxmoxbar-macos/releases/latest).
-2. Download `ProxmoxBar.dmg`.
-3. Drag `ProxmoxBar.app` to `/Applications`.
-4. Launch ProxmoxBar and add your server.
+Enter your server's HTTPS address, token ID and token secret. A typical address is `https://pve.example.net:8006` and a token ID looks like `proxmoxbar@pve!menubar`. If macOS asks for local network access, allow it so the app can reach your server.
 
-## Create a restricted API token
+### Create a restricted API token
 
-ProxmoxBar never needs your Proxmox password. Give it a token that can do only
-what the app actually does, and nothing more.
+In the Proxmox VE web interface:
 
-### 1. Create a role
+1. Under **Datacenter → Permissions → Roles**, create a role named `ProxmoxBar` with the privileges below.
+2. Under **Users**, create `proxmoxbar` in the Proxmox VE authentication server realm. Assign the role to that user at `/` with **Propagate** enabled.
+3. Under **API Tokens**, create a token for `proxmoxbar@pve`. With **Privilege Separation** enabled, grant the token the same role and scope. Alternatively, disable separation to inherit the dedicated user's permissions.
+4. Copy the secret when Proxmox shows it. ProxmoxBar uses the token for API requests and stores the secret in the macOS Keychain.
 
-**Datacenter** → **Permissions** → **Roles** → **Create**.
+| Privilege | Used for |
+| --- | --- |
+| `VM.Audit` | Reading VM and container state |
+| `VM.PowerMgmt` | Running power actions |
+| `Sys.Audit` | Reading node status |
+| `Datastore.Audit` | Reading storage usage |
 
-- Name: `ProxmoxBar`
-- Privileges:
+### Verify the certificate
 
-| Privilege | What it allows the app to do |
-| --------- | ---------------------------- |
-| `VM.Audit` | Read the list of VMs and containers and their status |
-| `VM.PowerMgmt` | Start, shutdown, reboot, stop and resume them |
-| `Sys.Audit` | Read node status, for the online count and the CPU meter |
-| `Datastore.Audit` | Read storage capacity for the summary row |
-
-Nothing else is required. The app never touches pools, SDN, the console, or any
-configuration.
-
-### 2. Create a user
-
-**Datacenter** → **Permissions** → **Users** → **Add**.
-
-- User name: `proxmoxbar`
-- Realm: `Proxmox VE authentication server`
-- Password: a strong one, which the app never uses
-
-### 3. Assign the role
-
-**Datacenter** → **Permissions** → **Add** → **User Permission**.
-
-- Path: `/`
-- User: `proxmoxbar`
-- Role: `ProxmoxBar`
-- Propagate: checked
-
-### 4. Create the token
-
-**Datacenter** → **Permissions** → **API Tokens** → **Add**.
-
-- User: `proxmoxbar@pve`
-- Token ID: `menubar`, or any name you prefer
-- Privilege Separation: unchecked
-- Copy the secret now. Proxmox shows it once and never again.
-
-Unchecking privilege separation gives the token the same rights as its user, and
-that user only holds the four privileges above. Separation matters when a token
-belongs to a powerful account; here there is nothing extra to separate from.
-
-Paste the address, the token ID and the secret into ProxmoxBar. The secret goes
-straight to the macOS keychain and is never written anywhere else.
-
-## Self-signed certificates
-
-Most homelab servers present a certificate macOS does not trust. ProxmoxBar shows
-you the fingerprint and asks. Once you accept, that exact certificate is pinned:
-if it ever changes, the connection is refused rather than trusted quietly.
+A default Proxmox VE certificate is signed by the cluster's own CA. If macOS does not recognize it, ProxmoxBar shows its SHA-256 fingerprint before you connect. Compare the fingerprint with the certificate on the node you intended to add, using a trusted connection.
 
 ## Build from source
 
-```
-git clone https://github.com/ryzenixx/proxmoxbar-macos.git
-cd proxmoxbar-macos
-open ProxmoxBar.xcodeproj
-```
+Open [ProxmoxBar.xcodeproj](ProxmoxBar.xcodeproj) in **Xcode 27 or later**, select **ProxmoxBar**, then press **⌘R**. Xcode resolves Sparkle through Swift Package Manager. Use **ProxmoxBar MAS** for the App Store build.
 
-Select the `ProxmoxBar` scheme, then `Cmd+R`. Xcode 27 or later; dependencies are
-resolved by Swift Package Manager on first open. The updater stays disabled in
-Debug builds, so running from Xcode will not offer to replace your installed copy.
-
-## Contributing
-
-Bug reports, feature requests and pull requests are welcome. See
-[CONTRIBUTING.md](CONTRIBUTING.md).
-
-Security vulnerabilities go through
-[private reporting](https://github.com/ryzenixx/proxmoxbar-macos/security/advisories/new),
-never a public issue. See [SECURITY.md](.github/SECURITY.md).
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+[Contributing](CONTRIBUTING.md) · [Privacy](PRIVACY.md) · [Security](.github/SECURITY.md) · [MIT License](LICENSE)

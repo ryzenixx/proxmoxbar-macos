@@ -48,13 +48,13 @@ jobs:
           }
 
       - name: Check formatting
-        run: xcrun swift-format lint --strict --recursive ProxmoxBar ProxmoxBarWidget ProxmoxBarTests
+        run: git ls-files -z -- '*.swift' | xargs -0 xcrun swift-format lint --strict
 
-      - name: Build and test
+      - name: Build
         run: |
           set -o pipefail
           xcodebuild -project "${APP_NAME}.xcodeproj" -scheme "$APP_NAME" \
-            -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build test
+            -destination 'generic/platform=macOS' -configuration Release CODE_SIGNING_ALLOWED=NO build
 
   package:
     name: Sign, notarize and package

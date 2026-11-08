@@ -8,11 +8,6 @@ struct ServerCertificate: Hashable, Sendable {
     let issuer: String?
     let notBefore: Date?
     let expiry: Date?
-
-    var isExpired: Bool {
-        guard let expiry else { return false }
-        return expiry < Date()
-    }
 }
 
 extension ServerCertificate {

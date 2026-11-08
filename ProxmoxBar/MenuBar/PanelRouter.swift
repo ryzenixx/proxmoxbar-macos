@@ -10,10 +10,6 @@ final class PanelRouter {
         self.page = page
     }
 
-    var canGoBack: Bool {
-        !history.isEmpty
-    }
-
     func go(to destination: PanelPage) {
         guard destination != page else { return }
         history.append(page)

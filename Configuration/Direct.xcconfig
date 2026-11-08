@@ -1,0 +1,5 @@
+#include "Application.xcconfig"
+
+CODE_SIGN_ENTITLEMENTS = ProxmoxBar/ProxmoxBar.entitlements
+INFOPLIST_FILE = Configuration/Direct-Info.plist
+SPARKLE_PUBLIC_ED_KEY =

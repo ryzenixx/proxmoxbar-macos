@@ -1,0 +1,180 @@
+import SwiftUI
+
+struct SettingsPage: View {
+    @Environment(PanelRouter.self) private var router
+    @Environment(ServerStore.self) private var store
+    @Environment(MenuBarPreference.self) private var menuBar
+    @Environment(AppNotifications.self) private var notifications
+    @Environment(AppUpdates.self) private var updates
+
+    let makeServerForm: @MainActor (ServerFormModel.Mode) -> ServerFormModel
+
+    @State private var editor: ServerFormModel?
+    @State private var removalError: String?
+    @State private var launchAtLogin = LaunchAtLogin()
+
+    private var title: String {
+        guard let editor else { return PanelPage.settings.title }
+        if case .awaitingTrust = editor.phase { return "Check the Certificate" }
+        return "Edit Server"
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            PageHeader(title: title, onBack: back)
+            if let editor {
+                ServerFormContent(model: editor, submitTitle: "Save") {
+                    EmptyView()
+                }
+                .onChange(of: editor.phase) { _, phase in
+                    if phase == .saved { self.editor = nil }
+                }
+            } else {
+                sections
+            }
+        }
+    }
+
+    private func back() {
+        guard let editor else {
+            router.goBack()
+            return
+        }
+        if case .awaitingTrust = editor.phase {
+            editor.cancelTrust()
+            return
+        }
+        self.editor = nil
+    }
+
+    private var sections: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    serversSection
+                    generalSection
+                    #if !MAC_APP_STORE
+                        updatesSection
+                    #endif
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 4)
+                .padding(.bottom, 16)
+            }
+            .scrollIndicators(.never)
+            footer
+        }
+        .task {
+            launchAtLogin.refresh()
+            updates.refresh()
+            await notifications.refreshAuthorization()
+        }
+    }
+
+    private var generalSection: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            SectionLabel("General")
+            FieldGroup {
+                MenuBarContentRow(preference: menuBar)
+                Divider()
+                NotificationsRow(notifications: notifications)
+                Divider()
+                LaunchAtLoginRow(launch: launchAtLogin)
+            }
+        }
+    }
+
+    #if !MAC_APP_STORE
+        private var updatesSection: some View {
+            VStack(alignment: .leading, spacing: 5) {
+                SectionLabel("Updates")
+                FieldGroup {
+                    UpdatesRows(updates: updates)
+                }
+                .disabled(!updates.isSupported)
+            }
+        }
+    #endif
+
+    private var serversSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 4) {
+                SectionLabel("Servers")
+                Spacer(minLength: 8)
+                PanelIconButton(symbol: "plus", title: "Add a server") {
+                    router.go(to: .addServer)
+                }
+            }
+            FieldGroup {
+                if store.servers.isEmpty {
+                    emptyRow
+                } else {
+                    ForEach(store.servers) { configuration in
+                        if configuration.id != store.servers.first?.id {
+                            Divider()
+                        }
+                        ServerRow(
+                            configuration: configuration,
+                            needsToken: store.needsToken(configuration.id),
+                            onEdit: { startEditing(configuration) },
+                            onRemove: { remove(configuration) }
+                        )
+                    }
+                }
+            }
+            if let removalError {
+                ErrorNote(message: removalError)
+                    .padding(.top, 4)
+            }
+        }
+    }
+
+    private var footer: some View {
+        VStack(spacing: 7) {
+            Text("\(AppInfo.name) \(AppInfo.versionSummary)")
+                .font(.caption)
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+            HStack(spacing: 16) {
+                if let issues = AppLinks.issues {
+                    HelpLink(
+                        "Report a problem",
+                        symbol: "exclamationmark.bubble",
+                        destination: issues
+                    )
+                }
+                if let support = AppLinks.support {
+                    HelpLink("Support the work", symbol: "heart", destination: support)
+                }
+            }
+            .font(.footnote.weight(.medium))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+    }
+
+    private var emptyRow: some View {
+        Text("No servers yet")
+            .font(.callout)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 14)
+    }
+
+    private func startEditing(_ configuration: ServerConfiguration) {
+        removalError = nil
+        editor = makeServerForm(.editing(configuration))
+    }
+
+    private func remove(_ configuration: ServerConfiguration) {
+        do {
+            removalError = nil
+            try store.remove(configuration.id)
+        } catch {
+            removalError = "The server was removed but its secret stayed in the keychain."
+        }
+    }
+}

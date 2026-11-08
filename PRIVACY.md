@@ -1,22 +1,23 @@
 # Privacy Policy
 
-ProxmoxBar does not collect, store, share, or transmit any personal data.
+ProxmoxBar connects your Mac directly to the Proxmox VE servers you configure. The developer does not operate an intermediary service. The app has no account system, analytics or advertising.
 
-## No data collection
+## What the app stores
 
-ProxmoxBar has no analytics, no tracking, no advertising, and no user accounts. It contains no third-party code that collects data about you.
+| Data | Where it is stored |
+| --- | --- |
+| Server addresses, names, token IDs, approved certificate fingerprints and app preferences | Local macOS preferences |
+| API token secrets | macOS Keychain |
+| The latest server names, status and usage summaries for widgets | A local App Group shared by ProxmoxBar and its widget extension |
 
-## Your servers and credentials
+## Network requests
 
-ProxmoxBar communicates only with the Proxmox VE servers that you add, directly over your own network. There is no intermediate server operated by the developer. Your server addresses and API tokens are stored locally in the macOS keychain, on your device only. They never leave your Mac and are never sent to the developer or to any third party.
+ProxmoxBar sends the API token to the configured Proxmox VE server in the authorization header when it reads cluster data or sends a power command.
 
-## Network access
-
-The app connects only to the server addresses you configure. The version distributed outside the Mac App Store also contacts GitHub to check for updates; the Mac App Store version receives updates through the App Store instead.
+The direct-download edition uses Sparkle to check the public update feed and download releases from GitHub. App Store installations receive updates through the Mac App Store.
 
 ## Contact
 
-Questions about this policy can be sent through the project's issue tracker:
-https://github.com/ryzenixx/proxmoxbar-macos/issues
+For privacy questions, use the [project issue tracker](https://github.com/ryzenixx/proxmoxbar-macos/issues). For reports involving credentials or another security issue, use the [private reporting instructions](.github/SECURITY.md).
 
-Last updated: 2026-08-12
+Last updated November 8, 2026.

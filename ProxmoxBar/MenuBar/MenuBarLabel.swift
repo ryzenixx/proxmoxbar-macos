@@ -31,7 +31,7 @@ struct MenuBarLabel: View {
             return "\(state.runningGuests)"
         case .processor:
             guard let usage = state.cpuUsage else { return nil }
-            return "\(Int((usage * 100).rounded()))%"
+            return usage.formatted(.usagePercent)
         }
     }
 }

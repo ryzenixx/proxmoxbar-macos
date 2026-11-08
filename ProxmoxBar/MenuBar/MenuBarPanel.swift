@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct MenuBarPanel: View {
+    let makeServerForm: @MainActor (ServerFormModel.Mode) -> ServerFormModel
+
     private static let width: CGFloat = 420
     private static let height: CGFloat = 500
 
@@ -16,8 +18,8 @@ struct MenuBarPanel: View {
     private var page: some View {
         switch router.page {
         case .dashboard: DashboardPage()
-        case .addServer: AddServerPage()
-        case .settings: SettingsPage()
+        case .addServer: AddServerPage(makeServerForm: makeServerForm)
+        case .settings: SettingsPage(makeServerForm: makeServerForm)
         }
     }
 }

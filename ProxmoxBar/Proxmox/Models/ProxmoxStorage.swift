@@ -26,9 +26,4 @@ struct ProxmoxStorage: Identifiable, Hashable, Sendable {
         let totalText = Int64(total).formatted(.byteCount(style: .file))
         return "\(usedText) of \(totalText)"
     }
-
-    var percentageText: String? {
-        guard let usage else { return nil }
-        return "\(Int((usage * 100).rounded()))%"
-    }
 }
