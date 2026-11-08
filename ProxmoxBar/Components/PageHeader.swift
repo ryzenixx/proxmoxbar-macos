@@ -10,9 +10,11 @@ struct PageHeader: View {
                 Image(systemName: "chevron.backward")
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Back")
             Text(title)
                 .font(.headline)
             Spacer()
+            PanelCommands()
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

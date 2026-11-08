@@ -1,4 +1,3 @@
-import AppKit
 import SwiftUI
 
 struct DashboardHeader: View {
@@ -6,19 +5,23 @@ struct DashboardHeader: View {
     let selected: ServerConfiguration?
     let onSelect: (UUID) -> Void
     let onAddServer: () -> Void
-    let onOpenSettings: () -> Void
     var titleOverride: String?
     var onExitDemo: (() -> Void)?
 
     var body: some View {
         HStack(spacing: 2) {
-            ServerSelector(
-                servers: servers,
-                selected: selected,
-                onSelect: onSelect,
-                onAddServer: onAddServer,
-                titleOverride: titleOverride
-            )
+            if servers.isEmpty, titleOverride == nil {
+                Text(PanelPage.dashboard.title)
+                    .font(.headline)
+            } else {
+                ServerSelector(
+                    servers: servers,
+                    selected: selected,
+                    onSelect: onSelect,
+                    onAddServer: onAddServer,
+                    titleOverride: titleOverride
+                )
+            }
             Spacer(minLength: 8)
             if let onExitDemo {
                 Button(action: onExitDemo) {
@@ -28,10 +31,7 @@ struct DashboardHeader: View {
                 .controlSize(.small)
                 .tint(.red)
             }
-            PanelIconButton(symbol: "gearshape", title: "Settings", action: onOpenSettings)
-            PanelIconButton(symbol: "power", title: "Quit ProxmoxBar") {
-                NSApplication.shared.terminate(nil)
-            }
+            PanelCommands()
         }
         .padding(.leading, 16)
         .padding(.trailing, 12)

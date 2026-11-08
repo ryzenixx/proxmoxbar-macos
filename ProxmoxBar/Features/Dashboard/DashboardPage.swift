@@ -15,26 +15,28 @@ struct DashboardPage: View {
     @State private var search = ""
 
     var body: some View {
-        if store.servers.isEmpty && !model.isDemo {
-            NoServersView(
-                onAddServer: { router.go(to: .addServer) },
-                onTryDemo: { model.enterDemo() }
-            )
-        } else {
-            VStack(spacing: 0) {
-                header
-                content
-            }
-            .task {
-                if model.isDemo {
-                    if store.servers.isEmpty { return }
-                    model.exitDemo()
+        VStack(spacing: 0) {
+            header
+            if store.servers.isEmpty && !model.isDemo {
+                NoServersView(
+                    onAddServer: { router.go(to: .addServer) },
+                    onTryDemo: { model.enterDemo() }
+                )
+            } else {
+                VStack(spacing: 0) {
+                    content
                 }
-                model.startMonitoring()
-                await model.refresh()
-            }
-            .onChange(of: store.servers) { _, _ in
-                model.selectionDidChange()
+                .task {
+                    if model.isDemo {
+                        if store.servers.isEmpty { return }
+                        model.exitDemo()
+                    }
+                    model.startMonitoring()
+                    await model.refresh()
+                }
+                .onChange(of: store.servers) { _, _ in
+                    model.selectionDidChange()
+                }
             }
         }
     }
@@ -48,7 +50,6 @@ struct DashboardPage: View {
                 if model.isDemo { model.exitDemo() }
                 router.go(to: .addServer)
             },
-            onOpenSettings: { router.go(to: .settings) },
             titleOverride: model.isDemo ? "Demo" : nil,
             onExitDemo: model.isDemo ? { model.exitDemo() } : nil
         )
