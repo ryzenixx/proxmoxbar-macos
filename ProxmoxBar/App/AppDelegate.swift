@@ -10,12 +10,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         services.notifications.configure()
         welcome.presentIfNeeded()
         services.watcher.start()
-        services.dashboard.startMonitoring()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         services.watcher.stop()
-        services.dashboard.stopMonitoring()
     }
 
     nonisolated func applicationShouldTerminateAfterLastWindowClosed(

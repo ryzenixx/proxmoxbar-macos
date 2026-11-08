@@ -27,10 +27,6 @@ struct VersionPayload: Decodable, Sendable {
     let repoid: String
 }
 
-struct GuestStatusPayload: Decodable, Sendable {
-    let status: String
-}
-
 struct TaskStatusPayload: Decodable, Sendable {
     let upid: String
     let node: String

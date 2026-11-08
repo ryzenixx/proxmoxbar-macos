@@ -4,7 +4,6 @@ struct ProxmoxAPIClient: ProxmoxAPI {
     private enum Limits {
         static let taskPollInterval: Duration = .seconds(1)
         static let taskPollAttempts = 30
-        static let settlePollAttempts = 20
     }
 
     private let transport: ProxmoxHTTPTransport
@@ -44,25 +43,6 @@ struct ProxmoxAPIClient: ProxmoxAPI {
             from: server
         )
         try await waitForTask(upid, on: guest.node, of: server)
-        if let settled = action.settledStatus {
-            try await waitUntilGuestSettles(into: settled, guest: guest, of: server)
-        }
-    }
-
-    private func waitUntilGuestSettles(
-        into expected: GuestStatus,
-        guest: ProxmoxGuest,
-        of server: ProxmoxServer
-    ) async throws {
-        let segments = [
-            "nodes", guest.node, guest.kind.pathComponent, String(guest.vmid),
-            "status", "current",
-        ]
-        for _ in 0..<Limits.settlePollAttempts {
-            let current: GuestStatusPayload = try await transport.request(segments, from: server)
-            if GuestStatus(rawValue: current.status) == expected { return }
-            try await Task.sleep(for: Limits.taskPollInterval)
-        }
     }
 
     private func waitForTask(

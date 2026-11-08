@@ -36,8 +36,7 @@ struct DashboardPage: View {
                         if store.servers.isEmpty { return }
                         model.exitDemo()
                     }
-                    model.startMonitoring()
-                    await model.refresh()
+                    await model.loadSelection()
                 }
                 .onChange(of: store.servers) { _, _ in
                     model.selectionDidChange()

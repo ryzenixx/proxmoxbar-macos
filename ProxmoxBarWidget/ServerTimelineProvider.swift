@@ -13,15 +13,19 @@ struct ServerTimelineProvider: AppIntentTimelineProvider {
     func timeline(for configuration: SelectServerIntent, in context: Context) async
         -> Timeline<ServerEntry>
     {
-        let entry = ServerEntry(date: .now, snapshot: resolve(configuration))
-        let next = Calendar.current.date(byAdding: .minute, value: 15, to: .now) ?? .now
-        return Timeline(entries: [entry], policy: .after(next))
+        let now = Date.now
+        let snapshot = resolve(configuration)
+        var entries = [ServerEntry(date: now, snapshot: snapshot)]
+        if let snapshot, let staleAt = snapshot.staleAt, !snapshot.isStale(at: now) {
+            entries.append(ServerEntry(date: staleAt, snapshot: snapshot))
+        }
+        return Timeline(entries: entries, policy: .after(now.addingTimeInterval(15 * 60)))
     }
 
     private func resolve(_ configuration: SelectServerIntent) -> WidgetSnapshot? {
         let all = WidgetSharedStore.read()
-        if let id = configuration.server?.id, let match = all.first(where: { $0.id == id }) {
-            return match
+        if let id = configuration.server?.id {
+            return all.first { $0.id == id }
         }
         return all.first
     }
@@ -33,16 +37,19 @@ struct ServerEntry: TimelineEntry {
 }
 
 extension WidgetSnapshot {
-    static let placeholder = WidgetSnapshot(
-        id: "placeholder",
-        name: "homelab",
-        reachable: true,
-        nodesOnline: 1,
-        nodesTotal: 1,
-        running: 8,
-        guestsTotal: 12,
-        cpu: 0.27,
-        memory: 0.12,
-        storage: 0.34
-    )
+    static var placeholder: WidgetSnapshot {
+        WidgetSnapshot(
+            id: "placeholder",
+            name: "homelab",
+            reachable: true,
+            observedAt: .now,
+            nodesOnline: 1,
+            nodesTotal: 1,
+            running: 8,
+            guestsTotal: 12,
+            cpu: 0.27,
+            memory: 0.12,
+            storage: 0.34
+        )
+    }
 }

@@ -7,15 +7,34 @@ struct ServerWidgetView: View {
 
     var body: some View {
         if let snapshot = entry.snapshot {
-            switch family {
-            case .systemSmall:
-                SmallServerView(snapshot: snapshot)
-            default:
-                MediumServerView(snapshot: snapshot)
+            if snapshot.isStale(at: entry.date) {
+                OutdatedServerView(name: snapshot.name)
+            } else {
+                switch family {
+                case .systemSmall:
+                    SmallServerView(snapshot: snapshot)
+                default:
+                    MediumServerView(snapshot: snapshot)
+                }
             }
         } else {
             EmptyServerView()
         }
+    }
+}
+
+private struct OutdatedServerView: View {
+    let name: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ServerHeader(name: name, reachable: false)
+            Label("Data out of date", systemImage: "clock")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

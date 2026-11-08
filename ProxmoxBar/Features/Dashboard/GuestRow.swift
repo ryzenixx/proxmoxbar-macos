@@ -22,7 +22,7 @@ struct GuestRow: View {
         .onChange(of: isExpanded) { _, expanded in
             if !expanded { pendingForce = nil }
         }
-        .onChange(of: runningAction) { _, action in
+        .onChange(of: actionProgress) { _, action in
             if action != nil { pendingForce = nil }
         }
     }
@@ -56,23 +56,23 @@ struct GuestRow: View {
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
-        .disabled(guest.availableActions.isEmpty && failure == nil)
+        .disabled(guest.availableActions.isEmpty && notice == nil)
         .accessibilityLabel(
             "\(guest.displayName), \(guest.kind.label) \(guest.vmid), \(spokenStatus)")
     }
 
     @ViewBuilder
     private var statusLine: some View {
-        if let failure, !isExpanded {
+        if let notice, !isExpanded {
             HStack(spacing: 4) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 9))
-                Text(failure)
+                Text(notice.message)
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
             .font(.caption)
-            .foregroundStyle(.red)
+            .foregroundStyle(noticeTint)
         } else {
             Text(metadata)
                 .font(.caption)
@@ -85,12 +85,12 @@ struct GuestRow: View {
 
     @ViewBuilder
     private var trailing: some View {
-        if runningAction != nil {
+        if actionProgress != nil {
             ProgressView()
                 .controlSize(.small)
                 .scaleEffect(0.6)
                 .frame(width: 14, height: 14)
-        } else if !guest.availableActions.isEmpty || failure != nil {
+        } else if !guest.availableActions.isEmpty || notice != nil {
             Image(systemName: "chevron.right")
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundStyle(.tertiary)
@@ -100,13 +100,13 @@ struct GuestRow: View {
 
     private var details: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if let failure {
+            if let notice {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(failure)
+                    Text(notice.message)
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(noticeTint)
                         .fixedSize(horizontal: false, vertical: true)
-                    Button("Dismiss") { model.dismissFailure(for: guest, from: source) }
+                    Button("Dismiss") { model.dismissNotice(for: guest, from: source) }
                         .buttonStyle(.link)
                         .font(.caption)
                 }
@@ -143,19 +143,24 @@ struct GuestRow: View {
         .buttonStyle(.bordered)
         .controlSize(.small)
         .tint(action.isForceful ? .red : nil)
-        .disabled(runningAction != nil)
+        .disabled(actionProgress != nil)
     }
 
-    private var runningAction: GuestAction? {
-        model.runningAction(for: guest, from: source)
+    private var actionProgress: DashboardModel.ActionProgress? {
+        model.actionProgress(for: guest, from: source)
     }
 
-    private var failure: String? {
-        model.actionFailures[guest.id]
+    private var notice: DashboardModel.ActionNotice? {
+        model.actionNotices[guest.id]
+    }
+
+    private var noticeTint: Color {
+        if case .stateUnconfirmed = notice { return .orange }
+        return .red
     }
 
     private var isDimmed: Bool {
-        guest.status.isRunning == false && runningAction == nil && failure == nil
+        guest.status.isRunning == false && actionProgress == nil && notice == nil
     }
 
     @ViewBuilder
@@ -168,8 +173,8 @@ struct GuestRow: View {
     }
 
     private var metadata: String {
-        if let runningAction {
-            return "\(guest.node) · \(runningAction.progressLabel)"
+        if let actionProgress {
+            return "\(guest.node) · \(actionProgress.label)"
         }
         var parts = [guest.node]
         if guest.isTemplate {
@@ -184,7 +189,7 @@ struct GuestRow: View {
     }
 
     private var spokenStatus: String {
-        failure.map { "Failed: \($0)" } ?? metadata
+        notice?.message ?? metadata
     }
 
     private var statusTint: Color {

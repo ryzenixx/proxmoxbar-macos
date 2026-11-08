@@ -1,23 +1,37 @@
 import Foundation
+import Observation
 
 @MainActor
-protocol UserActionRecorder {
-    func recordUserAction(server: UUID, guestID: String)
-}
+@Observable
+final class ServerWatcher {
+    struct Reading {
+        let result: Result<ClusterState, ProxmoxError>
+        let startedAt: ContinuousClock.Instant
+        let observedAt: Date
 
-@MainActor
-final class ServerWatcher: UserActionRecorder {
+        var state: ClusterState? { try? result.get() }
+
+        var failureMessage: String? {
+            if case .failure(let error) = result { return error.localizedDescription }
+            return nil
+        }
+    }
+
     static let actionWindow: TimeInterval = 90
 
-    private let store: ServerStore
-    private let api: any ProxmoxAPI
-    private let notifier: any StatusChangeNotifier
-    private let polling = PollingSchedule()
+    @ObservationIgnored private let store: ServerStore
+    @ObservationIgnored private let api: any ProxmoxAPI
+    @ObservationIgnored private let notifier: any StatusChangeNotifier
+    @ObservationIgnored private let polling = PollingSchedule()
 
-    private var previousGuests: [UUID: [String: GuestStatus]] = [:]
-    private var previousNodes: [UUID: [String: Bool]] = [:]
-    private var recentActions: [String: Date] = [:]
-    private var widgetPublisher = WidgetSnapshotPublisher()
+    private var readings: [ServerConfiguration: Reading] = [:]
+    @ObservationIgnored private var requests: [ServerConfiguration: Task<Void, Never>] = [:]
+    @ObservationIgnored private var isPolling = false
+    @ObservationIgnored private var previousGuests: [ServerConfiguration: [String: GuestStatus]] =
+        [:]
+    @ObservationIgnored private var previousNodes: [ServerConfiguration: [String: Bool]] = [:]
+    @ObservationIgnored private var recentActions: [String: Date] = [:]
+    @ObservationIgnored private var widgetPublisher = WidgetSnapshotPublisher()
 
     init(store: ServerStore, api: any ProxmoxAPI, notifier: any StatusChangeNotifier) {
         self.store = store
@@ -33,43 +47,77 @@ final class ServerWatcher: UserActionRecorder {
 
     func stop() {
         polling.stop()
+        for request in requests.values { request.cancel() }
     }
 
     func recordUserAction(server: UUID, guestID: String) {
         recentActions[key(server, guestID)] = Date()
     }
 
+    func reading(for configuration: ServerConfiguration) -> Reading? {
+        readings[configuration]
+    }
+
+    func refresh(_ configuration: ServerConfiguration) async {
+        guard !Task.isCancelled, store.servers.contains(configuration) else { return }
+        if let request = requests[configuration] {
+            await request.value
+            return
+        }
+
+        let request = Task<Void, Never> { [weak self] in
+            await self?.fetch(configuration)
+        }
+        requests[configuration] = request
+        await request.value
+    }
+
+    private func fetch(_ configuration: ServerConfiguration) async {
+        defer { requests[configuration] = nil }
+        guard !Task.isCancelled, store.servers.contains(configuration) else { return }
+
+        let startedAt = ContinuousClock.now
+        let result: Result<ClusterState, ProxmoxError>
+        do {
+            guard let server = try store.server(for: configuration.id) else {
+                throw ProxmoxError.transport("This server has no token yet.")
+            }
+            result = .success(try await api.clusterState(of: server))
+        } catch is CancellationError {
+            return
+        } catch {
+            result = .failure((error as? ProxmoxError) ?? .transport(error.localizedDescription))
+        }
+
+        guard !Task.isCancelled, store.servers.contains(configuration) else { return }
+        readings[configuration] = Reading(result: result, startedAt: startedAt, observedAt: .now)
+        if case .success(let state) = result {
+            handle(server: configuration, state: state, notify: notifier.isEnabled)
+        }
+    }
+
     private func pollOnce() async {
+        guard !Task.isCancelled, !isPolling else { return }
+        isPolling = true
+        defer { isPolling = false }
         pruneRecentActions()
 
         let servers = store.servers
-        let living = Set(servers.map(\.id))
+        let living = Set(servers)
+        if readings.keys.contains(where: { !living.contains($0) }) {
+            readings = readings.filter { living.contains($0.key) }
+        }
         previousGuests = previousGuests.filter { living.contains($0.key) }
         previousNodes = previousNodes.filter { living.contains($0.key) }
 
-        let targets = servers.compactMap { config in
-            (try? store.server(for: config.id)).map { (config.id, $0) }
-        }
-
-        let api = self.api
-        var states: [UUID: ClusterState] = [:]
-        await withTaskGroup(of: (UUID, ClusterState?).self) { group in
-            for (id, server) in targets {
-                group.addTask {
-                    (id, try? await api.clusterState(of: server))
-                }
-            }
-            for await (id, state) in group {
-                if let state { states[id] = state }
+        await withTaskGroup(of: Void.self) { group in
+            for configuration in servers {
+                group.addTask { await self.refresh(configuration) }
             }
         }
 
-        widgetPublisher.publish(servers: servers, states: states)
-
-        let shouldNotify = notifier.isEnabled
-        for (id, state) in states {
-            handle(server: id, state: state, notify: shouldNotify)
-        }
+        guard !Task.isCancelled, store.writeError == nil else { return }
+        widgetPublisher.publish(servers: store.servers, readings: readings)
     }
 
     private func pruneRecentActions() {
@@ -79,27 +127,27 @@ final class ServerWatcher: UserActionRecorder {
         }
     }
 
-    private func handle(server id: UUID, state: ClusterState, notify: Bool) {
+    private func handle(server: ServerConfiguration, state: ClusterState, notify: Bool) {
         if notify {
-            let skip = Set(state.guests.map(\.id).filter { recentlyActed(id, $0) })
+            let skip = Set(state.guests.map(\.id).filter { recentlyActed(server.id, $0) })
             for change in GuestStatusChange.detect(
-                previous: previousGuests[id] ?? [:],
+                previous: previousGuests[server] ?? [:],
                 current: state.guests,
                 skipping: skip
             ) {
                 notifier.post(change.event)
             }
             for change in NodeStatusChange.detect(
-                previous: previousNodes[id] ?? [:],
+                previous: previousNodes[server] ?? [:],
                 current: state.nodes
             ) {
                 notifier.post(change.event)
             }
         }
-        previousGuests[id] = Dictionary(
+        previousGuests[server] = Dictionary(
             uniqueKeysWithValues: state.guests.map { ($0.id, $0.status) }
         )
-        previousNodes[id] = Dictionary(
+        previousNodes[server] = Dictionary(
             uniqueKeysWithValues: state.nodes.map { ($0.name, $0.isOnline) }
         )
     }

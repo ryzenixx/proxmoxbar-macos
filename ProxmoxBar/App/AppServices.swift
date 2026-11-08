@@ -18,7 +18,7 @@ final class AppServices {
         self.store = store
         self.notifications = notifications
         self.watcher = watcher
-        dashboard = DashboardModel(store: store, api: ProxmoxAPIClient(), recorder: watcher)
+        dashboard = DashboardModel(store: store, api: ProxmoxAPIClient(), watcher: watcher)
     }
 
     func makeServerForm(mode: ServerFormModel.Mode) -> ServerFormModel {

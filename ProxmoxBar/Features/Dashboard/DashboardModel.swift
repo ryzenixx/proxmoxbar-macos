@@ -14,16 +14,29 @@ final class DashboardModel {
         let state: ClusterState
     }
 
-    private enum Phase: Equatable {
-        case idle
-        case loading
-        case loaded(ClusterState)
-        case failed(String)
+    enum ActionProgress: Equatable {
+        case executing(GuestAction)
+        case confirmingState
+
+        var label: String {
+            switch self {
+            case .executing(let action): action.progressLabel
+            case .confirmingState: "Checking machine state…"
+            }
+        }
     }
 
-    private struct ConfirmedStatus {
-        let status: GuestStatus
-        let confirmedAt: Date
+    enum ActionNotice: Equatable {
+        case failed(String)
+        case stateUnconfirmed
+
+        var message: String {
+            switch self {
+            case .failed(let message): message
+            case .stateUnconfirmed:
+                "The task completed, but the machine’s new state could not be confirmed."
+            }
+        }
     }
 
     private struct ActionKey: Hashable {
@@ -31,54 +44,41 @@ final class DashboardModel {
         let guestID: String
     }
 
-    static let confirmedStatusLifetime: TimeInterval = 60
-
     private var selectedID: UUID?
-    private var phase: Phase = .idle
     private var displaySource: Source?
-    private var refreshFailure: String?
-    private var runningActions: [ActionKey: GuestAction] = [:]
-    private(set) var actionFailures: [String: String] = [:]
-    private var confirmedStatuses: [String: ConfirmedStatus] = [:]
+    private var runningActions: [ActionKey: ActionProgress] = [:]
+    private var notices: [String: ActionNotice] = [:]
     private var demoID: UUID?
+    private var demoState: ClusterState?
 
     var isDemo: Bool { demoID != nil }
 
-    var failureMessage: String? {
-        guard displaySource == activeSource else { return nil }
-        if let refreshFailure { return refreshFailure }
-        if case .failed(let message) = phase { return message }
-        return nil
+    var failureMessage: String? { currentReading?.failureMessage }
+
+    var actionNotices: [String: ActionNotice] {
+        displaySource == activeSource ? notices : [:]
     }
 
     var visibleSnapshot: Snapshot? {
-        guard let displaySource, displaySource == activeSource, case .loaded(let state) = phase
+        guard let source = activeSource, let state = isDemo ? demoState : currentReading?.state
         else { return nil }
-        let visible = state.applying(confirmedStatuses.mapValues(\.status))
-        return Snapshot(source: displaySource, state: visible)
+        return Snapshot(source: source, state: state)
     }
 
     @ObservationIgnored private let store: ServerStore
     @ObservationIgnored private let api: any ProxmoxAPI
-    @ObservationIgnored private let recorder: any UserActionRecorder
-    @ObservationIgnored private let polling = PollingSchedule()
-    @ObservationIgnored private var refreshGeneration = 0
+    @ObservationIgnored private let watcher: ServerWatcher
 
-    init(store: ServerStore, api: any ProxmoxAPI, recorder: any UserActionRecorder) {
+    init(store: ServerStore, api: any ProxmoxAPI, watcher: ServerWatcher) {
         self.store = store
         self.api = api
-        self.recorder = recorder
+        self.watcher = watcher
     }
 
-    var servers: [ServerConfiguration] {
-        store.servers
-    }
+    var servers: [ServerConfiguration] { store.servers }
 
     var selected: ServerConfiguration? {
-        if let selected = servers.first(where: { $0.id == selectedID }) {
-            return selected
-        }
-        return servers.first
+        servers.first { $0.id == selectedID } ?? servers.first
     }
 
     private var activeSource: Source? {
@@ -86,69 +86,68 @@ final class DashboardModel {
         return selected.map { .server(id: $0.id, address: $0.address) }
     }
 
-    func startMonitoring() {
-        polling.start { [weak self] in
-            await self?.refresh()
-        }
-    }
-
-    func stopMonitoring() {
-        polling.stop()
+    private var currentReading: ServerWatcher.Reading? {
+        guard !isDemo, let selected else { return nil }
+        return watcher.reading(for: selected)
     }
 
     func select(_ identifier: UUID) {
-        guard identifier != selected?.id,
-            servers.contains(where: { $0.id == identifier })
+        guard identifier != selected?.id, servers.contains(where: { $0.id == identifier })
         else { return }
         selectedID = identifier
-        reloadSelection()
+        selectionDidChange()
     }
 
     func selectionDidChange() {
         if let selectedID, !servers.contains(where: { $0.id == selectedID }) {
             self.selectedID = nil
         }
-        if displaySource != activeSource { reloadSelection() }
+        updateDisplaySource()
+        Task { await loadSelection() }
     }
 
-    private func reloadSelection() {
-        resetDisplay(to: activeSource)
-        Task { await refresh() }
-    }
-
-    private func resetDisplay(to source: Source?) {
-        refreshGeneration += 1
-        phase = .idle
-        refreshFailure = nil
-        actionFailures.removeAll()
-        confirmedStatuses.removeAll()
+    private func updateDisplaySource() {
+        let source = activeSource
+        guard displaySource != source else { return }
+        notices.removeAll()
         displaySource = source
     }
 
+    func loadSelection() async {
+        updateDisplaySource()
+        guard !isDemo, let selected, watcher.reading(for: selected) == nil else { return }
+        await watcher.refresh(selected)
+    }
+
+    func refresh() async {
+        guard !isDemo, let selected else { return }
+        await watcher.refresh(selected)
+    }
+
     func enterDemo() {
-        stopMonitoring()
         demoID = UUID()
+        demoState = DemoCluster.state()
         selectedID = nil
-        resetDisplay(to: activeSource)
-        phase = .loaded(DemoCluster.state())
+        updateDisplaySource()
     }
 
     func exitDemo() {
         demoID = nil
-        resetDisplay(to: activeSource)
+        demoState = nil
+        updateDisplaySource()
     }
 
     private func performDemo(_ action: GuestAction, on guest: ProxmoxGuest, from source: Source)
         async
     {
         try? await Task.sleep(for: .seconds(0.8))
-        guard isDisplaying(source), case .loaded(let current) = phase,
-            let settled = action.settledStatus
-        else { return }
-        phase = .loaded(current.applying([guest.id: settled]))
+        guard isDisplaying(source), let demoState, let settled = action.settledStatus else {
+            return
+        }
+        self.demoState = demoState.applying([guest.id: settled])
     }
 
-    func runningAction(for guest: ProxmoxGuest, from source: Source) -> GuestAction? {
+    func actionProgress(for guest: ProxmoxGuest, from source: Source) -> ActionProgress? {
         runningActions[ActionKey(source: source, guestID: guest.id)]
     }
 
@@ -157,92 +156,70 @@ final class DashboardModel {
     }
 
     func perform(_ action: GuestAction, on guest: ProxmoxGuest, from source: Source) async {
-        guard isDisplaying(source), case .loaded = phase else { return }
+        guard isDisplaying(source), visibleSnapshot?.source == source else { return }
         let key = ActionKey(source: source, guestID: guest.id)
         guard runningActions[key] == nil else { return }
-        runningActions[key] = action
+        runningActions[key] = .executing(action)
         defer { runningActions[key] = nil }
 
-        guard case .server(let target, _) = source else {
+        guard case .server(let target, _) = source, let configuration = selected else {
             await performDemo(action, on: guest, from: source)
             return
         }
-        actionFailures[guest.id] = nil
-        recorder.recordUserAction(server: target, guestID: guest.id)
+        notices[guest.id] = nil
+        watcher.recordUserAction(server: target, guestID: guest.id)
 
         do {
             guard let server = try store.server(for: target) else {
-                actionFailures[guest.id] = "This server has no token yet."
+                notices[guest.id] = .failed("This server has no token yet.")
                 return
             }
             try await api.perform(action, on: guest, of: server)
+            let completedAt = ContinuousClock.now
             guard isDisplaying(source) else { return }
-            if let settled = action.settledStatus {
-                confirmedStatuses[guest.id] = ConfirmedStatus(
-                    status: settled,
-                    confirmedAt: Date()
+            if let expected = action.settledStatus {
+                runningActions[key] = .confirmingState
+                await watcher.refresh(configuration)
+                let confirmed = try await confirm(
+                    expected, for: key, since: completedAt, on: configuration
                 )
-            }
-        } catch is CancellationError {
-            return
-        } catch {
-            guard isDisplaying(source) else { return }
-            actionFailures[guest.id] =
-                (error as? ProxmoxError)?.errorDescription ?? error.localizedDescription
-        }
-        await refresh()
-    }
-
-    private func reconcileConfirmedStatuses(against state: ClusterState) {
-        guard !confirmedStatuses.isEmpty else { return }
-        let now = Date()
-        for (id, confirmed) in confirmedStatuses {
-            let reported = state.guests.first { $0.id == id }?.status
-            let agreed = reported == confirmed.status
-            let expired =
-                now.timeIntervalSince(confirmed.confirmedAt) > Self.confirmedStatusLifetime
-            if agreed || expired || reported == nil {
-                confirmedStatuses[id] = nil
-            }
-        }
-    }
-
-    func dismissFailure(for guest: ProxmoxGuest, from source: Source) {
-        guard isDisplaying(source) else { return }
-        actionFailures[guest.id] = nil
-    }
-
-    func refresh() async {
-        if isDemo { return }
-        let source = activeSource
-        if displaySource != source { resetDisplay(to: source) }
-        guard let source, case .server(let target, _) = source else { return }
-        if phase == .idle {
-            phase = .loading
-        }
-        refreshGeneration += 1
-        let generation = refreshGeneration
-        do {
-            guard let server = try store.server(for: target) else {
-                phase = .failed("This server has no token yet.")
-                return
-            }
-            let state = try await api.clusterState(of: server)
-            guard generation == refreshGeneration, isDisplaying(source) else { return }
-            reconcileConfirmedStatuses(against: state)
-            phase = .loaded(state)
-            refreshFailure = nil
-        } catch is CancellationError {
-            return
-        } catch {
-            guard generation == refreshGeneration, isDisplaying(source) else { return }
-            let message =
-                (error as? ProxmoxError)?.errorDescription ?? error.localizedDescription
-            if case .loaded = phase {
-                refreshFailure = message
+                if !confirmed, isDisplaying(source), selected == configuration {
+                    notices[guest.id] = .stateUnconfirmed
+                }
             } else {
-                phase = .failed(message)
+                await watcher.refresh(configuration)
             }
+        } catch is CancellationError {
+            return
+        } catch {
+            guard isDisplaying(source), selected == configuration else { return }
+            notices[guest.id] = .failed(error.localizedDescription)
+            await watcher.refresh(configuration)
         }
+    }
+
+    private func confirm(
+        _ expected: GuestStatus,
+        for key: ActionKey,
+        since completedAt: ContinuousClock.Instant,
+        on configuration: ServerConfiguration
+    ) async throws -> Bool {
+        let deadline = completedAt.advanced(by: .seconds(20))
+        while isDisplaying(key.source), selected == configuration {
+            if let reading = watcher.reading(for: configuration),
+                reading.startedAt >= completedAt,
+                reading.state?.guests.first(where: { $0.id == key.guestID })?.status == expected
+            {
+                return true
+            }
+            guard ContinuousClock.now < deadline else { break }
+            try await Task.sleep(for: .seconds(1))
+        }
+        return false
+    }
+
+    func dismissNotice(for guest: ProxmoxGuest, from source: Source) {
+        guard isDisplaying(source) else { return }
+        notices[guest.id] = nil
     }
 }
