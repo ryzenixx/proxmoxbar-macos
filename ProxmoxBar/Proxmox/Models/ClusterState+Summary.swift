@@ -29,14 +29,14 @@ extension ClusterState {
     }
 
     var storage: ClusterCapacity? {
-        var countedShared: Set<String> = []
         var used = 0
         var total = 0
 
-        for storage in storages where !storage.isUnavailable {
-            guard let capacity = storage.total, capacity > 0 else { continue }
-            if storage.isShared, !countedShared.insert(storage.name).inserted { continue }
-            used += storage.used ?? 0
+        for storage in distinctStorages where storage.isAvailable {
+            guard let capacity = storage.total, capacity > 0, let occupied = storage.used else {
+                continue
+            }
+            used += occupied
             total += capacity
         }
 
@@ -45,17 +45,14 @@ extension ClusterState {
     }
 
     var distinctStorages: [ProxmoxStorage] {
+        let ordered = storages.sorted { lhs, rhs in
+            if lhs.isAvailable != rhs.isAvailable { return lhs.isAvailable }
+            let nameOrder = lhs.name.localizedCaseInsensitiveCompare(rhs.name)
+            if nameOrder != .orderedSame { return nameOrder == .orderedAscending }
+            return (lhs.usage ?? -1) > (rhs.usage ?? -1)
+        }
+
         var seenShared: Set<String> = []
-        var result: [ProxmoxStorage] = []
-
-        for storage in storages {
-            if storage.isShared, !seenShared.insert(storage.name).inserted { continue }
-            result.append(storage)
-        }
-
-        return result.sorted { lhs, rhs in
-            if lhs.isUnavailable != rhs.isUnavailable { return rhs.isUnavailable }
-            return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
-        }
+        return ordered.filter { !$0.isShared || seenShared.insert($0.name).inserted }
     }
 }

@@ -26,21 +26,14 @@ struct ProxmoxGuest: Identifiable, Hashable, Sendable {
         return name
     }
 
-    var isLocked: Bool {
-        guard let lock else { return false }
-        return lock.isEmpty == false
-    }
-
-    var acceptsPowerActions: Bool {
-        isTemplate == false && isLocked == false
-    }
-
     var availableActions: [GuestAction] {
-        guard acceptsPowerActions else { return [] }
+        guard !isTemplate else { return [] }
+        guard (lock?.isEmpty ?? true) || status == .suspendedToDisk else { return [] }
         switch status {
         case .running: return [.shutdown, .reboot, .stop]
         case .stopped: return [.start]
         case .paused, .suspended: return [.resume, .stop]
+        case .suspendedToDisk: return [.resume]
         case .unknown: return []
         }
     }

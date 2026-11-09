@@ -133,7 +133,7 @@ enum DemoCluster {
             id: "storage/\(name)",
             name: name,
             node: node,
-            status: "available",
+            availability: .available,
             used: used,
             total: total,
             content: ["images", "rootdir"],

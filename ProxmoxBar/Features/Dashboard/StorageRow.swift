@@ -26,14 +26,14 @@ struct StorageRow: View {
                 metadata
             }
             Spacer(minLength: 8)
-            if !storage.isUnavailable, let percentage = percentageText {
+            if let percentage = percentageText {
                 Text(percentage)
                     .font(.caption)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
             }
         }
-        .opacity(storage.isUnavailable ? 0.6 : 1)
+        .opacity(storage.isAvailable ? 1 : 0.6)
         .padding(.horizontal, 16)
         .padding(.vertical, 5)
         .background(isHovered ? Color.primary.opacity(0.06) : .clear)
@@ -44,8 +44,8 @@ struct StorageRow: View {
 
     @ViewBuilder
     private var metadata: some View {
-        if storage.isUnavailable {
-            Text("Unavailable")
+        if let message = storage.availability.message {
+            Text(message)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         } else {
@@ -84,8 +84,8 @@ struct StorageRow: View {
     }
 
     private var spoken: String {
-        if storage.isUnavailable {
-            return "\(storage.name), unavailable"
+        if let message = storage.availability.message {
+            return "\(storage.name), \(message)"
         }
         var parts = [storage.name]
         if let percentage = percentageText { parts.append(percentage) }

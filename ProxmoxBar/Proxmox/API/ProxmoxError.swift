@@ -11,6 +11,7 @@ enum ProxmoxError: Error, Hashable, Sendable {
     case transport(String)
     case decoding(String)
     case taskFailed(String)
+    case taskStatusUnconfirmed
     case timedOut
 }
 
@@ -43,6 +44,8 @@ extension ProxmoxError: LocalizedError {
             "The server's answer could not be read: \(reason)"
         case .taskFailed(let reason):
             reason
+        case .taskStatusUnconfirmed:
+            "The command was accepted, but Proxmox did not confirm the task result in time."
         case .timedOut:
             "The server did not answer in time."
         }

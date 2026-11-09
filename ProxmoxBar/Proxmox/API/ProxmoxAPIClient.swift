@@ -3,7 +3,8 @@ import Foundation
 struct ProxmoxAPIClient: ProxmoxAPI {
     private enum Limits {
         static let taskPollInterval: Duration = .seconds(1)
-        static let taskPollAttempts = 30
+        // Proxmox allows 60 seconds for a clean shutdown by default.
+        static let taskTimeout: Duration = .seconds(90)
     }
 
     private let transport: ProxmoxHTTPTransport
@@ -33,7 +34,7 @@ struct ProxmoxAPIClient: ProxmoxAPI {
         _ action: GuestAction,
         on guest: ProxmoxGuest,
         of server: ProxmoxServer
-    ) async throws {
+    ) async throws -> TaskCompletion {
         let upid: String = try await transport.request(
             [
                 "nodes", guest.node, guest.kind.pathComponent, String(guest.vmid),
@@ -42,26 +43,34 @@ struct ProxmoxAPIClient: ProxmoxAPI {
             method: .post,
             from: server
         )
-        try await waitForTask(upid, on: guest.node, of: server)
+        return try await waitForTask(upid, of: server)
     }
 
-    private func waitForTask(
-        _ upid: String,
-        on node: String,
-        of server: ProxmoxServer
-    ) async throws {
-        let segments = ["nodes", node, "tasks", upid, "status"]
+    private func waitForTask(_ upid: String, of server: ProxmoxServer) async throws
+        -> TaskCompletion
+    {
+        let parts = upid.split(separator: ":", maxSplits: 2, omittingEmptySubsequences: false)
+        guard parts.count == 3, parts[0] == "UPID", !parts[1].isEmpty, !parts[2].isEmpty else {
+            throw ProxmoxError.taskStatusUnconfirmed
+        }
+        let segments = ["nodes", String(parts[1]), "tasks", upid, "status"]
+        let deadline = ContinuousClock.now.advanced(by: Limits.taskTimeout)
 
-        for _ in 0..<Limits.taskPollAttempts {
-            let status: TaskStatusPayload = try await transport.request(segments, from: server)
-            if status.isFinished {
-                guard status.succeeded else {
-                    throw ProxmoxError.taskFailed(status.exitstatus ?? "The task failed.")
+        while ContinuousClock.now < deadline {
+            try Task.checkCancellation()
+            do {
+                let status: TaskStatusPayload = try await transport.request(segments, from: server)
+                if let completion = try status.completion() { return completion }
+            } catch let error as ProxmoxError {
+                switch error {
+                case .timedOut, .transport, .httpError(status: 502...504, reason: _):
+                    break
+                default:
+                    throw error
                 }
-                return
             }
             try await Task.sleep(for: Limits.taskPollInterval)
         }
-        throw ProxmoxError.timedOut
+        throw ProxmoxError.taskStatusUnconfirmed
     }
 }

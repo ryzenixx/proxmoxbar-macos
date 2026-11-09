@@ -33,11 +33,17 @@ struct TaskStatusPayload: Decodable, Sendable {
     let status: String
     let exitstatus: String?
 
-    var isFinished: Bool {
-        status.lowercased() == "stopped"
-    }
-
-    var succeeded: Bool {
-        exitstatus?.uppercased() == "OK"
+    func completion() throws -> TaskCompletion? {
+        guard status.lowercased() == "stopped", let exitstatus, !exitstatus.isEmpty else {
+            return nil
+        }
+        if exitstatus.uppercased() == "OK" { return .succeeded }
+        let prefix = "WARNINGS: "
+        if exitstatus.hasPrefix(prefix), let count = Int(exitstatus.dropFirst(prefix.count)),
+            count > 0
+        {
+            return .warnings(count)
+        }
+        throw ProxmoxError.taskFailed(exitstatus)
     }
 }

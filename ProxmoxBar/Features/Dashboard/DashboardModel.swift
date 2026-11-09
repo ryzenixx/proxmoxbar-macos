@@ -28,11 +28,18 @@ final class DashboardModel {
 
     enum ActionNotice: Equatable {
         case failed(String)
+        case taskUnconfirmed
+        case taskWarnings(Int)
         case stateUnconfirmed
 
         var message: String {
             switch self {
             case .failed(let message): message
+            case .taskUnconfirmed: ProxmoxError.taskStatusUnconfirmed.localizedDescription
+            case .taskWarnings(let count):
+                count == 1
+                    ? "The task completed with one warning in Proxmox."
+                    : "The task completed with \(count) warnings in Proxmox."
             case .stateUnconfirmed:
                 "The task completed, but the machine’s new state could not be confirmed."
             }
@@ -167,33 +174,64 @@ final class DashboardModel {
             return
         }
         notices[guest.id] = nil
-        watcher.recordUserAction(server: target, guestID: guest.id)
 
         do {
             guard let server = try store.server(for: target) else {
                 notices[guest.id] = .failed("This server has no token yet.")
                 return
             }
-            try await api.perform(action, on: guest, of: server)
+            let cluster = try await api.clusterState(of: server)
+            guard !Task.isCancelled, isDisplaying(source), selected == configuration else {
+                return
+            }
+            guard
+                let currentGuest = cluster.guests.first(where: {
+                    $0.id == guest.id && $0.vmid == guest.vmid && $0.kind == guest.kind
+                })
+            else {
+                notices[guest.id] = .failed("This machine is no longer visible on this server.")
+                await watcher.refresh(configuration)
+                return
+            }
+            guard currentGuest.availableActions.contains(action) else {
+                notices[guest.id] = .failed("This action is no longer available for this machine.")
+                await watcher.refresh(configuration)
+                return
+            }
+            watcher.recordUserAction(server: target, guestID: guest.id)
+            let completion = try await api.perform(action, on: currentGuest, of: server)
             let completedAt = ContinuousClock.now
-            guard isDisplaying(source) else { return }
+            watcher.recordUserAction(server: target, guestID: guest.id)
+            guard isDisplaying(source), selected == configuration else { return }
+
+            let confirmed: Bool
             if let expected = action.settledStatus {
                 runningActions[key] = .confirmingState
                 await watcher.refresh(configuration)
-                let confirmed = try await confirm(
-                    expected, for: key, since: completedAt, on: configuration
+                let timeout: Duration = currentGuest.haState == nil ? .seconds(20) : .seconds(90)
+                confirmed = try await confirm(
+                    expected, for: key, since: completedAt, timeout: timeout, on: configuration
                 )
-                if !confirmed, isDisplaying(source), selected == configuration {
-                    notices[guest.id] = .stateUnconfirmed
-                }
             } else {
                 await watcher.refresh(configuration)
+                confirmed = true
+            }
+            guard isDisplaying(source), selected == configuration else { return }
+            if !confirmed {
+                notices[guest.id] = .stateUnconfirmed
+            } else if case .warnings(let count) = completion {
+                notices[guest.id] = .taskWarnings(count)
             }
         } catch is CancellationError {
             return
         } catch {
             guard isDisplaying(source), selected == configuration else { return }
-            notices[guest.id] = .failed(error.localizedDescription)
+            notices[guest.id] =
+                if case ProxmoxError.taskStatusUnconfirmed = error {
+                    .taskUnconfirmed
+                } else {
+                    .failed(error.localizedDescription)
+                }
             await watcher.refresh(configuration)
         }
     }
@@ -202,9 +240,10 @@ final class DashboardModel {
         _ expected: GuestStatus,
         for key: ActionKey,
         since completedAt: ContinuousClock.Instant,
+        timeout: Duration,
         on configuration: ServerConfiguration
     ) async throws -> Bool {
-        let deadline = completedAt.advanced(by: .seconds(20))
+        let deadline = completedAt.advanced(by: timeout)
         while isDisplaying(key.source), selected == configuration {
             if let reading = watcher.reading(for: configuration),
                 reading.startedAt >= completedAt,

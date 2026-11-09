@@ -155,8 +155,10 @@ struct GuestRow: View {
     }
 
     private var noticeTint: Color {
-        if case .stateUnconfirmed = notice { return .orange }
-        return .red
+        switch notice {
+        case .taskUnconfirmed, .taskWarnings, .stateUnconfirmed: .orange
+        case .failed, nil: .red
+        }
     }
 
     private var isDimmed: Bool {
@@ -196,7 +198,7 @@ struct GuestRow: View {
         guard !guest.isTemplate else { return .secondary }
         switch guest.status {
         case .running: return .green
-        case .paused, .suspended: return .orange
+        case .paused, .suspended, .suspendedToDisk: return .orange
         case .stopped, .unknown: return .secondary
         }
     }

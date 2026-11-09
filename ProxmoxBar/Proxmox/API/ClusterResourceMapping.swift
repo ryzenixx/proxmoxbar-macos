@@ -5,16 +5,16 @@ extension ClusterState {
         var storages: [ProxmoxStorage] = []
 
         for resource in resources {
-            switch resource.type {
-            case .node:
+            switch resource {
+            case .node(let resource):
                 guard let node = ProxmoxNode(resource: resource) else { continue }
                 nodes.append(node)
-            case .qemu, .lxc:
-                guard let guest = ProxmoxGuest(resource: resource) else { continue }
+            case .guest(let kind, let resource):
+                guard let guest = ProxmoxGuest(resource: resource, kind: kind) else { continue }
                 guests.append(guest)
-            case .storage:
+            case .storage(let resource):
                 storages.append(ProxmoxStorage(resource: resource))
-            case .pool, .openvz, .sdn, .network:
+            case .ignored:
                 continue
             }
         }
@@ -22,15 +22,13 @@ extension ClusterState {
         self.init(
             nodes: nodes.sorted { $0.name < $1.name },
             guests: guests.sorted { $0.vmid < $1.vmid },
-            storages: storages.sorted {
-                ($0.usage ?? 0, $1.name) > ($1.usage ?? 0, $0.name)
-            }
+            storages: storages
         )
     }
 }
 
 extension ProxmoxNode {
-    fileprivate init?(resource: ClusterResource) {
+    fileprivate init?(resource: ClusterResource.Payload) {
         guard let name = resource.node ?? resource.name else { return nil }
         self.init(
             id: resource.id,
@@ -50,11 +48,14 @@ extension ProxmoxNode {
 }
 
 extension ProxmoxGuest {
-    fileprivate init?(resource: ClusterResource) {
-        guard let vmid = resource.vmid,
-            let kind = GuestKind(rawValue: resource.type.rawValue),
-            let node = resource.node
-        else { return nil }
+    fileprivate init?(resource: ClusterResource.Payload, kind: GuestKind) {
+        guard let vmid = resource.vmid, let node = resource.node, !node.isEmpty else { return nil }
+        let status: GuestStatus =
+            if kind == .virtualMachine && resource.lock == "suspended" {
+                .suspendedToDisk
+            } else {
+                GuestStatus(rawValue: resource.status ?? "unknown")
+            }
 
         self.init(
             id: resource.id,
@@ -62,7 +63,7 @@ extension ProxmoxGuest {
             kind: kind,
             node: node,
             name: resource.name,
-            status: GuestStatus(rawValue: resource.status ?? "unknown"),
+            status: status,
             isTemplate: resource.template?.value ?? false,
             lock: resource.lock,
             tags: resource.tagList,
@@ -80,12 +81,12 @@ extension ProxmoxGuest {
 }
 
 extension ProxmoxStorage {
-    fileprivate init(resource: ClusterResource) {
+    fileprivate init(resource: ClusterResource.Payload) {
         self.init(
             id: resource.id,
             name: resource.storage ?? resource.name ?? resource.id,
             node: resource.node,
-            status: resource.status,
+            availability: .init(status: resource.status),
             used: resource.disk,
             total: resource.maxdisk,
             content: resource.contentList,

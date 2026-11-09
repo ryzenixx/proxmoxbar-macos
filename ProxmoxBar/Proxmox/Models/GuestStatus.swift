@@ -5,13 +5,14 @@ enum GuestStatus: Hashable, Sendable {
     case stopped
     case paused
     case suspended
+    case suspendedToDisk
     case unknown(String)
 
     init(rawValue: String) {
         switch rawValue.lowercased() {
         case "running": self = .running
         case "stopped": self = .stopped
-        case "paused": self = .paused
+        case "paused", "prelaunch": self = .paused
         case "suspended": self = .suspended
         default: self = .unknown(rawValue)
         }
@@ -26,7 +27,7 @@ enum GuestStatus: Hashable, Sendable {
         case .running: "Running"
         case .stopped: "Stopped"
         case .paused: "Paused"
-        case .suspended: "Suspended"
+        case .suspended, .suspendedToDisk: "Suspended"
         case .unknown(let raw): raw.capitalized
         }
     }
